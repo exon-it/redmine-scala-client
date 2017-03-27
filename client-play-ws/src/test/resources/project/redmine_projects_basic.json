@@ -1,0 +1,41 @@
+{
+  "projects": [
+    {
+      "id": 1,
+      "name": "Test1",
+      "identifier": "test1",
+      "description": "",
+      "status": 1,
+      "is_public": true,
+      "created_on": "2016-12-04T23:21:08Z",
+      "updated_on": "2016-12-04T23:21:08Z"
+    },
+    {
+      "id": 2,
+      "name": "test1 child1",
+      "identifier": "test1-child1",
+      "description": "",
+      "parent": {
+        "id": 1,
+        "name": "Test1"
+      },
+      "status": 1,
+      "is_public": true,
+      "created_on": "2016-12-04T23:25:25Z",
+      "updated_on": "2016-12-04T23:25:25Z"
+    },
+    {
+      "id": 3,
+      "name": "Test2",
+      "identifier": "test2",
+      "description": "",
+      "status": 1,
+      "is_public": true,
+      "created_on": "2016-12-04T23:25:50Z",
+      "updated_on": "2016-12-04T23:25:50Z"
+    }
+  ],
+  "total_count": 3,
+  "offset": 0,
+  "limit": 25
+}

@@ -1,3 +1,4 @@
+
 import com.atlassian.labs.gitstamp.GitStampPlugin._
 
 lazy val repo: Option[String] = sys.props.get("publishTo")
@@ -21,15 +22,28 @@ lazy val commonSettings = Seq(
   si2712,
   libraryDependencies ++= Dependencies.si2712(scalaVersion.value),
 
-  publishMavenStyle := true,
+  publishMavenStyle := false,
+  bintrayOrganization := Some("exon-it"),
+  bintrayRepository := "maven-releases",
+  bintrayReleaseOnPublish in ThisBuild := false,
+
   pomIncludeRepository := {_ => false},
-  publishTo := repo.map {r =>
-    if (isSnapshot.value) {
-       "snapshots" at r
-    } else {
-      "releases" at r
-    }
-  },
+  licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt")),
+  homepage := Some(url("https://github.com/exon-it/redmine-scala-client")),
+  scmInfo := Some(ScmInfo(
+    url("https://github.com/exon-it/redmine-scala-client"),
+    "scm:git:https://github.com/exon-it/redmine-scala-client.git",
+    Some("scm:git:git@github.com:exon-it/redmine-scala-client.git"))),
+  pomExtra := <developers>
+    <developer>
+      <id>antonov_i</id>
+      <name>Igor Antonov</name>
+      <email>antonov_i@exon-it.by</email>
+      <organization>Exon IT</organization>
+      <organizationUrl>http://exonit.by</organizationUrl>
+      <timezone>Europe/Minsk</timezone>
+    </developer>
+  </developers>,
   credentials ++= sys.props.get("credentialPath").map {cp =>
     cp.split(',').map {path => Credentials(file(path))}.toSeq
   } getOrElse Seq.empty
@@ -38,8 +52,10 @@ lazy val commonSettings = Seq(
 lazy val `client-api` = (project in file("client-api")).
   settings(commonSettings: _*).
   settings(
-    name := "client-api",
-    description := s"Redmine Scala Client API for Scala ${scalaBinaryVersion.value}",
+    name := s"client-api",
+    description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Client API. " +
+      s"Contains domain classes and API manager traits.",
+
     crossScalaVersions := Seq("2.11.8", "2.12.1"),
     libraryDependencies ++= Seq(
       Dependencies.monixEval,
@@ -58,8 +74,9 @@ lazy val `client-core` = (project in file("client-core")).
   dependsOn(`client-api`).
   settings(commonSettings: _*).
   settings(
-    name := "client-core",
-    description := s"Redmine Scala Client Core for Scala ${scalaBinaryVersion.value}",
+    name := s"client-core",
+    description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Client Core. " +
+      s"Contains API manager and JSON serialization implementation.",
     crossScalaVersions := Seq("2.11.8", "2.12.1"),
     libraryDependencies ++= Seq(
       Dependencies.catsFree,
@@ -80,8 +97,8 @@ lazy val `client-play-ws` = (project in file("client-play-ws")).
   dependsOn(`client-core`).
   settings(commonSettings: _*).
   settings(
-    name := "client-play-ws",
-    description := s"Redmine Scala Client Play-WS Implementation for Scala ${scalaBinaryVersion.value}",
+    name := s"client-play-ws",
+    description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Play-WS Web Client",
     libraryDependencies ++= Seq(
       Dependencies.playWs,
       Dependencies.slf4jJdk14 % Test,
@@ -95,8 +112,10 @@ lazy val `client-play-ws` = (project in file("client-play-ws")).
 lazy val `client-parent` = (project in file(".")).
   settings(commonSettings: _*).
   settings(
-    name := "client-parent",
-    description := s"Redmine Scala Client Parent for Scala ${scalaBinaryVersion.value}"
+    name := s"client-parent",
+    description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Parent POM. Used for grouping sub-projects.",
+    // Do not publish root project
+    publishArtifact := false
   ).
   aggregate(`client-api`, `client-core`, `client-play-ws`).
   enablePlugins(CrossPerProjectPlugin)

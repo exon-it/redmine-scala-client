@@ -1,0 +1,23 @@
+language: scala
+sudo: false
+jdk:
+- oraclejdk8
+
+script:
+- sbt ";+ test"
+
+addons:
+  apt:
+    packages:
+    - oracle-java8-installer
+env:
+  global:
+  - secure: UTzvRwqeIYINxxZ3qcCsaPJhm5dS2s2dbUG4JMqaVMDhtrSjdNDsW092bpUeSJWQ3Qs+84HkC78qMO61AebLfbVc9IteExKxhWOv+QCOTqt73gnoUer0COma7+GHg3yQWdTY79QwhBy2Jroh3g6penOaOE5dALGeWV15OLfEdtMs5Pg6y0RX8dhoc3Z5Rcj+k1upockZuet9w9hUqEWdMdQ6wDobhrZiKA7TNwNBf6gXUxh0vIpQWLhgGqYkHLz9vGEM5CrpdvJIDkqZGzunXLkX5ny1fwX+MsiVcbruU6nTfRFxK7UJ3uo+2jiH5vW7qF0SyQjBEnvvr8kBWnkM6owe31kPNsXo47HKorDA4fg1ubIZSjBLDsiDPCWugGKBhi1YYvI5CpTvQ1QCQ6D7P5MxLKRBTm/vcsndsmUCXIQohwJBn9Z7137GhioZMqa30aiFTqPZhtNP7SQIIWOgArUeRGdvZwNKMpl+w6gJDE+GLvMjnQp13YUQEdoNfU8cPaexGydAOvnFBtWShyp/w3rQIblxV1nlr/9dnOhe5wQ4BHEvgqekALz+lHumuesoYtzi6nZEiBzsEJgEmXpZLN/Fr43PmumGaU/X2LBlLkGbWp3dUSmEL3rhcxt44t34iJ/r8++goAqdoOfvxNBHjIo7ng/xRTp2SxcgW0ivOxY=
+  - secure: HuRwFiWjEU7g8BZRJWmsU7ZJ0ChV4SrM3eG/gnt8MqyfVO3WwCdaa1Q66LICJf074XX+9+EEChT3ym3jOEOLj1S1z2cGAz1y9TDw5L9/IomMbeu7oJXZBy77qJVakO+5by1KlPNe0XlAzaA5CRhnEiIGVo9DgQabWxcooOawbmy7fJ4m+/yB2Pjz9tkWNe5dx5u1LkIobS4GJ6penW34OGKfNc8dirWkaSCWDgtqc5Q5Cr/unl6SKssjZC3pCoxXeg5RTdCHkVqtd8KnZdoBMNtLoJ9rl2l/Nv8aB+X1n22p6C26NEiXexBhCX/VvP7F4P8oN8jaLP33ONmfrvW5w/gOOK4fRCbK6QsYb0X+2FS+S7ACPvOkWeVPFyd0i1PDNxTFO3oJxuyBJfZyxVPnWfLuRtewWR1vzSuMX86sbxW3yy+xkAN6hjwyk8JTYUf+ICBT/puw6iNj5UCA4lyyYhXVRklN4/XLy6hw5Nqvjd3MjHpSkXp1cPSqUYEqrX7sjR9Wq7p65n9P5X6RswnDw+9QQmFRTmdarvnDKNEwvDF6S2AuGcTCJIjOfXzWJ8565Ippi5D3RfuZZHonvATIfoi9HbdxLnbhS2KWKdrmIX5awMspRA+rdLQjfozsrU+/KVhNkVg16T4xQv7Uyg+LLTE2xcWosrLWhf/CwB4m7xU=
+
+after_success:
+  - >
+    test "${TRAVIS_PULL_REQUEST}" = 'false' &&
+    test "${TRAVIS_BRANCH}" = 'release' &&
+    sh "$TRAVIS_BUILD_DIR/.travis.credentials.sh" &&
+    sbt ';+publish'

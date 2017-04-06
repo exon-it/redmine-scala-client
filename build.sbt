@@ -22,7 +22,7 @@ lazy val commonSettings = Seq(
   si2712,
   libraryDependencies ++= Dependencies.si2712(scalaVersion.value),
 
-  publishMavenStyle := false,
+  publishMavenStyle := true,
   bintrayOrganization := Some("exon-it"),
   bintrayRepository := "maven-releases",
   bintrayReleaseOnPublish in ThisBuild := false,

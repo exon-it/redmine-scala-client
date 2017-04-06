@@ -15,14 +15,14 @@ lazy val commonSettings = Seq(
 
   startYear := Some(2015),
 
-  version := "4.0.0-RC1",
+  version := "4.0.0-RC2",
 
   scalaVersion := "2.11.8",
 
   si2712,
   libraryDependencies ++= Dependencies.si2712(scalaVersion.value),
 
-  publishMavenStyle := false,
+  publishMavenStyle := true,
   bintrayOrganization := Some("exon-it"),
   bintrayRepository := "maven-releases",
   bintrayReleaseOnPublish in ThisBuild := false,

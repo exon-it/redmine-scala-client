@@ -21,3 +21,20 @@ after_success:
     test "${TRAVIS_BRANCH}" = 'release' &&
     sh "$TRAVIS_BUILD_DIR/.travis.credentials.sh" &&
     sbt ';+publish'
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt
+
+before_cache:
+  # Cleanup the cached directories to avoid unnecessary cache updates
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
+  - find $HOME/.sbt        -name "*.lock"               -print -delete
+
+notifications:
+  email:
+    recipients:
+      - secure: "e567pZmW8L8OE3+FkdzJdrTCYY2rnDB4gsEOUcu+J5WpianGhsrvnuw9lTdDj6ETtqIPMYNWCQZRdN9xp/nl/J+4MJkOkmN7mSwu9ZO0UOnwlBBVUc2X0pT7lf25EUOXprs/BYnpTOluk5RKmWUum5ytbCu9DDl+YGoDGkwCidunwXIpw3qPnBwsVkUgIemZc68jQqnZeXji3cjaOHXxnu3EKcOlPTkR/bnuIhCRNILe1NPW+Q8PJtDbX8u71aDv+TgUF30F4K3Rmm/9yye4kHdydFE6hTe0v4Xv3n+KNriWDvGya7en84nPUoerc7ws4FNryep88tYTD0Zoh4PQMwUV51ZZ/C4g65DWWaIgyaz1PbvJMtH5fstRMLveZKnJJbifs9KXPhoz020IJgZdcasQcpkQm0cep2o2GpN4P0KxgrI3wCYWq9859t0eg48gNa45UtLTWRZPeBTUy7ipX+U7miaXkemXKiKd0nBnwy1s7mWWlbi5unwzo6HZVx04YuZ55uqNQWXANePKFCyyVzRosPn8TOdnh/fLhv10flWZ9yeEZg7KpAOBVkq9/1Uw9ve3N6OXab9JXljyoOndXwU61JQ4XC/hoMzhqF3abOa4y6VDH2LULrsEMOigrzUvWUK7jFAAlgtPjdwzpMmzZKL3ICJlbjhmXJXBXNAGUtE="
+      - secure: "L+LogCiW03C/i9slPVZVY1U1Yo3o5SMSI/8pANqEdD0hght1IGAXhQ835l1TcA5yu+BlLbFKQlZOCKCckJBhU/D1qvrSdj1S0nvoxIBj3AaAkbMNIDvXtWOkIjymZSVpoySsz+5wMnW2euNS3ykNAoK8uuFXUC5cXz+Vo19HXC2LY3XKdDVq0HYjOYyyPTaKRXPtYDq50XBQs7UDOOo19DQxY1JNupA2B/2q5XvXMBQaAZVnlsw+OqOOqy1KItwteOg1MrIXRgsE66ovwBS7CvWmE9oFzIhhBvnfof9ZY7ua8KVTlo/FwdBBmvzzD1Ed4UsU/RJeuDnlvAlKRfgYClUjyqrw/iG/BShVVUcba9vmtx+N8E9PgsWnAyLDFnr9Ve1dtlCwCGn08illvTIZPehpd/8C+5uxI0uMZol5pWhT7VvmraQNl2zuxmqArO0Pp0gYj/w8OsCA9uuig5ia6KrCvbM3/rr996qjb9h1NMfzE1uU7RwI7Ewt+SO8R23nyhEFI5E3XQN3LTL81LLEn/IaQqyqvhRLATDqcSeiscIv0Etaw1VNlmPylcnEMT/56AvL5Z861no/sYwN7gWNNqybuU0ImVR6/sBBgS1G7wwkVNWC91hUHcyLsrXkcPYrwiepPMLYRVgWC8MTRu7ZB4EjVK5yh9lpl3Gx9zkAonw="
+    on_success: always

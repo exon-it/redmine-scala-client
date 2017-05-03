@@ -374,6 +374,11 @@ object Issue {
      * Uploads to attach to issue
      */
     val uploads = new FluentSettableField[Set[Upload], Update](this)
+
+    /**
+      * Parent issue
+      */
+    val parentIssue = new FluentSettableField[Option[IssueIdLike], Update](this)
   }
 
 }

@@ -137,7 +137,8 @@ object IssueSerializers {
         ("uploads" -> u.uploads.toOpt.map(_.map(Extraction.decompose))) ~
         ("notes" -> u.notes.toOpt.map(_.message).map(Extraction.decompose)) ~
         ("private_notes" -> u.notes.toOpt.map(_.isPrivate)) ~
-        ("author_id" -> u.author.toOpt.map(_.id))
+        ("author_id" -> u.author.toOpt.map(_.id)) ~
+        ("parent_issue_id" -> u.parentIssue.toOpt.map(_.map(_.id).map(Extraction.decompose).getOrElse(JNull)))
   }
 
   object issueUpdateSerializer extends CustomSerializer[Issue.Update](

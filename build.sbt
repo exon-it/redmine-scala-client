@@ -17,10 +17,7 @@ lazy val commonSettings = Seq(
 
   version := "4.0.0-SNAPSHOT",
 
-  scalaVersion := "2.11.8",
-
-  si2712,
-  libraryDependencies ++= Dependencies.si2712(scalaVersion.value),
+  scalaVersion := "2.11.11",
 
   publishMavenStyle := true,
   bintrayOrganization := Some("exon-it"),
@@ -55,8 +52,7 @@ lazy val `client-api` = (project in file("client-api")).
     name := s"client-api",
     description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Client API. " +
       s"Contains domain classes and API manager traits.",
-
-    crossScalaVersions := Seq("2.11.8", "2.12.1"),
+    crossScalaVersions := Seq("2.11.11", "2.12.2"),
     libraryDependencies ++= Seq(
       Dependencies.monixEval,
       Dependencies.catsFree,
@@ -77,7 +73,7 @@ lazy val `client-core` = (project in file("client-core")).
     name := s"client-core",
     description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Client Core. " +
       s"Contains API manager and JSON serialization implementation.",
-    crossScalaVersions := Seq("2.11.8", "2.12.1"),
+    crossScalaVersions := Seq("2.11.11", "2.12.2"),
     libraryDependencies ++= Seq(
       Dependencies.catsFree,
       Dependencies.jodaTime,
@@ -99,6 +95,7 @@ lazy val `client-play-ws` = (project in file("client-play-ws")).
   settings(
     name := s"client-play-ws",
     description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Play-WS Web Client",
+    crossScalaVersions := Seq("2.11.11"),
     libraryDependencies ++= Seq(
       Dependencies.playWs,
       Dependencies.slf4jJdk14 % Test,

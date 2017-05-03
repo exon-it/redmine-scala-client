@@ -16,11 +16,4 @@ object Dependencies {
   val catsFree        : ModuleID = "org.typelevel" %% "cats-free" % "0.9.0"
   val scalaArm        : ModuleID = "com.jsuereth" %% "scala-arm" % "2.0"
   val monixEval       : ModuleID = "io.monix" %% "monix-eval" % "2.2.4"
-
-
-  def si2712(scalaVersion: String): Seq[ModuleID] =
-    if (CrossVersion.partialVersion(scalaVersion).exists(_._2 < 12))
-      Seq(compilerPlugin("com.milessabin" % ("si2712fix-plugin_"+scalaVersion) % "1.2.0"))
-    else
-      Seq()
 }

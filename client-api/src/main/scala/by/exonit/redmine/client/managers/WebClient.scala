@@ -29,7 +29,6 @@ object WebClient {
   object Constants {
     lazy val ApiKeyQueryParameterName = "key"
     lazy val ContentTypeHeader        = "Content-Type"
-    lazy val StatusOk                 = 200
   }
 
   object RequestDSL {

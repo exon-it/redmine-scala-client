@@ -279,19 +279,22 @@ class RequestManagerImpl(
     client.execute(req, responseHandler)
   }
 
+  protected def statusCodeIsSuccessful(status: Int): Boolean =
+    status / 100 == 2
+
   protected def checkResponseOk(): Response[Unit] =
     for {
       status <- ResponseDSL.getStatusCode
       statusText <- ResponseDSL.getStatusText
     } yield {
-      if (status != WebClient.Constants.StatusOk) throw ResponseStatusException(status, Some(statusText))
+      if (!statusCodeIsSuccessful(status)) throw ResponseStatusException(status, Some(statusText))
     }
 
   protected def checkStreamingResponseOk(): StreamingResponse[Unit] =
     for {
       status <- StreamingResponseDSL.getStatusCode
     } yield {
-      if (status != WebClient.Constants.StatusOk) throw ResponseStatusException(status, None)
+      if (!statusCodeIsSuccessful(status)) throw ResponseStatusException(status, None)
     }
 
   def copy(

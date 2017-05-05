@@ -164,7 +164,8 @@ object IssueSerializers {
         ("custom_fields" -> i.customFields.toOpt.map(_.map(Extraction.decompose))) ~
         ("uploads" -> i.uploads.toOpt.map(_.map(Extraction.decompose))) ~
         ("author_id" -> i.author.toOpt.map(_.id)) ~
-        ("parent_issue_id" -> i.parentIssue.toOpt.map(_.id))
+        ("parent_issue_id" -> i.parentIssue.toOpt.map(_.id)) ~
+        ("assigned_to_id" -> i.assignee.toOpt.map(_.id))
   }
 
   object newIssueSerializer extends CustomSerializer[Issue.New](

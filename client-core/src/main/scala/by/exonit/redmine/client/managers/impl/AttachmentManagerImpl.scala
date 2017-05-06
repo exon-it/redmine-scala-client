@@ -81,6 +81,7 @@ class AttachmentManagerImpl(requestManager: RequestManager) extends AttachmentMa
   def downloadAttachment(attachment: Attachment): Task[Array[Byte]] = {
     val request = for {
       _ <- RequestDSL.setUrl(attachment.contentUrl)
+      _ <- requestManager.authenticateRequest()
     } yield ()
     requestManager.downloadToByteArray(request)
   }
@@ -88,6 +89,7 @@ class AttachmentManagerImpl(requestManager: RequestManager) extends AttachmentMa
   def downloadAttachmentStreaming(attachment: Attachment, outputStreamProvider: () => OutputStream): Task[Task[Unit]] = {
     val request = for {
       _ <- RequestDSL.setUrl(attachment.contentUrl)
+      _ <- requestManager.authenticateRequest()
     } yield ()
     requestManager.downloadToStream(request, outputStreamProvider)
   }

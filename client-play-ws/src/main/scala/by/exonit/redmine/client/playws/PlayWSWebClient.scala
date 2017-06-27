@@ -33,13 +33,11 @@ import play.api.libs.ws.ahc.{AhcWSClient, AhcWSClientConfig, AhcWSRequest}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class PlayWSWebClient(
-  actorSystemName: String = "default"
-)
+class PlayWSWebClient(  actorSystemName: String = "default")
   (implicit clientConfig: AhcWSClientConfig = AhcWSClientConfig(), ec: ExecutionContext = ExecutionContext.global)
   extends WebClient {
 
-  import Implicits._
+  import by.exonit.redmine.client.playws.Implicits._
 
   implicit val actorSystem  = ActorSystem(actorSystemName, defaultExecutionContext = Some(ec))
   implicit val materializer = ActorMaterializer()

@@ -3,11 +3,6 @@ import com.atlassian.labs.gitstamp.GitStampPlugin._
 
 lazy val repo: Option[String] = sys.props.get("publishTo")
 
-lazy val si2712 =
-  scalacOptions ++=
-    (if (CrossVersion.partialVersion(scalaVersion.value).exists(_._2 >= 12)) Seq("-Ypartial-unification")
-    else Seq())
-
 lazy val commonSettings = Seq(
   organization := "by.exonit.redmine.client",
   organizationName := "Exon IT",
@@ -18,6 +13,8 @@ lazy val commonSettings = Seq(
   version := "4.0.0-SNAPSHOT",
 
   scalaVersion := "2.11.11",
+
+  addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.4" cross CrossVersion.binary),
 
   publishMavenStyle := true,
   bintrayOrganization := Some("exon-it"),
@@ -97,7 +94,24 @@ lazy val `client-play-ws` = (project in file("client-play-ws")).
     description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Play-WS Web Client",
     crossScalaVersions := Seq("2.11.11"),
     libraryDependencies ++= Seq(
-      Dependencies.playWs,
+      Dependencies.play25Ws,
+      Dependencies.slf4jJdk14 % Test,
+      Dependencies.junit % Test,
+      Dependencies.scalatest % Test,
+      Dependencies.restClientDriver % Test,
+      Dependencies.scalaArm % Test
+    )
+  )
+
+lazy val `client-play-ws-standalone` = (project in file("client-play-ws-standalone")).
+  dependsOn(`client-core`).
+  settings(commonSettings: _*).
+  settings(
+    name := s"client-play-ws-standalone",
+    description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Play-WS Standalone Web Client",
+    crossScalaVersions := Seq("2.11.11", "2.12.2"),
+    libraryDependencies ++= Seq(
+      Dependencies.playWsStandalone,
       Dependencies.slf4jJdk14 % Test,
       Dependencies.junit % Test,
       Dependencies.scalatest % Test,
@@ -114,6 +128,6 @@ lazy val `client-parent` = (project in file(".")).
     // Do not publish root project
     publishArtifact := false
   ).
-  aggregate(`client-api`, `client-core`, `client-play-ws`).
+  aggregate(`client-api`, `client-core`, `client-play-ws`, `client-play-ws-standalone`).
   enablePlugins(CrossPerProjectPlugin)
 

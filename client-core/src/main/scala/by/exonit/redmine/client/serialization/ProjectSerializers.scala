@@ -18,11 +18,14 @@ package by.exonit.redmine.client.serialization
 
 import by.exonit.redmine.client._
 import org.json4s._
+import org.json4s.JsonAST.JValue
 import org.json4s.JsonDSL._
 
 import scala.collection.immutable._
 
 object ProjectSerializers {
+  import Implicits._
+
   lazy val all: Seq[Serializer[_]] = Seq(
     projectIdSerializer, projectLinkSerializer, projectSerializer, newProjectSerializer, projectUpdateSerializer)
 
@@ -82,14 +85,14 @@ object ProjectSerializers {
     case p: Project.New =>
       ("name" -> p.name) ~
         ("identifier" -> p.identifier) ~
-        ("description" -> p.description.toOpt) ~
-        ("homepage" -> p.homepage.toOpt) ~
-        ("is_public" -> p.isPublic.toOpt) ~
-        ("parent_id" -> p.parent.toOpt.map(_.id)) ~
-        ("inherit_members" -> p.inheritMembers.toOpt) ~
-        ("tracker_ids" -> p.trackers.toOpt.map(_.map(_.id))) ~
-        ("enabled_module_names" -> p.enabledModuleNames.toOpt) ~
-        ("custom_fields" -> p.customFields.toOpt.map(_.map(Extraction.decompose)))
+        ("description" -> p.description) ~
+        ("homepage" -> p.homepage) ~
+        ("is_public" -> p.isPublic) ~
+        ("parent_id" -> p.parent.map(_.id)) ~
+        ("inherit_members" -> p.inheritMembers) ~
+        ("tracker_ids" -> p.trackers.map(_.map(_.id))) ~
+        ("enabled_module_names" -> p.enabledModuleNames) ~
+        ("custom_fields" -> p.customFields.map(_.map(Extraction.decompose)))
   }
 
   object newProjectSerializer
@@ -99,16 +102,16 @@ object ProjectSerializers {
 
   def serializeProjectUpdate(implicit formats: Formats): PartialFunction[Any, JValue] = {
     case p: Project.Update =>
-      ("name" -> p.name.toOpt) ~
-        ("description" -> p.description.toOpt.map(_.map(Extraction.decompose).getOrElse(JNull)).getOrElse(JNothing)) ~
-        ("homepage" -> p.homepage.toOpt.map(_.map(Extraction.decompose).getOrElse(JNull)).getOrElse(JNothing)) ~
-        ("is_public" -> p.isPublic.toOpt) ~
+      ("name" -> p.name) ~
+        ("description" -> p.description.map(_.map(Extraction.decompose).orJNull)) ~
+        ("homepage" -> p.homepage.map(_.map(Extraction.decompose).orJNull)) ~
+        ("is_public" -> p.isPublic.orJNothing) ~
         ("parent_id" ->
-          p.parent.toOpt.map(_.map(v => Extraction.decompose(v.id.toString())).getOrElse(JNull)).getOrElse(JNothing)) ~
-        ("inherit_members" -> p.inheritMembers.toOpt) ~
-        ("tracker_ids" -> p.trackers.toOpt.map(_.map(Extraction.decompose))) ~
-        ("enabled_module_names" -> p.enabledModuleNames.toOpt.map(_.map(Extraction.decompose))) ~
-        ("custom_fields" -> p.customFields.toOpt.map(_.map(Extraction.decompose)))
+          p.parent.map(_.map(v => Extraction.decompose(v.id.toString())).orJNull)) ~
+        ("inherit_members" -> p.inheritMembers) ~
+        ("tracker_ids" -> p.trackers.map(_.map(Extraction.decompose))) ~
+        ("enabled_module_names" -> p.enabledModuleNames.map(_.map(Extraction.decompose))) ~
+        ("custom_fields" -> p.customFields.map(_.map(Extraction.decompose)))
   }
 
   object projectUpdateSerializer

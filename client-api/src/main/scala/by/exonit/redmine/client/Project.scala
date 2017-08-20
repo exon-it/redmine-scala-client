@@ -26,52 +26,50 @@ case class ProjectId(id: BigInt) extends ProjectIdLike
 
 case class ProjectLink(id: BigInt, name: String) extends ProjectIdLike
 
-case class Project(id: BigInt,
-                   identifier: String,
-                   parent: Option[ProjectLink],
-                   name: String,
-                   description: Option[String],
-                   homepage: Option[String],
-                   createdOn: DateTime,
-                   updatedOn: DateTime,
-                   isPublic: Option[Boolean],
-                   customFields: Option[Set[CustomField]],
-                   trackers: Option[Set[TrackerLink]],
-                   issueCategories: Option[Set[CategoryLink]],
-                   enabledModules: Option[Set[ModuleLink]]) extends ProjectIdLike with OptionalCustomFieldSet
+case class Project(
+  id: BigInt,
+  identifier: String,
+  parent: Option[ProjectLink],
+  name: String,
+  description: Option[String],
+  homepage: Option[String],
+  createdOn: DateTime,
+  updatedOn: DateTime,
+  isPublic: Option[Boolean],
+  customFields: Option[Set[CustomField]],
+  trackers: Option[Set[TrackerLink]],
+  issueCategories: Option[Set[CategoryLink]],
+  enabledModules: Option[Set[ModuleLink]]
+) extends ProjectIdLike with OptionalCustomFieldSet
 
 object Project {
 
+  case class New(
+    name: String,
+    identifier: String,
+    description: Option[String] = None,
+    homepage: Option[String] = None,
+    isPublic: Option[Boolean] = None,
+    parent: Option[ProjectIdLike] = None,
+    inheritMembers: Option[Boolean] = None,
+    trackers: Option[Set[TrackerIdLike]] = None,
+    enabledModuleNames: Option[Set[String]] = None,
+    customFields: Option[Set[CustomField.Update]] = None
+  )
+
+  case class Update(
+    name: Option[String] = None,
+    description: Option[Option[String]] = None,
+    homepage: Option[Option[String]] = None,
+    isPublic: Option[Boolean] = None,
+    parent: Option[Option[ProjectIdLike]] = None,
+    inheritMembers: Option[Boolean] = None,
+    trackers: Option[Set[TrackerIdLike]] = None,
+    enabledModuleNames: Option[Set[String]] = None,
+    customFields: Option[Set[CustomField.Update]] = None
+  )
+
   sealed abstract class Include(val token: String)
-
-  object New {
-    def apply(name: String, identifier: String) = new New(name, identifier)
-  }
-  class New(val name: String, val identifier: String) extends CustomFieldUpdateSetFSF[New] {
-    val description = new FluentSettableField[String, New](this)
-    val homepage = new FluentSettableField[String, New](this)
-    val isPublic = new FluentSettableField[Boolean, New](this)
-    val parent = new FluentSettableField[ProjectId, New](this)
-    val inheritMembers = new FluentSettableField[Boolean, New](this)
-
-    val trackers = new FluentSettableField[Set[TrackerId], New](this)
-    val enabledModuleNames = new FluentSettableField[Set[String], New](this)
-  }
-
-  object Update {
-    def apply() = new Update
-  }
-  class Update extends CustomFieldUpdateSetFSF[Update] {
-    val name = new FluentSettableField[String, Update](this)
-    val description = new FluentSettableField[Option[String], Update](this)
-    val homepage = new FluentSettableField[Option[String], Update](this)
-    val isPublic = new FluentSettableField[Boolean, Update](this)
-    val parent = new FluentSettableField[Option[ProjectId], Update](this)
-    val inheritMembers = new FluentSettableField[Boolean, Update](this)
-
-    val trackers = new FluentSettableField[Set[TrackerId], Update](this)
-    val enabledModuleNames = new FluentSettableField[Set[String], Update](this)
-  }
 
   object Include {
 

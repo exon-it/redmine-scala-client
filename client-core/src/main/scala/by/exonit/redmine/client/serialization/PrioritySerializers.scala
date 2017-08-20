@@ -26,28 +26,28 @@ object PrioritySerializers {
   lazy val all: immutable.Seq[Serializer[_]] = immutable.Seq(
     priorityIdSerializer, priorityLinkSerializer, prioritySerializer)
 
-  def deserializePriorityId(implicit formats: Formats): PartialFunction[JValue, PriorityId] = {
+  def deserializePriorityId: PartialFunction[JValue, PriorityId] = {
     case JInt(id) => PriorityId(id)
   }
 
-  def serializePriorityId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializePriorityId: PartialFunction[Any, JValue] = {
     case PriorityId(id) => JInt(id)
   }
 
   object priorityIdSerializer extends CustomSerializer[PriorityId](
-    formats => deserializePriorityId(formats) -> serializePriorityId(formats))
+    _ => deserializePriorityId -> serializePriorityId)
 
   def deserializePriorityLink(implicit formats: Formats): PartialFunction[JValue, PriorityLink] = {
     case j: JObject =>
       PriorityLink((j \ "id").extract[BigInt], (j \ "name").extract[String])
   }
 
-  def serializePriorityLink(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializePriorityLink: PartialFunction[Any, JValue] = {
     case PriorityLink(id, name) => ("id" -> id) ~ ("name" -> name)
   }
 
   object priorityLinkSerializer extends CustomSerializer[PriorityLink](
-    formats => deserializePriorityLink(formats) -> serializePriorityLink(formats))
+    formats => deserializePriorityLink(formats) -> serializePriorityLink)
 
   def deserializePriority(implicit formats: Formats): PartialFunction[JValue, Priority] = {
     case j: JObject =>

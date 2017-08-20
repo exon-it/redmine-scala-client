@@ -34,7 +34,7 @@ class FluentSettableFieldSpec extends BasicSpec {
     "set" should {
       "return provided return instance" in {
         val field = new FluentSettableField[Unit, this.type](this)
-        field.set(Unit) shouldBe this
+        field.set(()) shouldBe this
       }
     }
 
@@ -77,7 +77,7 @@ class FluentSettableFieldSpec extends BasicSpec {
 
       "allow unsetting a field" in {
         val field = new FluentSettableField[Unit, this.type](this)
-        field.set(Unit)
+        field.set(())
         field shouldBe 'set
         field.unset()
         field should not be 'set
@@ -108,7 +108,7 @@ class FluentSettableFieldSpec extends BasicSpec {
     "set using optional value" should {
       "return provided return instance" in {
         val field = new FluentSettableField[Unit, this.type](this)
-        field.setOpt(Some(Unit)) shouldBe this
+        field.setOpt(Some(())) shouldBe this
       }
 
       "be set after using optional Some" in {

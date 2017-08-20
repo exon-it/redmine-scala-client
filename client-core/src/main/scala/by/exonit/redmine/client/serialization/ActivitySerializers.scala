@@ -24,17 +24,16 @@ import scala.collection.immutable._
 object ActivitySerializers {
   lazy val all: Seq[Serializer[_]] = Seq(activityIdSerializer, activityLinkSerializer, activitySerializer)
 
-  def deserializeActivityId(implicit formats: Formats): PartialFunction[JValue, ActivityId] = {
+  def deserializeActivityId: PartialFunction[JValue, ActivityId] = {
     case JInt(id) => ActivityId(id)
   }
 
-  def serializeActivityId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeActivityId: PartialFunction[Any, JValue] = {
     case ActivityId(id) => JInt(id)
   }
 
   object activityIdSerializer extends CustomSerializer[ActivityId](
-    formats =>
-      (deserializeActivityId(formats), serializeActivityId(formats)))
+    _ => (deserializeActivityId, serializeActivityId))
 
   def deserializeActivityLink(implicit formats: Formats): PartialFunction[JValue, ActivityLink] = {
     case j: JObject =>

@@ -29,16 +29,16 @@ object MembershipSerializers {
     newMembershipSerializer,
     membershipUpdateSerializer)
 
-  def serializeMembershipId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeMembershipId: PartialFunction[Any, JValue] = {
     case MembershipId(id) => JInt(id)
   }
 
-  def deserializeMembershipId(implicit formats: Formats): PartialFunction[JValue, MembershipId] = {
+  def deserializeMembershipId: PartialFunction[JValue, MembershipId] = {
     case JInt(id) => MembershipId(id)
   }
 
   object membershipIdSerializer extends CustomSerializer[MembershipId](
-    formats => deserializeMembershipId(formats) -> serializeMembershipId(formats))
+    _ => deserializeMembershipId -> serializeMembershipId)
 
   def deserializeMembership(implicit formats: Formats): PartialFunction[JValue, Membership] = {
     case j: JObject =>

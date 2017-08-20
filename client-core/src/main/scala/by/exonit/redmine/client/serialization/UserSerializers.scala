@@ -26,16 +26,16 @@ object UserSerializers {
   lazy val all: Seq[Serializer[_]] = Seq(
     userIdSerializer, userLinkSerializer, userSerializer, newUserSerializer, userUpdateSerializer)
 
-  def deserializeUserId(implicit formats: Formats): PartialFunction[JValue, UserId] = {
+  def deserializeUserId: PartialFunction[JValue, UserId] = {
     case JInt(id) => UserId(id)
   }
 
-  def serializeUserId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeUserId: PartialFunction[Any, JValue] = {
     case UserId(id) => JInt(id)
   }
 
   object userIdSerializer extends CustomSerializer[UserId](
-    formats => deserializeUserId(formats) -> serializeUserId(formats))
+    _ => deserializeUserId -> serializeUserId)
 
   def deserializeUserLink(implicit formats: Formats): PartialFunction[JValue, UserLink] = {
     case j: JObject =>
@@ -47,16 +47,16 @@ object UserSerializers {
   object userLinkSerializer extends CustomSerializer[UserLink](
     formats => deserializeUserLink(formats) -> PartialFunction.empty)
 
-  def deserializeUserStatus(implicit formats: Formats): PartialFunction[JValue, User.Status] = {
+  def deserializeUserStatus: PartialFunction[JValue, User.Status] = {
     case JInt(s) => User.Status(s.toInt)
   }
 
-  def serializeUserStatus(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeUserStatus: PartialFunction[Any, JValue] = {
     case User.Status(id) => JInt(id)
   }
 
   object userStatusSerializer extends CustomSerializer[User.Status](
-    formats => deserializeUserStatus(formats) -> serializeUserStatus(formats))
+    _ => deserializeUserStatus -> serializeUserStatus)
 
   def deserializeUser(implicit formats: Formats): PartialFunction[JValue, User] = {
     case j: JObject =>

@@ -26,16 +26,16 @@ object AttachmentSerializers {
     attachmentIdSerializer,
     attachmentSerializer)
 
-  def deserializeAttachmentId(implicit formats: Formats): PartialFunction[JValue, AttachmentId] = {
+  def deserializeAttachmentId: PartialFunction[JValue, AttachmentId] = {
     case JInt(id) => AttachmentId(id)
   }
 
-  def serializeAttachmentId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeAttachmentId: PartialFunction[Any, JValue] = {
     case AttachmentId(id) => JInt(id)
   }
 
-  object attachmentIdSerializer extends CustomSerializer[AttachmentId](formats =>
-    (deserializeAttachmentId(formats), serializeAttachmentId(formats)))
+  object attachmentIdSerializer extends CustomSerializer[AttachmentId](_ =>
+    deserializeAttachmentId -> serializeAttachmentId)
 
   object attachmentSerializer extends CustomSerializer[Attachment](formats => (
     deserializeAttachment(formats),

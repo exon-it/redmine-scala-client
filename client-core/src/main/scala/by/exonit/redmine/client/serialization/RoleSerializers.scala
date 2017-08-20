@@ -25,16 +25,16 @@ object RoleSerializers {
   lazy val all: Seq[Serializer[_]] = Seq(
     roleIdSerializer, roleLinkSerializer, roleSerializer)
 
-  def deserializeRoleId(implicit formats: Formats): PartialFunction[JValue, RoleId] = {
+  def deserializeRoleId: PartialFunction[JValue, RoleId] = {
     case JInt(id) => RoleId(id)
   }
 
-  def serializeRoleId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeRoleId: PartialFunction[Any, JValue] = {
     case RoleId(id) => JInt(id)
   }
 
   object roleIdSerializer extends CustomSerializer[RoleId](
-    formats => deserializeRoleId(formats) -> serializeRoleId(formats))
+    _ => deserializeRoleId -> serializeRoleId)
 
   def deserializeRoleLink(implicit formats: Formats): PartialFunction[JValue, RoleLink] = {
     case j: JObject =>

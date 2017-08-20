@@ -184,7 +184,6 @@ class RequestManagerImpl(
 
   def putEntity[T](request: Request[Unit], entityName: String, entity: T)
     (implicit mf: Manifest[T]): Task[Unit] = {
-    implicit val implicitFormats = formats
     val subRequest = for {
       _ <- request
       _ <- RequestDSL.setMethod("PUT")

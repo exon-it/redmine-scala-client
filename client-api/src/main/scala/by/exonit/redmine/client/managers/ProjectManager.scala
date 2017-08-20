@@ -19,8 +19,6 @@ package by.exonit.redmine.client.managers
 import by.exonit.redmine.client._
 import monix.eval.Task
 
-import scala.collection.immutable._
-
 /**
  * Redmine project manager
  */

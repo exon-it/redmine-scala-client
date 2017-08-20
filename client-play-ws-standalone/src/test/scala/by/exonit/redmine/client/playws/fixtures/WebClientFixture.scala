@@ -16,15 +16,35 @@
 
 package by.exonit.redmine.client.playws.fixtures
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import by.exonit.redmine.client.playws.standalone.PlayWSStandaloneWebClient
+import monix.execution.misc.NonFatal
 import org.scalatest.{BeforeAndAfterAll, Suite}
+import play.api.libs.ws.ahc.StandaloneAhcWSClient
+
+import scala.concurrent.Await
+import scala.concurrent.duration._
 
 trait WebClientFixture extends BeforeAndAfterAll {
   this: Suite =>
 
-  val webClient: PlayWSStandaloneWebClient = new PlayWSStandaloneWebClient()()
+  implicit val as: ActorSystem = ActorSystem("Test")
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  val webClient: PlayWSStandaloneWebClient = new PlayWSStandaloneWebClient(StandaloneAhcWSClient())
 
   override protected def afterAll(): Unit = {
-    try {webClient.close()} finally super.afterAll()
+    try {
+      webClient.close()
+    } catch {
+      case NonFatal(_) =>
+    }
+    try {
+      val terminationFuture = as.terminate()
+      Await.ready(terminationFuture, 10.seconds)
+    } catch {
+      case NonFatal(_) =>
+    }
+    super.afterAll()
   }
 }

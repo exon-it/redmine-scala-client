@@ -30,11 +30,11 @@ object CategorySerializers {
     newCategorySerializer,
     categoryUpdateSerializer)
 
-  def serializeCategoryId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeCategoryId: PartialFunction[Any, JValue] = {
     case CategoryId(id) => JInt(id)
   }
 
-  def deserializeCategoryId(implicit formats: Formats): PartialFunction[JValue, CategoryId] = {
+  def deserializeCategoryId: PartialFunction[JValue, CategoryId] = {
     case JInt(id) => CategoryId(id)
   }
 
@@ -67,9 +67,8 @@ object CategorySerializers {
         ("assigned_to_id" -> u.defaultAssignee.toOpt.map(_.map(Extraction.decompose).getOrElse(JNull)).getOrElse(JNothing))
   }
 
-  object categoryIdSerializer extends CustomSerializer[CategoryId](formats => (
-    deserializeCategoryId(formats),
-    serializeCategoryId(formats)))
+  object categoryIdSerializer extends CustomSerializer[CategoryId](_ =>
+    deserializeCategoryId -> serializeCategoryId)
 
   object categoryLinkSerializer extends CustomSerializer[CategoryLink](formats => (
     deserializeCategoryLink(formats),

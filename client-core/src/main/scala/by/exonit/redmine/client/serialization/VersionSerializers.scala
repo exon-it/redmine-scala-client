@@ -29,39 +29,39 @@ object VersionSerializers {
     versionIdSerializer, versionStatusSerializer, versionSharingSerializer, versionLinkSerializer, versionSerializer,
     newVersionSerializer, versionUpdateSerializer)
 
-  def deserializeVersionId(implicit formats: Formats): PartialFunction[JValue, VersionId] = {
+  def deserializeVersionId: PartialFunction[JValue, VersionId] = {
     case JInt(id) => VersionId(id)
   }
 
-  def serializeVersionId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeVersionId: PartialFunction[Any, JValue] = {
     case VersionId(id) => JInt(id)
   }
 
   object versionIdSerializer extends CustomSerializer[VersionId](
-    formats => deserializeVersionId(formats) -> serializeVersionId(formats))
+    _ => deserializeVersionId -> serializeVersionId)
 
 
-  def deserializeVersionStatus(implicit formats: Formats): PartialFunction[JValue, Version.Status] = {
+  def deserializeVersionStatus: PartialFunction[JValue, Version.Status] = {
     case JString(s) => Version.Status(s)
   }
 
-  def serializeVersionStatus(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeVersionStatus: PartialFunction[Any, JValue] = {
     case Version.Status(id) => JString(id)
   }
 
   object versionStatusSerializer extends CustomSerializer[Version.Status](
-    formats => deserializeVersionStatus(formats) -> serializeVersionStatus(formats))
+    _ => deserializeVersionStatus -> serializeVersionStatus)
 
-  def deserializeVersionSharing(implicit formats: Formats): PartialFunction[JValue, Version.Sharing] = {
+  def deserializeVersionSharing: PartialFunction[JValue, Version.Sharing] = {
     case JString(s) => Version.Sharing(s)
   }
 
-  def serializeVersionSharing(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeVersionSharing: PartialFunction[Any, JValue] = {
     case Version.Sharing(id) => JString(id)
   }
 
   object versionSharingSerializer extends CustomSerializer[Version.Sharing](
-    formats => deserializeVersionSharing(formats) -> serializeVersionSharing(formats))
+    _ => deserializeVersionSharing -> serializeVersionSharing)
 
   def deserializeVersionLink(implicit formats: Formats): PartialFunction[JValue, VersionLink] = {
     case j: JObject =>

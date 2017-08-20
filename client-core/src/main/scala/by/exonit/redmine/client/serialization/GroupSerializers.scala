@@ -25,11 +25,11 @@ object GroupSerializers {
   lazy val all: Seq[Serializer[_]] = Seq(
     groupIdSerializer, groupLinkSerializer, groupSerializer)
 
-  def serializeGroupId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeGroupId: PartialFunction[Any, JValue] = {
     case GroupId(id) => JInt(id)
   }
 
-  def deserializeGroupId(implicit formats: Formats): PartialFunction[JValue, GroupId] = {
+  def deserializeGroupId: PartialFunction[JValue, GroupId] = {
     case JInt(id) => GroupId(id)
   }
 
@@ -50,7 +50,7 @@ object GroupSerializers {
   }
 
   object groupIdSerializer extends CustomSerializer[GroupId](
-    formats => deserializeGroupId(formats) -> serializeGroupId(formats))
+    _ => deserializeGroupId -> serializeGroupId)
 
   object groupLinkSerializer extends CustomSerializer[GroupLink](
     formats => deserializeGroupLink(formats) -> PartialFunction.empty)

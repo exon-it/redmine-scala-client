@@ -13,6 +13,21 @@ lazy val commonSettings = Seq(
   version := "4.0.0-SNAPSHOT",
 
   scalaVersion := "2.11.11",
+  scalacOptions ++= Seq(
+    "-deprecation",
+    "-encoding", "UTF-8",       // yes, this is 2 args
+    "-feature",
+    "-language:existentials",
+    "-language:higherKinds",
+    "-language:implicitConversions",
+    "-unchecked",
+    "-Xfatal-warnings",
+    "-Xlint",
+    "-Yno-adapted-args",
+    "-Ywarn-numeric-widen",
+    "-Ywarn-value-discard",
+    "-Xfuture"
+  ),
 
   addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.4" cross CrossVersion.binary),
 
@@ -49,7 +64,7 @@ lazy val `client-api` = (project in file("client-api")).
     name := s"client-api",
     description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Client API. " +
       s"Contains domain classes and API manager traits.",
-    crossScalaVersions := Seq("2.11.11", "2.12.2"),
+    crossScalaVersions := Seq("2.11.11", "2.12.3"),
     libraryDependencies ++= Seq(
       Dependencies.monixEval,
       Dependencies.catsFree,
@@ -70,7 +85,7 @@ lazy val `client-core` = (project in file("client-core")).
     name := s"client-core",
     description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Client Core. " +
       s"Contains API manager and JSON serialization implementation.",
-    crossScalaVersions := Seq("2.11.11", "2.12.2"),
+    crossScalaVersions := Seq("2.11.11", "2.12.3"),
     libraryDependencies ++= Seq(
       Dependencies.catsFree,
       Dependencies.jodaTime,
@@ -86,15 +101,32 @@ lazy val `client-core` = (project in file("client-core")).
     )
   )
 
-lazy val `client-play-ws` = (project in file("client-play-ws")).
+lazy val `client-play25-ws` = (project in file("client-play25-ws")).
   dependsOn(`client-core`).
   settings(commonSettings: _*).
   settings(
-    name := s"client-play-ws",
-    description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Play-WS Web Client",
+    name := s"client-play25-ws",
+    description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Play-WS 2.5 Web Client",
     crossScalaVersions := Seq("2.11.11"),
     libraryDependencies ++= Seq(
       Dependencies.play25Ws,
+      Dependencies.slf4jJdk14 % Test,
+      Dependencies.junit % Test,
+      Dependencies.scalatest % Test,
+      Dependencies.restClientDriver % Test,
+      Dependencies.scalaArm % Test
+    )
+  )
+
+lazy val `client-play26-ws` = (project in file("client-play26-ws")).
+  dependsOn(`client-core`).
+  settings(commonSettings: _*).
+  settings(
+    name := s"client-play26-ws",
+    description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Play-WS 2.6 Web Client",
+    crossScalaVersions := Seq("2.11.11","2.12.3"),
+    libraryDependencies ++= Seq(
+      Dependencies.play26Ws,
       Dependencies.slf4jJdk14 % Test,
       Dependencies.junit % Test,
       Dependencies.scalatest % Test,
@@ -109,7 +141,7 @@ lazy val `client-play-ws-standalone` = (project in file("client-play-ws-standalo
   settings(
     name := s"client-play-ws-standalone",
     description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Play-WS Standalone Web Client",
-    crossScalaVersions := Seq("2.11.11", "2.12.2"),
+    crossScalaVersions := Seq("2.11.11", "2.12.3"),
     libraryDependencies ++= Seq(
       Dependencies.playWsStandalone,
       Dependencies.slf4jJdk14 % Test,
@@ -128,6 +160,6 @@ lazy val `client-parent` = (project in file(".")).
     // Do not publish root project
     publishArtifact := false
   ).
-  aggregate(`client-api`, `client-core`, `client-play-ws`, `client-play-ws-standalone`).
+  aggregate(`client-api`, `client-core`, `client-play25-ws`, `client-play26-ws`, `client-play-ws-standalone`).
   enablePlugins(CrossPerProjectPlugin)
 

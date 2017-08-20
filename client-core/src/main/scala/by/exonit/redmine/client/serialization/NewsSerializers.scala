@@ -25,16 +25,16 @@ object NewsSerializers {
   lazy val all: Seq[Serializer[_]] = Seq(
     newsIdSerializer, newsSerializer)
 
-  def deserializeNewsId(implicit formats: Formats): PartialFunction[JValue, NewsId] = {
+  def deserializeNewsId: PartialFunction[JValue, NewsId] = {
     case JInt(id) => NewsId(id)
   }
 
-  def serializeNewsId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeNewsId: PartialFunction[Any, JValue] = {
     case NewsId(id) => JInt(id)
   }
 
   object newsIdSerializer extends CustomSerializer[NewsId](
-    formats => deserializeNewsId(formats) -> serializeNewsId(formats))
+    _ => deserializeNewsId -> serializeNewsId)
 
   def deserializeNews(implicit formats: Formats): PartialFunction[JValue, News] = {
     case j: JObject =>

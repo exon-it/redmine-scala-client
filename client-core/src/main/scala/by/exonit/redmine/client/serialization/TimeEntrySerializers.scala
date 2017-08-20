@@ -27,16 +27,16 @@ object TimeEntrySerializers {
   lazy val all: Seq[Serializer[_]] = Seq(
     timeEntryIdSerializer, timeEntrySerializer, newTimeEntrySerializer, timeEntryUpdateSerializer)
 
-  def deserializeTimeEntryId(implicit formats: Formats): PartialFunction[JValue, TimeEntryId] = {
+  def deserializeTimeEntryId: PartialFunction[JValue, TimeEntryId] = {
     case JInt(id) => TimeEntryId(id)
   }
 
-  def serializeTimeEntryId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeTimeEntryId: PartialFunction[Any, JValue] = {
     case TimeEntryId(id) => JInt(id)
   }
 
   object timeEntryIdSerializer extends CustomSerializer[TimeEntryId](
-    formats => deserializeTimeEntryId(formats) -> serializeTimeEntryId(formats))
+    _ => deserializeTimeEntryId -> serializeTimeEntryId)
 
   def deserializeTimeEntry(implicit formats: Formats): PartialFunction[JValue, TimeEntry] = {
     case j: JObject =>

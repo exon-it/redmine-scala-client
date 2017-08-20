@@ -27,25 +27,23 @@ object JournalSerializers {
     journalSerializer,
     journalDetailSerializer)
 
-  def deserializeJournalId(implicit formats: Formats): PartialFunction[JValue, JournalId] = {
+  def deserializeJournalId: PartialFunction[JValue, JournalId] = {
     case JInt(id) => JournalId(id)
   }
 
-  def serializeJournalId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeJournalId: PartialFunction[Any, JValue] = {
     case JournalId(id) => JInt(id)
   }
 
-  object journalIdSerializer extends CustomSerializer[JournalId](formats =>
-    (deserializeJournalId(formats), serializeJournalId(formats)))
+  object journalIdSerializer extends CustomSerializer[JournalId](_ =>
+    deserializeJournalId -> serializeJournalId)
 
-  object journalSerializer extends CustomSerializer[Journal](formats => (
-    deserializeJournal(formats),
-    PartialFunction.empty))
+  object journalSerializer extends CustomSerializer[Journal](formats =>
+    deserializeJournal(formats) -> PartialFunction.empty)
 
-  def deserializeJournal(formats: => Formats): PartialFunction[JValue, Journal] =
+  def deserializeJournal(implicit formats: Formats): PartialFunction[JValue, Journal] =
     {
       case j: JObject =>
-        implicit val implicitFormats = formats
         val id = (j \ "id").extract[BigInt]
         val createdOn = RedmineDateParser.parse((j \ "created_on").extract[String])
         val user = (j \ "user").extractOpt[UserLink]
@@ -54,14 +52,12 @@ object JournalSerializers {
         Journal(id, createdOn, user, notes, details)
     }
 
-  object journalDetailSerializer extends CustomSerializer[JournalDetail](formats => (
-    deserializeJournalDetail(formats),
-    PartialFunction.empty))
+  object journalDetailSerializer extends CustomSerializer[JournalDetail](formats =>
+    deserializeJournalDetail(formats) -> PartialFunction.empty)
 
-  def deserializeJournalDetail(formats: => Formats): PartialFunction[JValue, JournalDetail] =
+  def deserializeJournalDetail(implicit formats: Formats): PartialFunction[JValue, JournalDetail] =
     {
       case j: JObject =>
-        implicit val implicitFormats = formats
         JournalDetail(
           (j \ "name").extract[String],
           (j \ "property").extract[String],

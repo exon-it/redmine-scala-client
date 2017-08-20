@@ -47,7 +47,7 @@ trait RequestManager {
     *
     * @param formats New serialization/deserialization formats
     */
-  def formats_=(formats: Formats)
+  def formats_=(formats: Formats): Unit
 
   /**
     * Adds Redmine REST API authentication data to the request

@@ -26,16 +26,16 @@ object WikiSerializers {
   lazy val all: Seq[Serializer[_]] = Seq(wikiPageIdSerializer, wikiPageSerializer, wikiPageDetailsSerializer,
     newWikiPageSerializer, wikiPageUpdateSerializer)
 
-  def deserializeWikiPageId(implicit formats: Formats): PartialFunction[JValue, WikiPageId] = {
+  def deserializeWikiPageId: PartialFunction[JValue, WikiPageId] = {
     case JString(id) => WikiPageId(id)
   }
 
-  def serializeWikiPageId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeWikiPageId: PartialFunction[Any, JValue] = {
     case WikiPageId(id) => JString(id)
   }
 
   object wikiPageIdSerializer extends CustomSerializer[WikiPageId](
-    formats => deserializeWikiPageId(formats) -> serializeWikiPageId(formats))
+    _ => deserializeWikiPageId -> serializeWikiPageId)
 
   def deserializeWikiPage(implicit formats: Formats): PartialFunction[JValue, WikiPage] = {
     case j: JObject =>
@@ -59,7 +59,7 @@ object WikiSerializers {
   object wikiPageDetailsSerializer extends CustomSerializer[WikiPageDetails](
     formats => deserializeWikiPageDetails(formats) -> PartialFunction.empty)
 
-  def serializeNewWikiPage(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeNewWikiPage: PartialFunction[Any, JValue] = {
     case u@WikiPage.New(_, text) =>
       ("text" -> text) ~
         ("comments" -> u.comments.toOpt) ~
@@ -67,7 +67,7 @@ object WikiSerializers {
   }
 
   object newWikiPageSerializer extends CustomSerializer[WikiPage.New](
-    formats => PartialFunction.empty -> serializeNewWikiPage(formats))
+    _ => PartialFunction.empty -> serializeNewWikiPage)
 
   def serializeWikiPageUpdate(implicit formats: Formats): PartialFunction[Any, JValue] = {
     case u: WikiPage.Update =>

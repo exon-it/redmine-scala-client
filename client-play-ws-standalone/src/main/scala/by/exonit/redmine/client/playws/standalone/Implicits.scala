@@ -16,6 +16,12 @@
 
 package by.exonit.redmine.client.playws.standalone
 
+import akka.stream.scaladsl.StreamConverters
+import by.exonit.redmine.client.managers.WebClient.RequestDSL
+import by.exonit.redmine.client.managers.WebClient.RequestDSL.Body.{EmptyBody, FileBody, InMemoryByteBody, StreamedBody}
+import play.api.libs.ws
+import play.api.libs.ws.{StandaloneWSRequest, WSAuthScheme}
+
 /**
   * Created by antonov_i on 01.03.2017.
   */
@@ -34,6 +40,33 @@ object Implicits {
       opt match {
         case Some(o) => mutator(value)(o)
         case None => value
+      }
+    }
+  }
+
+  implicit class ExtendedWSRequest(r: StandaloneWSRequest) {
+    def withDslAuth(auth: RequestDSL.AuthenticationMethod): StandaloneWSRequest = {
+      auth match {
+        case RequestDSL.AuthenticationMethod.Basic(user, password) =>
+          r.withAuth(user, password.mkString, WSAuthScheme.BASIC)
+        case RequestDSL.AuthenticationMethod.Digest(user, password) =>
+          r.withAuth(user, password.mkString, WSAuthScheme.DIGEST)
+        case RequestDSL.AuthenticationMethod.Bearer(token) =>
+          r.addHttpHeaders("Authentication" -> s"Bearer $token")
+      }
+    }
+
+    def withDslBody(body: RequestDSL.Body): StandaloneWSRequest = {
+      import play.api.libs.ws.DefaultBodyWritables._
+      body match {
+        case EmptyBody() =>
+          r.withBody(ws.EmptyBody)
+        case FileBody(file) =>
+          r.withBody(file)
+        case InMemoryByteBody(b) =>
+          r.withBody(b)
+        case StreamedBody(streamProvider) =>
+          r.withBody(ws.SourceBody(StreamConverters.fromInputStream(streamProvider)))
       }
     }
   }

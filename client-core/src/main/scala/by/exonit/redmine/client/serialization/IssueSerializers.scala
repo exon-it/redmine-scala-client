@@ -33,17 +33,16 @@ object IssueSerializers {
     issueUpdateSerializer,
     issueUploadSerializer)
 
-  def deserializeIssueId(implicit formats: Formats): PartialFunction[JValue, IssueId] = {
+  def deserializeIssueId: PartialFunction[JValue, IssueId] = {
     case JInt(id) => IssueId(id)
   }
 
-  def serializeIssueId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeIssueId: PartialFunction[Any, JValue] = {
     case IssueId(id) => JInt(id)
   }
 
   object issueIdSerializer extends CustomSerializer[IssueId](
-    formats =>
-      (deserializeIssueId(formats), serializeIssueId(formats)))
+    _ => deserializeIssueId -> serializeIssueId)
 
   def deserializeChildIssue(implicit formats: Formats): PartialFunction[JValue, ChildIssue] = {
     case j: JObject =>
@@ -172,7 +171,7 @@ object IssueSerializers {
     formats => (
       PartialFunction.empty, serializeNewIssue(formats)))
 
-  def serializeIssueUpload(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeIssueUpload: PartialFunction[Any, JValue] = {
     case Issue.Upload(token, filename, description, contentType) =>
       ("token" -> token) ~
         ("filename" -> filename) ~
@@ -182,7 +181,6 @@ object IssueSerializers {
 
   object issueUploadSerializer
     extends CustomSerializer[Issue.Upload](
-      formats => (
-        PartialFunction.empty, serializeIssueUpload(formats)))
+      _ => PartialFunction.empty -> serializeIssueUpload)
 
 }

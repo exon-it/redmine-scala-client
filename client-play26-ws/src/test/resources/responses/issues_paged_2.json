@@ -1,0 +1,291 @@
+{
+
+  "issues":
+
+  [
+
+    {
+
+      "id": 24,
+      "project":
+
+      {
+
+        "id": 15,
+        "name": "test1"
+
+      },
+      "tracker":
+      {
+
+        "id": 2,
+        "name": "Test tracker"
+
+      },
+      "status":
+      {
+
+        "id": 1,
+        "name": "Test status"
+
+      },
+      "priority":
+      {
+
+        "id": 2,
+        "name": "Test priority"
+
+      },
+      "author":
+      {
+
+        "id": 1,
+        "name": "Test User"
+
+      },
+      "subject": "5",
+      "description": "",
+      "start_date": "2015-08-21",
+      "done_ratio": 0,
+      "custom_fields":
+      [
+
+        {
+          "id": 1,
+          "name": "Test CF",
+          "value": ""
+        }
+      ],
+      "created_on": "2015-08-21T05:46:42Z",
+      "updated_on": "2015-08-21T05:46:42Z"
+
+    },
+    {
+
+      "id": 23,
+      "project":
+
+      {
+
+        "id": 15,
+        "name": "test1"
+
+      },
+      "tracker":
+      {
+
+        "id": 2,
+        "name": "Test tracker"
+
+      },
+      "status":
+      {
+
+        "id": 1,
+        "name": "Test status"
+
+      },
+      "priority":
+      {
+
+        "id": 2,
+        "name": "Test priority"
+
+      },
+      "author":
+      {
+
+        "id": 1,
+        "name": "Test User"
+
+      },
+      "subject": "4",
+      "description": "",
+      "start_date": "2015-08-21",
+      "done_ratio": 0,
+      "custom_fields":
+      [
+
+        {
+          "id": 1,
+          "name": "Test CF",
+          "value": ""
+        }
+      ],
+      "created_on": "2015-08-21T05:46:40Z",
+      "updated_on": "2015-08-21T05:46:40Z"
+
+    },
+    {
+
+      "id": 22,
+      "project":
+
+      {
+
+        "id": 15,
+        "name": "test1"
+
+      },
+      "tracker":
+      {
+
+        "id": 2,
+        "name": "Test tracker"
+
+      },
+      "status":
+      {
+
+        "id": 1,
+        "name": "Test status"
+
+      },
+      "priority":
+      {
+
+        "id": 2,
+        "name": "Test priority"
+
+      },
+      "author":
+      {
+
+        "id": 1,
+        "name": "Test User"
+
+      },
+      "subject": "3",
+      "description": "",
+      "start_date": "2015-08-21",
+      "done_ratio": 0,
+      "custom_fields":
+      [
+
+        {
+          "id": 1,
+          "name": "Test CF",
+          "value": ""
+        }
+      ],
+      "created_on": "2015-08-21T05:46:38Z",
+      "updated_on": "2015-08-21T05:46:38Z"
+
+    },
+    {
+
+      "id": 21,
+      "project":
+
+      {
+
+        "id": 15,
+        "name": "test1"
+
+      },
+      "tracker":
+      {
+
+        "id": 2,
+        "name": "Test tracker"
+
+      },
+      "status":
+      {
+
+        "id": 1,
+        "name": "Test status"
+
+      },
+      "priority":
+      {
+
+        "id": 2,
+        "name": "Test priority"
+
+      },
+      "author":
+      {
+
+        "id": 1,
+        "name": "Test User"
+
+      },
+      "subject": "2",
+      "description": "",
+      "start_date": "2015-08-21",
+      "done_ratio": 0,
+      "custom_fields":
+      [
+
+        {
+          "id": 1,
+          "name": "Test CF",
+          "value": ""
+        }
+      ],
+      "created_on": "2015-08-21T05:46:36Z",
+      "updated_on": "2015-08-21T05:46:36Z"
+
+    },
+    {
+
+      "id": 20,
+      "project":
+
+      {
+
+        "id": 15,
+        "name": "test1"
+
+      },
+      "tracker":
+      {
+
+        "id": 2,
+        "name": "Test tracker"
+
+      },
+      "status":
+      {
+
+        "id": 1,
+        "name": "Test status"
+
+      },
+      "priority":
+      {
+
+        "id": 2,
+        "name": "Test priority"
+
+      },
+      "author":
+      {
+
+        "id": 1,
+        "name": "Test User"
+
+      },
+      "subject": "1",
+      "description": "",
+      "start_date": "2015-08-21",
+      "done_ratio": 0,
+      "custom_fields":
+      [
+
+        {
+          "id": 1,
+          "name": "Test CF",
+          "value": ""
+        }
+      ],
+      "created_on": "2015-08-21T05:46:34Z",
+      "updated_on": "2015-08-21T05:46:34Z"
+    }
+  ],
+  "total_count": 30,
+  "offset": 25,
+  "limit": 25
+
+}

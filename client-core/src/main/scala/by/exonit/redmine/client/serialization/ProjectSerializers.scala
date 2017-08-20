@@ -26,18 +26,17 @@ object ProjectSerializers {
   lazy val all: Seq[Serializer[_]] = Seq(
     projectIdSerializer, projectLinkSerializer, projectSerializer, newProjectSerializer, projectUpdateSerializer)
 
-  def deserializeProjectId(implicit formats: Formats): PartialFunction[JValue, ProjectId] = {
+  def deserializeProjectId: PartialFunction[JValue, ProjectId] = {
     case JInt(id) => ProjectId(id)
   }
 
-  def serializeProjectId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeProjectId: PartialFunction[Any, JValue] = {
     case ProjectId(id) => JInt(id)
   }
 
   object projectIdSerializer
     extends CustomSerializer[ProjectId](
-      formats => (
-        deserializeProjectId(formats), serializeProjectId(formats)))
+      _ => deserializeProjectId -> serializeProjectId)
 
   def deserializeProjectLink(implicit formats: Formats): PartialFunction[JValue, ProjectLink] = {
     case j: JObject =>
@@ -46,14 +45,13 @@ object ProjectSerializers {
       ProjectLink(id, name)
   }
 
-  def serializeProjectLink(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeProjectLink: PartialFunction[Any, JValue] = {
     case ProjectLink(id, name) => ("id" -> id) ~ ("name" -> name)
   }
 
   object projectLinkSerializer
     extends CustomSerializer[ProjectLink](
-      formats => (
-        deserializeProjectLink(formats), serializeProjectLink(formats)))
+      formats => deserializeProjectLink(formats) -> serializeProjectLink)
 
   def deserializeProject(implicit formats: Formats): PartialFunction[JValue, Project] = {
     case j: JObject =>

@@ -19,8 +19,6 @@ package by.exonit.redmine.client.playws.fixtures
 import com.github.restdriver.clientdriver.{ClientDriver, ClientDriverFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
 
-import scala.util.Try
-
 trait ClientDriverFixture extends BeforeAndAfterEach with BeforeAndAfterAll {
   this: Suite =>
 
@@ -33,6 +31,6 @@ trait ClientDriverFixture extends BeforeAndAfterEach with BeforeAndAfterAll {
 
   override protected def afterAll(): Unit = {
     clientDriver.shutdownQuietly()
-    Try(super.afterAll())
+    super.afterAll()
   }
 }

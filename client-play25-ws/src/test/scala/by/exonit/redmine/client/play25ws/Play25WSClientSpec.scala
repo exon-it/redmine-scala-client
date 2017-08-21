@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package by.exonit.redmine.client.playws.client.playws
+package by.exonit.redmine.client.play25ws
 
 import by.exonit.redmine.client.managers.WebClient.{RequestDSL, ResponseDSL}
-import by.exonit.redmine.client.playws.BasicSpec
-import by.exonit.redmine.client.playws.fixtures.{ClientDriverFixture, WebClientFixture}
+import by.exonit.redmine.client.play25ws.fixtures.{ClientDriverFixture, WebClientFixture}
 import com.github.restdriver.clientdriver.ClientDriverRequest._
 import com.github.restdriver.clientdriver.RestClientDriver._
+import play.api.http.Status
+
 
 /**
   * Created by antonov_i on 28.02.2017.
   */
-class PlayWSClientSpec extends BasicSpec with ClientDriverFixture with WebClientFixture {
-  "Play-WS Web Client" must {
+class Play25WSClientSpec extends BasicSpec with ClientDriverFixture with WebClientFixture {
+  "Play-WS 2.5 Web Client" must {
     "issue correct requests when adding segments in setUrl" in {
       clientDriver.addExpectation(
         onRequestTo("/test").withMethod(Method.GET), giveResponse("TEST", "text/plain"))
@@ -41,7 +42,7 @@ class PlayWSClientSpec extends BasicSpec with ClientDriverFixture with WebClient
 
       val requestFuture = webClient.execute(request, responseCommand)
       whenReady(requestFuture.runAsync) {case (status, body) =>
-        status shouldBe 200
+        status shouldBe Status.OK
         body shouldBe "TEST"
         clientDriver.verify()
       }
@@ -62,7 +63,7 @@ class PlayWSClientSpec extends BasicSpec with ClientDriverFixture with WebClient
 
       val requestFuture = webClient.execute(request, responseCommand)
       whenReady(requestFuture.runAsync) {case (status, body) =>
-        status shouldBe 200
+        status shouldBe Status.OK
         body shouldBe "TEST"
         clientDriver.verify()
       }
@@ -83,7 +84,7 @@ class PlayWSClientSpec extends BasicSpec with ClientDriverFixture with WebClient
 
       val requestFuture = webClient.execute(request, responseCommand)
       whenReady(requestFuture.runAsync) {case (status, body) =>
-        status shouldBe 200
+        status shouldBe Status.OK
         body shouldBe "TEST"
         clientDriver.verify()
       }
@@ -104,7 +105,7 @@ class PlayWSClientSpec extends BasicSpec with ClientDriverFixture with WebClient
 
       val requestFuture = webClient.execute(request, responseCommand)
       whenReady(requestFuture.runAsync) {case (status, body) =>
-        status shouldBe 200
+        status shouldBe Status.OK
         body shouldBe "TEST"
         clientDriver.verify()
       }

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package by.exonit.redmine.client.playws.managers
+package by.exonit.redmine.client.playws.standalone.managers
 
 import by.exonit.redmine.client.Project
 import by.exonit.redmine.client.managers.impl.RedmineManagerFactory
-import by.exonit.redmine.client.playws.BasicSpec
-import by.exonit.redmine.client.playws.fixtures.{ClientDriverFixture, WebClientFixture}
+import by.exonit.redmine.client.playws.standalone.fixtures.{ClientDriverFixture, WebClientFixture}
+import by.exonit.redmine.client.playws.standalone.BasicSpec
 import com.github.restdriver.clientdriver.RestClientDriver._
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.time.{Seconds, Span}

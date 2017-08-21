@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package by.exonit.redmine.client.playws
+package by.exonit.redmine.client.serialization
 
 import monix.execution.Scheduler
 import org.scalatest._

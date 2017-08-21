@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package by.exonit.redmine.client.playws.managers
+package by.exonit.redmine.client.playws.standalone.managers
 
 import by.exonit.redmine.client.managers.WebClient.{RequestDSL, ResponseDSL}
 import by.exonit.redmine.client.managers.impl.RedmineManagerFactory
-import by.exonit.redmine.client.playws.BasicSpec
-import by.exonit.redmine.client.playws.fixtures.{ClientDriverFixture, WebClientFixture}
+import by.exonit.redmine.client.playws.standalone.fixtures.{ClientDriverFixture, WebClientFixture}
+import by.exonit.redmine.client.playws.standalone.BasicSpec
 import com.github.restdriver.clientdriver.ClientDriverRequest._
 import com.github.restdriver.clientdriver.RestClientDriver._
 

@@ -21,7 +21,7 @@ import akka.stream.ActorMaterializer
 import by.exonit.redmine.client.play25ws.Play25WSWebClient
 import monix.execution.misc.NonFatal
 import org.scalatest.{BeforeAndAfterAll, Suite}
-import play.api.test.WsTestClient
+import play.api.libs.ws.ahc.{AhcWSClient, AhcWSClientConfig}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -29,9 +29,10 @@ import scala.concurrent.duration._
 trait WebClientFixture extends BeforeAndAfterAll {
   this: Suite =>
 
-  implicit val as: ActorSystem = ActorSystem("Test")
+  implicit val as: ActorSystem = ActorSystem("play25-ws-test-client")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
-  val webClient: Play25WSWebClient = WsTestClient.withClient(c => new Play25WSWebClient(c))
+  val wsClient = AhcWSClient(AhcWSClientConfig(maxRequestRetry = 0))(materializer)
+  val webClient: Play25WSWebClient = new Play25WSWebClient(wsClient)(materializer)
 
   override protected def afterAll(): Unit = {
     try {

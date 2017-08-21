@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package by.exonit.redmine.client.playws.fixtures
+package by.exonit.redmine.client.playws.standalone.fixtures
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
@@ -29,9 +29,10 @@ import scala.concurrent.duration._
 trait WebClientFixture extends BeforeAndAfterAll {
   this: Suite =>
 
-  implicit val as: ActorSystem = ActorSystem("Test")
+  implicit val as: ActorSystem = ActorSystem("ws-standalone-test-client")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
-  val webClient: PlayWSStandaloneWebClient = new PlayWSStandaloneWebClient(StandaloneAhcWSClient())
+  val wsClient: StandaloneAhcWSClient = StandaloneAhcWSClient()(materializer)
+  val webClient: PlayWSStandaloneWebClient = new PlayWSStandaloneWebClient(wsClient)(materializer)
 
   override protected def afterAll(): Unit = {
     try {

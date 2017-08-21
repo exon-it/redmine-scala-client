@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package by.exonit.redmine.client.playws.fixtures
+package by.exonit.redmine.client.playws.standalone
 
-import com.github.restdriver.clientdriver.{ClientDriver, ClientDriverFactory}
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
+import monix.execution.Scheduler
+import org.scalatest._
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.time.{Millis, Seconds, Span}
 
-trait ClientDriverFixture extends BeforeAndAfterEach with BeforeAndAfterAll {
-  this: Suite =>
+trait BasicSpec extends WordSpec with Assertions with Matchers with ScalaFutures with Inside
+with OptionValues {
+  override implicit def patienceConfig = PatienceConfig(timeout = Span(2, Seconds), interval = Span(15, Millis))
+  val jsonContentType = "application/json"
 
-  val clientDriver: ClientDriver = new ClientDriverFactory().createClientDriver()
-
-  override protected def beforeEach(): Unit = {
-    super.beforeEach()
-    clientDriver.reset()
-  }
-
-  override protected def afterAll(): Unit = {
-    clientDriver.shutdownQuietly()
-    super.afterAll()
-  }
+  implicit val scheduler: Scheduler = Scheduler.global
 }

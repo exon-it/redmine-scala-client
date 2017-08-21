@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package by.exonit.redmine.client.play25ws.serialization
+package by.exonit.redmine.client.serialization
 
-import by.exonit.redmine.client.play25ws.BasicSpec
 import by.exonit.redmine.client._
-import by.exonit.redmine.client.serialization.Serializers
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.json4s._
-import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization
+import org.json4s.jackson.JsonMethods._
 
 class IssueSerializersSpec extends BasicSpec {
   implicit val formats: Formats = Serialization.formats(NoTypeHints) ++ Serializers.all

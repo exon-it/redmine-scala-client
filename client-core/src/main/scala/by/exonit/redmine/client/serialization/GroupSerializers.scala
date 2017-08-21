@@ -18,12 +18,18 @@ package by.exonit.redmine.client.serialization
 
 import by.exonit.redmine.client._
 import org.json4s._
+import org.json4s.JsonDSL._
 
 import scala.collection.immutable._
 
 object GroupSerializers {
   lazy val all: Seq[Serializer[_]] = Seq(
-    groupIdSerializer, groupLinkSerializer, groupSerializer)
+    groupIdSerializer,
+    groupLinkSerializer,
+    groupSerializer,
+    newGroupSerializer,
+    groupUpdateSerializer
+  )
 
   def serializeGroupId: PartialFunction[Any, JValue] = {
     case GroupId(id) => JInt(id)
@@ -49,6 +55,19 @@ object GroupSerializers {
         (j \ "custom_fields").toOption.map(_.extract[Set[CustomField]]))
   }
 
+  def serializeNewGroup(implicit formats: Formats): PartialFunction[Any, JValue] = {
+    case g: Group.New =>
+      ("name" -> g.name) ~
+        ("user_ids" -> g.users.map(Extraction.decompose)) ~
+        ("custom_fields" -> g.customFields.map(_.map(Extraction.decompose)))
+  }
+
+  def serializeGroupUpdate(implicit formats: Formats): PartialFunction[Any, JValue] = {
+    case g: Group.Update =>
+      ("name" -> g.name) ~
+        ("custom_fields" -> g.customFields.map(_.map(Extraction.decompose)))
+  }
+
   object groupIdSerializer extends CustomSerializer[GroupId](
     _ => deserializeGroupId -> serializeGroupId)
 
@@ -57,5 +76,11 @@ object GroupSerializers {
 
   object groupSerializer extends CustomSerializer[Group](
     formats => deserializeGroup(formats) -> PartialFunction.empty)
+
+  object newGroupSerializer extends CustomSerializer[Group.New](
+    formats => PartialFunction.empty -> serializeNewGroup(formats))
+
+  object groupUpdateSerializer extends CustomSerializer[Group.Update](
+    formats => PartialFunction.empty -> serializeGroupUpdate(formats))
 
 }

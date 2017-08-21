@@ -39,26 +39,32 @@ object RedmineDateParser {
 
   def parse(dateStr: String): DateTime = {
     if (dateStr.length > SHORT_DATE_FORMAT_MAX_LENGTH) {
-      return parseLongFormat(dateStr)
+      parseLongFormat(dateStr)
+    } else {
+      parseShortFormat(dateStr)
     }
-    parseShortFormat(dateStr)
   }
 
+  private val SLASH_SEPARATOR = '/'
+
   private def parseShortFormat(dateStr: String): DateTime = {
-    var format: DateTimeFormatter = null
-    format = if (dateStr.length >= 5 && dateStr.charAt(4) == '/') RedmineDateParser.SHORT_DATE_FORMAT else RedmineDateParser.SHORT_DATE_FORMAT_V2
+    val format = if (dateStr.length >= 5 && dateStr.charAt(4) == SLASH_SEPARATOR) {
+      RedmineDateParser.SHORT_DATE_FORMAT
+    } else {
+      RedmineDateParser.SHORT_DATE_FORMAT_V2
+    }
+
     format.parseDateTime(dateStr)
   }
 
   private def parseLongFormat(dateStr: String): DateTime = {
-    var format: DateTimeFormatter = null
-    if (dateStr.length >= 5 && dateStr.charAt(4) == '/') {
-      format = RedmineDateParser.FULL_DATE_FORMAT
-      return format.parseDateTime(dateStr)
+    if (dateStr.length >= 5 && dateStr.charAt(4) == SLASH_SEPARATOR) {
+      RedmineDateParser.FULL_DATE_FORMAT.parseDateTime(dateStr)
+    } else {
+      val s0 = normalizeTimeZoneInfo(dateStr)
+      val format = if (s0.indexOf('.') < 0) RedmineDateParser.FULL_DATE_FORMAT_V2 else RedmineDateParser.FULL_DATE_FORMAT_V3
+      format.parseDateTime(s0)
     }
-    val s0 = normalizeTimeZoneInfo(dateStr)
-    format = if (s0.indexOf('.') < 0) RedmineDateParser.FULL_DATE_FORMAT_V2 else RedmineDateParser.FULL_DATE_FORMAT_V3
-    format.parseDateTime(s0)
   }
 
   private def normalizeTimeZoneInfo(dateStr: String): String = {

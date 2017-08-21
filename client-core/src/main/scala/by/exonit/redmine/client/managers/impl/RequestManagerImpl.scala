@@ -75,10 +75,14 @@ class RequestManagerImpl(
         val total = (response \ "total_count").extractOrElse[BigInt](BigInt(0))
         val previous = if (offset > 0) {
           Some(getPartialResult(BigInt(0).max(offset - limit), limit))
-        } else None
+        } else {
+          None
+        }
         val next = if (total - offset - limit > 0) {
           Some(getPartialResult(offset + limit, limit))
-        } else None
+        } else {
+          None
+        }
         val allItemsTask = if (offset == 0 && items.size >= total) {
           // Short-circuit if all items are already loaded
           Task.now(items)

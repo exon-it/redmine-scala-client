@@ -49,7 +49,9 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
   def getUsers(params: Seq[(String, String)], includes: User.Include*): Task[PagedList[User]] = {
     val allParams = if (includes.nonEmpty) {
       params :+ "include" -> includes.map(_.token).mkString(",")
-    } else params
+    } else {
+      params
+    }
     getUsers(allParams: _*)
   }
 

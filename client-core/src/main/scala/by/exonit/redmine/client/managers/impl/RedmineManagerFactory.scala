@@ -23,7 +23,7 @@ import by.exonit.redmine.client.managers.{RedmineManager, WebClient}
 import scala.collection.immutable._
 
 object RedmineManagerFactory {
-  def apply(implicit client: WebClient) = new RedmineManagerFactory(client)
+  def apply(implicit client: WebClient): RedmineManagerFactory = new RedmineManagerFactory(client)
 }
 
 /**

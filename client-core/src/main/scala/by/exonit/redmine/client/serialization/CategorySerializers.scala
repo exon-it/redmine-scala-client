@@ -23,6 +23,8 @@ import org.json4s.JsonDSL._
 import scala.collection.immutable._
 
 object CategorySerializers {
+  import Implicits._
+
   lazy val all: Seq[Serializer[_]] = Seq(
     categoryIdSerializer,
     categoryLinkSerializer,
@@ -57,14 +59,15 @@ object CategorySerializers {
 
   def serializeNewCategory(implicit formats: Formats): PartialFunction[Any, JValue] = {
     case Category.New(name, assignee) =>
-      ("name" -> name) ~ ("assigned_to_id" -> assignee.map(Extraction.decompose))
+      ("name" -> name) ~
+        ("assigned_to_id" -> assignee.map(Extraction.decompose))
   }
 
   def serializeCategoryUpdate(implicit formats: Formats): PartialFunction[Any, JValue] = {
     case u: Category.Update =>
-      ("name" -> u.name.toOpt) ~
-        ("project_id" -> u.project.toOpt.map(_.map(Extraction.decompose).getOrElse(JNull)).getOrElse(JNothing)) ~
-        ("assigned_to_id" -> u.defaultAssignee.toOpt.map(_.map(Extraction.decompose).getOrElse(JNull)).getOrElse(JNothing))
+      ("name" -> u.name) ~
+        ("project_id" -> u.project.map(_.map(Extraction.decompose).orJNull).orJNothing) ~
+        ("assigned_to_id" -> u.defaultAssignee.map(_.map(Extraction.decompose).orJNull).orJNothing)
   }
 
   object categoryIdSerializer extends CustomSerializer[CategoryId](_ =>

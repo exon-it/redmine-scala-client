@@ -42,7 +42,11 @@ case class CategoryLink(id: BigInt, name: String) extends CategoryIdLike
  * @param defaultAssignee Default assigned user
  */
 case class Category(
-  id: BigInt, name: String, project: Option[ProjectLink], defaultAssignee: Option[UserLink]) extends CategoryIdLike
+  id: BigInt,
+  name: String,
+  project: Option[ProjectLink],
+  defaultAssignee: Option[UserLink]
+) extends CategoryIdLike
 
 /**
  * Category companion object
@@ -56,26 +60,18 @@ object Category {
    * @param name Category name
    * @param defaultAssignee Default assigned user
    */
-  case class New(name: String, defaultAssignee: Option[UserIdLike] = None)
+  case class New(
+    name: String,
+    defaultAssignee: Option[UserIdLike] = None
+  )
 
   /**
    * Category update entity type
    */
-  class Update {
-    /**
-     * Category name
-     */
-    val name = new FluentSettableField[String, Update](this)
-
-    /**
-     * Category project
-     */
-    val project = new FluentSettableField[Option[ProjectIdLike], Update](this)
-
-    /**
-     * Default assigned user
-     */
-    val defaultAssignee = new FluentSettableField[Option[UserIdLike], Update](this)
-  }
+  case class Update(
+    name: Option[String] = None,
+    project: Option[Option[ProjectIdLike]] = None,
+    defaultAssignee: Option[Option[UserIdLike]] = None
+  )
 
 }

@@ -59,8 +59,7 @@ class AttachmentManagerImpl(requestManager: RequestManager) extends AttachmentMa
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("issues", s"${issue.id}.json")
     } yield ()
-    val issueUpdate = new Issue.Update()
-    issueUpdate.uploads.set(uploads.toSet)
+    val issueUpdate = new Issue.Update(uploads = Some(uploads.toSet))
     requestManager.putEntity(request, "issue", issueUpdate)
   }
 

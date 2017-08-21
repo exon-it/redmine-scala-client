@@ -119,25 +119,25 @@ object IssueSerializers {
 
   def serializeIssueUpdate(implicit formats: Formats): PartialFunction[Any, JValue] = {
     case u: Issue.Update =>
-      ("subject" -> u.subject.toOpt) ~
-        ("description" -> u.description.toOpt.map(_.map(Extraction.decompose).getOrElse(JNull))) ~
-        ("start_date" -> u.startDate.toOpt.map(_.map(_.toRedmine2ShortDate).map(Extraction.decompose).getOrElse(JNull))) ~
-        ("due_date" -> u.dueDate.toOpt.map(_.map(_.toRedmine2ShortDate).map(Extraction.decompose).getOrElse(JNull))) ~
-        ("project_id" -> u.project.toOpt.map(_.id)) ~
-        ("tracker_id" -> u.tracker.toOpt.map(_.id)) ~
-        ("status_id" -> u.status.toOpt.map(_.id)) ~
-        ("priority_id" -> u.priority.toOpt.map(_.id)) ~
-        ("version_id" -> u.version.toOpt.map(_.map(_.id).map(Extraction.decompose).getOrElse(JNull))) ~
-        ("done_ratio" -> u.doneRatio.toOpt) ~
-        ("estimated_hours" -> u.estimatedHours.toOpt.map(_.map(Extraction.decompose).getOrElse(JNull))) ~
-        ("category_id" -> u.category.toOpt.map(_.id)) ~
-        ("is_private" -> u.isPrivate.toOpt) ~
-        ("custom_fields" -> u.customFields.toOpt.map(_.map(Extraction.decompose))) ~
-        ("uploads" -> u.uploads.toOpt.map(_.map(Extraction.decompose))) ~
-        ("notes" -> u.notes.toOpt.map(_.message).map(Extraction.decompose)) ~
-        ("private_notes" -> u.notes.toOpt.map(_.isPrivate)) ~
-        ("author_id" -> u.author.toOpt.map(_.id)) ~
-        ("parent_issue_id" -> u.parentIssue.toOpt.map(_.map(_.id).map(Extraction.decompose).getOrElse(JNull)))
+      ("subject" -> u.subject) ~
+        ("description" -> u.description.map(_.map(Extraction.decompose).orJNull)) ~
+        ("start_date" -> u.startDate.map(_.map(_.toRedmine2ShortDate).map(Extraction.decompose).orJNull)) ~
+        ("due_date" -> u.dueDate.map(_.map(_.toRedmine2ShortDate).map(Extraction.decompose).orJNull)) ~
+        ("project_id" -> u.project.map(_.id)) ~
+        ("tracker_id" -> u.tracker.map(_.id)) ~
+        ("status_id" -> u.status.map(_.id)) ~
+        ("priority_id" -> u.priority.map(_.id)) ~
+        ("version_id" -> u.version.map(_.map(_.id).map(Extraction.decompose).orJNull)) ~
+        ("done_ratio" -> u.doneRatio) ~
+        ("estimated_hours" -> u.estimatedHours.map(_.map(Extraction.decompose).orJNull)) ~
+        ("category_id" -> u.category.map(_.id)) ~
+        ("is_private" -> u.isPrivate) ~
+        ("custom_fields" -> u.customFields.map(_.map(Extraction.decompose))) ~
+        ("uploads" -> u.uploads.map(_.map(Extraction.decompose))) ~
+        ("notes" -> u.notes.map(_.message).map(Extraction.decompose)) ~
+        ("private_notes" -> u.notes.map(_.isPrivate)) ~
+        ("author_id" -> u.author.map(_.id)) ~
+        ("parent_issue_id" -> u.parentIssue.map(_.map(_.id).map(Extraction.decompose).orJNull))
   }
 
   object issueUpdateSerializer extends CustomSerializer[Issue.Update](
@@ -148,23 +148,23 @@ object IssueSerializers {
     case i: Issue.New =>
       ("subject" -> i.subject) ~
         ("project_id" -> i.project.id) ~
-        ("status_id" -> i.status.toOpt.map(_.id)) ~
-        ("description" -> i.description.toOpt) ~
-        ("start_date" -> i.startDate.toOpt.map(_.toRedmine2ShortDate)) ~
-        ("due_date" -> i.dueDate.toOpt.map(_.toRedmine2ShortDate)) ~
-        ("tracker_id" -> i.tracker.toOpt.map(_.id)) ~
-        ("status_id" -> i.status.toOpt.map(_.id)) ~
-        ("priority_id" -> i.priority.toOpt.map(_.id)) ~
-        ("version_id" -> i.version.toOpt.map(_.id)) ~
-        ("done_ratio" -> i.doneRatio.toOpt) ~
-        ("estimated_hours" -> i.estimatedHours.toOpt) ~
-        ("category_id" -> i.category.toOpt.map(_.id)) ~
-        ("is_private" -> i.isPrivate.toOpt) ~
-        ("custom_fields" -> i.customFields.toOpt.map(_.map(Extraction.decompose))) ~
-        ("uploads" -> i.uploads.toOpt.map(_.map(Extraction.decompose))) ~
-        ("author_id" -> i.author.toOpt.map(_.id)) ~
-        ("parent_issue_id" -> i.parentIssue.toOpt.map(_.id)) ~
-        ("assigned_to_id" -> i.assignee.toOpt.map(_.id))
+        ("status_id" -> i.status.map(_.id)) ~
+        ("description" -> i.description) ~
+        ("start_date" -> i.startDate.map(_.toRedmine2ShortDate)) ~
+        ("due_date" -> i.dueDate.map(_.toRedmine2ShortDate)) ~
+        ("tracker_id" -> i.tracker.map(_.id)) ~
+        ("status_id" -> i.status.map(_.id)) ~
+        ("priority_id" -> i.priority.map(_.id)) ~
+        ("version_id" -> i.version.map(_.id)) ~
+        ("done_ratio" -> i.doneRatio) ~
+        ("estimated_hours" -> i.estimatedHours) ~
+        ("category_id" -> i.category.map(_.id)) ~
+        ("is_private" -> i.isPrivate) ~
+        ("custom_fields" -> i.customFields.map(_.map(Extraction.decompose))) ~
+        ("uploads" -> i.uploads.map(_.map(Extraction.decompose))) ~
+        ("author_id" -> i.author.map(_.id)) ~
+        ("parent_issue_id" -> i.parentIssue.map(_.id)) ~
+        ("assigned_to_id" -> i.assignee.map(_.id))
   }
 
   object newIssueSerializer extends CustomSerializer[Issue.New](

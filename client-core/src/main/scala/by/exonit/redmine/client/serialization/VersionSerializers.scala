@@ -92,13 +92,13 @@ object VersionSerializers {
     formats => deserializeVersion(formats) -> PartialFunction.empty)
 
   def serializeNewVersion(implicit formats: Formats): PartialFunction[Any, JValue] = {
-    case v@Version.New(name) =>
-      ("name" -> name) ~
-        ("status" -> v.status.toOpt.map(Extraction.decompose(_))) ~
-        ("sharing" -> v.sharing.toOpt.map(Extraction.decompose(_))) ~
-        ("due_date" -> v.dueDate.toOpt.map(_.toRedmine2ShortDate)) ~
-        ("description" -> v.description.toOpt) ~
-        ("custom_fields" -> v.customFields.toOpt.map(_.map(Extraction.decompose)))
+    case v : Version.New =>
+      ("name" -> v.name) ~
+        ("status" -> v.status.map(Extraction.decompose)) ~
+        ("sharing" -> v.sharing.map(Extraction.decompose)) ~
+        ("due_date" -> v.dueDate.map(_.toRedmine2ShortDate)) ~
+        ("description" -> v.description) ~
+        ("custom_fields" -> v.customFields.map(_.map(Extraction.decompose)))
   }
 
   object newVersionSerializer extends CustomSerializer[Version.New](
@@ -106,12 +106,12 @@ object VersionSerializers {
 
   def serializeVersionUpdate(implicit formats: Formats): PartialFunction[Any, JValue] = {
     case u: Version.Update =>
-      ("name" -> u.name.toOpt) ~
-        ("status" -> u.status.toOpt.map(Extraction.decompose(_))) ~
-        ("sharing" -> u.sharing.toOpt.map(Extraction.decompose(_))) ~
-        ("due_date" -> u.dueDate.toOpt.map(_.map(_.toRedmine2ShortDate).map(Extraction.decompose).getOrElse(JNull)).getOrElse(JNothing)) ~
-        ("description" -> u.description.toOpt.map(_.map(Extraction.decompose).getOrElse(JNull)).getOrElse(JNothing)) ~
-        ("custom_fields" -> u.customFields.toOpt.map(_.map(Extraction.decompose)))
+      ("name" -> u.name) ~
+        ("status" -> u.status.map(Extraction.decompose)) ~
+        ("sharing" -> u.sharing.map(Extraction.decompose)) ~
+        ("due_date" -> u.dueDate.map(_.map(_.toRedmine2ShortDate).map(Extraction.decompose).orJNull).orJNothing) ~
+        ("description" -> u.description.map(_.map(Extraction.decompose).orJNull).orJNothing) ~
+        ("custom_fields" -> u.customFields.map(_.map(Extraction.decompose)))
   }
 
   object versionUpdateSerializer extends CustomSerializer[Version.Update](

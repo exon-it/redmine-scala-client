@@ -26,7 +26,7 @@ trait WikiPageLike extends WikiPageIdLike {
   def version: BigInt
   def createdOn: DateTime
   def updatedOn: DateTime
-  def parent: Option[WikiPageId]
+  def parent: Option[WikiPageIdLike]
 }
 
 case class WikiPage(
@@ -34,7 +34,8 @@ case class WikiPage(
   version: BigInt,
   createdOn: DateTime,
   updatedOn: DateTime,
-  parent: Option[WikiPageId]) extends WikiPageLike
+  parent: Option[WikiPageId]
+) extends WikiPageLike
 
 case class WikiPageDetails(
   id: String,
@@ -44,17 +45,20 @@ case class WikiPageDetails(
   parent: Option[WikiPageId],
   text: String,
   author: Option[UserLink],
-  comments: Option[String]) extends WikiPageLike
+  comments: Option[String]
+) extends WikiPageLike
 
 object WikiPage {
-  case class New(title: String, text: String) {
-    val parent = new FluentSettableField[Option[WikiPageIdLike], New](this)
-    val comments = new FluentSettableField[String, New](this)
-  }
+  case class New(
+    title: String,
+    text: String,
+    parent: Option[WikiPageIdLike] = None,
+    comments: Option[String] = None
+  )
 
-  class Update {
-    val parent = new FluentSettableField[Option[WikiPageIdLike], Update](this)
-    val text = new FluentSettableField[String, Update](this)
-    val comments = new FluentSettableField[String, Update](this)
-  }
+  case class Update(
+    text: Option[String] = None,
+    parent: Option[Option[WikiPageIdLike]] = None,
+    comments: Option[String] = None
+  )
 }

@@ -16,7 +16,7 @@
 
 package by.exonit.redmine.client.serialization
 
-import org.joda.time.{DateTime, DateTimeZone, LocalDate}
+import org.joda.time.{DateTime, LocalDate}
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, ISODateTimeFormat}
 
 object RedmineDateParser {

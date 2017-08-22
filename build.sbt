@@ -10,7 +10,7 @@ lazy val commonSettings = Seq(
 
   startYear := Some(2015),
 
-  version := "5.0.0-rc2",
+  version := "5.0.0-rc3",
 
   scalaVersion := "2.11.11",
   scalacOptions ++= Seq(
@@ -21,7 +21,6 @@ lazy val commonSettings = Seq(
     "-language:higherKinds",
     "-language:implicitConversions",
     "-unchecked",
-    "-Xfatal-warnings",
     "-Xlint",
     "-Yno-adapted-args",
     "-Ywarn-numeric-widen",

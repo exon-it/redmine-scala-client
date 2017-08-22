@@ -16,7 +16,7 @@
 
 package by.exonit.redmine.client.serialization
 
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, ISODateTimeFormat}
 
 object RedmineDateParser {
@@ -41,20 +41,21 @@ object RedmineDateParser {
     if (dateStr.length > SHORT_DATE_FORMAT_MAX_LENGTH) {
       parseLongFormat(dateStr)
     } else {
-      parseShortFormat(dateStr)
+      parseShortFormat(dateStr).toDateTimeAtStartOfDay
     }
   }
 
+  def parseLocalDate(str: String): LocalDate = parseShortFormat(str)
+
   private val SLASH_SEPARATOR = '/'
 
-  private def parseShortFormat(dateStr: String): DateTime = {
+  private def parseShortFormat(dateStr: String): LocalDate = {
     val format = if (dateStr.length >= 5 && dateStr.charAt(4) == SLASH_SEPARATOR) {
       RedmineDateParser.SHORT_DATE_FORMAT
     } else {
       RedmineDateParser.SHORT_DATE_FORMAT_V2
     }
-
-    format.parseDateTime(dateStr)
+    format.parseLocalDate(dateStr)
   }
 
   private def parseLongFormat(dateStr: String): DateTime = {

@@ -16,7 +16,8 @@
 
 package by.exonit.redmine.client
 
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, LocalDate}
+
 import scala.collection.immutable._
 
 trait TimeEntryIdLike extends Identifiable[BigInt]
@@ -29,28 +30,31 @@ case class TimeEntry(
   issueId: Option[IssueId],
   user: Option[UserLink],
   activity: ActivityLink,
-  spentOn: DateTime,
+  spentOn: LocalDate,
   hours: BigDecimal,
   comment: Option[String],
   createdOn: DateTime,
   updatedOn: DateTime,
-  customFields: Option[Set[CustomField]]) extends TimeEntryIdLike with OptionalCustomFieldSet
+  customFields: Option[Set[CustomField]]
+) extends TimeEntryIdLike with OptionalCustomFieldSet
 
 object TimeEntry {
 
   case class New(
-    issueOrProjectId: Either[IssueIdLike, ProjectIdLike], hours: BigDecimal) extends CustomFieldUpdateSetFSF[New] {
-    val spentOn = new FluentSettableField[DateTime, New](this)
-    val activity = new FluentSettableField[ActivityIdLike, New](this)
-    val comments = new FluentSettableField[String, New](this)
-  }
+    issueOrProjectId: Either[IssueIdLike, ProjectIdLike],
+    hours: BigDecimal,
+    spentOn: Option[LocalDate] = None,
+    activity: Option[ActivityIdLike] = None,
+    comments: Option[String],
+    customFields: Option[Set[CustomField.Update]]
+  )
 
-  class Update extends CustomFieldUpdateSetFSF[Update] {
-    val issueOrProjectId = new FluentSettableField[Either[IssueIdLike, ProjectIdLike], Update](this)
-    val hours = new FluentSettableField[BigDecimal, Update](this)
-    val spentOn = new FluentSettableField[DateTime, Update](this)
-    val activity = new FluentSettableField[ActivityIdLike, Update](this)
-    val comments = new FluentSettableField[Option[String], Update](this)
-  }
-
+  case class Update(
+    issueOrProjectId: Option[Either[IssueIdLike, ProjectIdLike]] = None,
+    hours: Option[BigDecimal] = None,
+    spentOn: Option[LocalDate] = None,
+    activity: Option[ActivityIdLike] = None,
+    comments: Option[Option[String]] = None,
+    customFields: Option[Set[CustomField.Update]] = None
+  )
 }

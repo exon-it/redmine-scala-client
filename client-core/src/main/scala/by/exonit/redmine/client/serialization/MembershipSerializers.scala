@@ -64,11 +64,11 @@ object MembershipSerializers {
   object newMembershipSerializer extends CustomSerializer[Membership.New](
     formats => PartialFunction.empty -> serializeNewMembership(formats))
 
-  def serializeMembershipUpdate(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeMembershipUpdate: PartialFunction[Any, JValue] = {
     case u: Membership.Update => "role_ids" -> u.roles.map(_.id)
   }
 
   object membershipUpdateSerializer extends CustomSerializer[Membership.Update](
-    formats => PartialFunction.empty -> serializeMembershipUpdate(formats))
+    _ => PartialFunction.empty -> serializeMembershipUpdate)
 
 }

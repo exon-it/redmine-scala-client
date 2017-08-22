@@ -81,16 +81,17 @@ object UserSerializers {
     formats => deserializeUser(formats) -> PartialFunction.empty)
 
   def serializeNewUser(implicit formats: Formats): PartialFunction[Any, JValue] = {
-    case u@User.New(login, fName, lName, email) =>
-      ("login" -> login) ~
-        ("firstname" -> fName) ~
-        ("lastname" -> lName) ~
-        ("mail" -> email) ~
-        ("password" -> u.password.toOpt) ~
-        ("auth_source_id" -> u.authSourceId.toOpt) ~
-        ("mail_notification" -> u.mailNotification.toOpt) ~
-        ("must_change_password" -> u.mustChangePassword.toOpt) ~
-        ("custom_fields" -> u.customFields.toOpt.map(_.map(Extraction.decompose)))
+    case u: User.New =>
+      ("login" -> u.login) ~
+        ("firstname" -> u.firstName) ~
+        ("lastname" -> u.lastName) ~
+        ("mail" -> u.email) ~
+        ("password" -> u.password) ~
+        ("auth_source_id" -> u.authSourceId) ~
+        ("mail_notification" -> u.mailNotification) ~
+        ("must_change_passwd" -> u.mustChangePassword) ~
+        ("generate_password" -> u.generatePassword) ~
+        ("custom_fields" -> u.customFields.map(_.map(Extraction.decompose)))
   }
 
   object newUserSerializer extends CustomSerializer[User.New](
@@ -98,15 +99,16 @@ object UserSerializers {
 
   def serializeUserUpdate(implicit formats: Formats): PartialFunction[Any, JValue] = {
     case u: User.Update =>
-      ("login" -> u.login.toOpt) ~
-        ("firstname" -> u.firstName.toOpt) ~
-        ("lastname" -> u.lastName.toOpt) ~
-        ("mail" -> u.email.toOpt) ~
-        ("password" -> u.password.toOpt) ~
-        ("auth_source_id" -> u.authSourceId.toOpt) ~
-        ("mail_notification" -> u.mailNotification.toOpt) ~
-        ("must_change_password" -> u.mustChangePassword.toOpt) ~
-        ("custom_fields" -> u.customFields.toOpt.map(_.map(Extraction.decompose)))
+      ("login" -> u.login) ~
+        ("firstname" -> u.firstName) ~
+        ("lastname" -> u.lastName) ~
+        ("mail" -> u.email) ~
+        ("password" -> u.password) ~
+        ("auth_source_id" -> u.authSourceId) ~
+        ("mail_notification" -> u.mailNotification) ~
+        ("must_change_passwd" -> u.mustChangePassword) ~
+        ("generate_password" -> u.generatePassword) ~
+        ("custom_fields" -> u.customFields.map(_.map(Extraction.decompose)))
   }
 
   object userUpdateSerializer extends CustomSerializer[User.Update](

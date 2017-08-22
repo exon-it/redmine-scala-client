@@ -25,16 +25,16 @@ object SavedQuerySerializers {
   lazy val all: Seq[Serializer[_]] = Seq(
     savedQueryIdSerializer, savedQuerySerializer)
 
-  def deserializeSavedQueryId(implicit formats: Formats): PartialFunction[JValue, SavedQueryId] = {
+  def deserializeSavedQueryId: PartialFunction[JValue, SavedQueryId] = {
     case JInt(id) => SavedQueryId(id)
   }
 
-  def serializeSavedQueryId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeSavedQueryId: PartialFunction[Any, JValue] = {
     case SavedQueryId(id) => JInt(id)
   }
 
   object savedQueryIdSerializer extends CustomSerializer[SavedQueryId](
-    formats => deserializeSavedQueryId(formats) -> serializeSavedQueryId(formats))
+    _ => deserializeSavedQueryId -> serializeSavedQueryId)
 
   def deserializeSavedQuery(implicit formats: Formats): PartialFunction[JValue, SavedQuery] = {
     case j: JObject =>

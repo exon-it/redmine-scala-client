@@ -75,10 +75,14 @@ class RequestManagerImpl(
         val total = (response \ "total_count").extractOrElse[BigInt](BigInt(0))
         val previous = if (offset > 0) {
           Some(getPartialResult(BigInt(0).max(offset - limit), limit))
-        } else None
+        } else {
+          None
+        }
         val next = if (total - offset - limit > 0) {
           Some(getPartialResult(offset + limit, limit))
-        } else None
+        } else {
+          None
+        }
         val allItemsTask = if (offset == 0 && items.size >= total) {
           // Short-circuit if all items are already loaded
           Task.now(items)
@@ -184,7 +188,6 @@ class RequestManagerImpl(
 
   def putEntity[T](request: Request[Unit], entityName: String, entity: T)
     (implicit mf: Manifest[T]): Task[Unit] = {
-    implicit val implicitFormats = formats
     val subRequest = for {
       _ <- request
       _ <- RequestDSL.setMethod("PUT")
@@ -279,19 +282,22 @@ class RequestManagerImpl(
     client.execute(req, responseHandler)
   }
 
+  protected def statusCodeIsSuccessful(status: Int): Boolean =
+    status / 100 == 2
+
   protected def checkResponseOk(): Response[Unit] =
     for {
       status <- ResponseDSL.getStatusCode
       statusText <- ResponseDSL.getStatusText
     } yield {
-      if (status != WebClient.Constants.StatusOk) throw ResponseStatusException(status, Some(statusText))
+      if (!statusCodeIsSuccessful(status)) throw ResponseStatusException(status, Some(statusText))
     }
 
   protected def checkStreamingResponseOk(): StreamingResponse[Unit] =
     for {
       status <- StreamingResponseDSL.getStatusCode
     } yield {
-      if (status != WebClient.Constants.StatusOk) throw ResponseStatusException(status, None)
+      if (!statusCodeIsSuccessful(status)) throw ResponseStatusException(status, None)
     }
 
   def copy(

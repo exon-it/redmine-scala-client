@@ -29,16 +29,16 @@ object MembershipSerializers {
     newMembershipSerializer,
     membershipUpdateSerializer)
 
-  def serializeMembershipId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeMembershipId: PartialFunction[Any, JValue] = {
     case MembershipId(id) => JInt(id)
   }
 
-  def deserializeMembershipId(implicit formats: Formats): PartialFunction[JValue, MembershipId] = {
+  def deserializeMembershipId: PartialFunction[JValue, MembershipId] = {
     case JInt(id) => MembershipId(id)
   }
 
   object membershipIdSerializer extends CustomSerializer[MembershipId](
-    formats => deserializeMembershipId(formats) -> serializeMembershipId(formats))
+    _ => deserializeMembershipId -> serializeMembershipId)
 
   def deserializeMembership(implicit formats: Formats): PartialFunction[JValue, Membership] = {
     case j: JObject =>
@@ -58,17 +58,17 @@ object MembershipSerializers {
   def serializeNewMembership(implicit formats: Formats): PartialFunction[Any, JValue] = {
     case Membership.New(user, roles) =>
       val identity = user.fold(u => "user_id" -> u.id, g => "user_id" -> g.id)
-      identity ~ ("role_ids" -> roles.map(Extraction.decompose(_)))
+      identity ~ ("role_ids" -> roles.map(Extraction.decompose))
   }
 
   object newMembershipSerializer extends CustomSerializer[Membership.New](
     formats => PartialFunction.empty -> serializeNewMembership(formats))
 
-  def serializeMembershipUpdate(implicit formats: Formats): PartialFunction[Any, JValue] = {
-    case u: Membership.Update => Extraction.decompose("role_ids" -> u.roles.map(_.id))
+  def serializeMembershipUpdate: PartialFunction[Any, JValue] = {
+    case u: Membership.Update => "role_ids" -> u.roles.map(_.id)
   }
 
   object membershipUpdateSerializer extends CustomSerializer[Membership.Update](
-    formats => PartialFunction.empty -> serializeMembershipUpdate(formats))
+    _ => PartialFunction.empty -> serializeMembershipUpdate)
 
 }

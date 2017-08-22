@@ -49,7 +49,8 @@ case class Group(
   name: String,
   users: Option[Set[UserLink]],
   memberships: Option[Set[IdentityMembership]],
-  customFields: Option[Set[CustomField]]) extends GroupIdLike with OptionalCustomFieldSet
+  customFields: Option[Set[CustomField]]
+) extends GroupIdLike with OptionalCustomFieldSet
 
 /**
  * Group companion object
@@ -64,22 +65,19 @@ object Group {
    * @param name Group name
    * @param users Group user list
    */
-  case class New(name: String, users: UserId*) extends CustomFieldUpdateSetFSF[New]
+  case class New(
+    name: String,
+    users: Set[UserIdLike],
+    customFields: Option[Set[CustomField.Update]] = None
+  )
 
   /**
    * Group update entity type
    */
-  case class Update() extends CustomFieldUpdateSetFSF[Update] {
-    /**
-     * Group name
-     */
-    val name = new FluentSettableField[String, Update](this)
-
-    /**
-     * Users to ''add'' to the group
-     */
-    val users = new FluentSettableField[Set[UserIdLike], Update](this)
-  }
+  case class Update(
+    name: Option[String] = None,
+    customFields: Option[Set[CustomField.Update]] = None
+  )
 
   /**
    * Group read operation additional include code type

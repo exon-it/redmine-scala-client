@@ -26,16 +26,16 @@ object UserSerializers {
   lazy val all: Seq[Serializer[_]] = Seq(
     userIdSerializer, userLinkSerializer, userSerializer, newUserSerializer, userUpdateSerializer)
 
-  def deserializeUserId(implicit formats: Formats): PartialFunction[JValue, UserId] = {
+  def deserializeUserId: PartialFunction[JValue, UserId] = {
     case JInt(id) => UserId(id)
   }
 
-  def serializeUserId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeUserId: PartialFunction[Any, JValue] = {
     case UserId(id) => JInt(id)
   }
 
   object userIdSerializer extends CustomSerializer[UserId](
-    formats => deserializeUserId(formats) -> serializeUserId(formats))
+    _ => deserializeUserId -> serializeUserId)
 
   def deserializeUserLink(implicit formats: Formats): PartialFunction[JValue, UserLink] = {
     case j: JObject =>
@@ -47,16 +47,16 @@ object UserSerializers {
   object userLinkSerializer extends CustomSerializer[UserLink](
     formats => deserializeUserLink(formats) -> PartialFunction.empty)
 
-  def deserializeUserStatus(implicit formats: Formats): PartialFunction[JValue, User.Status] = {
+  def deserializeUserStatus: PartialFunction[JValue, User.Status] = {
     case JInt(s) => User.Status(s.toInt)
   }
 
-  def serializeUserStatus(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeUserStatus: PartialFunction[Any, JValue] = {
     case User.Status(id) => JInt(id)
   }
 
   object userStatusSerializer extends CustomSerializer[User.Status](
-    formats => deserializeUserStatus(formats) -> serializeUserStatus(formats))
+    _ => deserializeUserStatus -> serializeUserStatus)
 
   def deserializeUser(implicit formats: Formats): PartialFunction[JValue, User] = {
     case j: JObject =>
@@ -81,16 +81,17 @@ object UserSerializers {
     formats => deserializeUser(formats) -> PartialFunction.empty)
 
   def serializeNewUser(implicit formats: Formats): PartialFunction[Any, JValue] = {
-    case u@User.New(login, fName, lName, email) =>
-      ("login" -> login) ~
-        ("firstname" -> fName) ~
-        ("lastname" -> lName) ~
-        ("mail" -> email) ~
-        ("password" -> u.password.toOpt) ~
-        ("auth_source_id" -> u.authSourceId.toOpt) ~
-        ("mail_notification" -> u.mailNotification.toOpt) ~
-        ("must_change_password" -> u.mustChangePassword.toOpt) ~
-        ("custom_fields" -> u.customFields.toOpt.map(_.map(Extraction.decompose)))
+    case u: User.New =>
+      ("login" -> u.login) ~
+        ("firstname" -> u.firstName) ~
+        ("lastname" -> u.lastName) ~
+        ("mail" -> u.email) ~
+        ("password" -> u.password) ~
+        ("auth_source_id" -> u.authSourceId) ~
+        ("mail_notification" -> u.mailNotification) ~
+        ("must_change_passwd" -> u.mustChangePassword) ~
+        ("generate_password" -> u.generatePassword) ~
+        ("custom_fields" -> u.customFields.map(_.map(Extraction.decompose)))
   }
 
   object newUserSerializer extends CustomSerializer[User.New](
@@ -98,15 +99,16 @@ object UserSerializers {
 
   def serializeUserUpdate(implicit formats: Formats): PartialFunction[Any, JValue] = {
     case u: User.Update =>
-      ("login" -> u.login.toOpt) ~
-        ("firstname" -> u.firstName.toOpt) ~
-        ("lastname" -> u.lastName.toOpt) ~
-        ("mail" -> u.email.toOpt) ~
-        ("password" -> u.password.toOpt) ~
-        ("auth_source_id" -> u.authSourceId.toOpt) ~
-        ("mail_notification" -> u.mailNotification.toOpt) ~
-        ("must_change_password" -> u.mustChangePassword.toOpt) ~
-        ("custom_fields" -> u.customFields.toOpt.map(_.map(Extraction.decompose)))
+      ("login" -> u.login) ~
+        ("firstname" -> u.firstName) ~
+        ("lastname" -> u.lastName) ~
+        ("mail" -> u.email) ~
+        ("password" -> u.password) ~
+        ("auth_source_id" -> u.authSourceId) ~
+        ("mail_notification" -> u.mailNotification) ~
+        ("must_change_passwd" -> u.mustChangePassword) ~
+        ("generate_password" -> u.generatePassword) ~
+        ("custom_fields" -> u.customFields.map(_.map(Extraction.decompose)))
   }
 
   object userUpdateSerializer extends CustomSerializer[User.Update](

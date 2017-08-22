@@ -49,23 +49,31 @@ object User {
     def unapply(status: Status): Option[Int] = Option(status).map(_.number)
   }
 
-  case class New(login: String, firstName: String, lastName: String, email: String) extends CustomFieldUpdateSetFSF[New] {
-    val password = new FluentSettableField[String, New](this)
-    val authSourceId = new FluentSettableField[BigInt, New](this)
-    val mailNotification = new FluentSettableField[String, New](this)
-    val mustChangePassword = new FluentSettableField[Boolean, New](this)
-  }
+  case class New(
+    login: String,
+    firstName: String,
+    lastName: String,
+    email: String,
+    password: Option[String] = None,
+    authSourceId: Option[BigInt] = None,
+    mailNotification: Option[String] = None,
+    mustChangePassword: Option[Boolean] = None,
+    generatePassword: Option[Boolean] = None,
+    customFields: Option[Set[CustomField.Update]] = None
+  )
 
-  case class Update() extends CustomFieldUpdateSetFSF[Update] {
-    val login = new FluentSettableField[String, Update](this)
-    val firstName = new FluentSettableField[String, Update](this)
-    val lastName = new FluentSettableField[String, Update](this)
-    val email = new FluentSettableField[String, Update](this)
-    val password = new FluentSettableField[String, Update](this)
-    val authSourceId = new FluentSettableField[BigInt, Update](this)
-    val mailNotification = new FluentSettableField[String, Update](this)
-    val mustChangePassword = new FluentSettableField[Boolean, Update](this)
-  }
+  case class Update(
+    login: Option[String] = None,
+    firstName: Option[String] = None,
+    lastName: Option[String] = None,
+    email: Option[String] = None,
+    password: Option[String] = None,
+    authSourceId: Option[BigInt] = None,
+    mailNotification: Option[String] = None,
+    mustChangePassword: Option[Boolean] = None,
+    generatePassword: Option[Boolean] = None,
+    customFields: Option[Set[CustomField.Update]] = None
+  )
 }
 
 case class User(
@@ -81,5 +89,5 @@ case class User(
   authSourceId: Option[BigInt],
   customFields: Option[Set[CustomField]],
   memberships: Option[Set[Membership]],
-  groups: Option[Set[GroupLink]])
-    extends UserIdLike with OptionalCustomFieldSet
+  groups: Option[Set[GroupLink]]
+) extends UserIdLike with OptionalCustomFieldSet

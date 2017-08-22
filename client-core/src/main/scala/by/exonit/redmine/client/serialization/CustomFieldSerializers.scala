@@ -16,7 +16,7 @@
 
 package by.exonit.redmine.client.serialization
 
-import by.exonit.redmine.client.{CustomField, CustomFieldDefinition, RoleLink, TrackerLink}
+import by.exonit.redmine.client._
 import org.json4s._
 import org.json4s.JsonDSL._
 
@@ -25,7 +25,11 @@ import scala.collection.immutable._
 
 object CustomFieldSerializers {
   lazy val all: immutable.Seq[Serializer[_]] = immutable.Seq(
-    customFieldSerializer, customFieldUpdateSerializer, customFieldDefinitionSerializer)
+    customFieldSerializer,
+    customFieldUpdateSerializer,
+    customFieldDefinitionSerializer,
+    customFieldPossibleValueSerializer
+  )
 
   def deserializeCustomField(implicit formats: Formats): PartialFunction[JValue, CustomField] = {
     case j: JObject =>
@@ -56,6 +60,17 @@ object CustomFieldSerializers {
       formats =>
         (PartialFunction.empty, serializeCustomFieldUpdate(formats)))
 
+  def deserializeCustomFieldPossibleValue(implicit formats: Formats): PartialFunction[JValue, CustomFieldPossibleValue] = {
+    case j: JObject =>
+      CustomFieldPossibleValue(
+        (j \ "value").extract[String],
+        (j \ "label").extractOpt[String]
+      )
+  }
+
+  object customFieldPossibleValueSerializer extends CustomSerializer[CustomFieldPossibleValue](
+    formats => deserializeCustomFieldPossibleValue(formats) -> PartialFunction.empty)
+
   def deserializeCustomFieldDefinition(implicit formats: Formats): PartialFunction[JValue, CustomFieldDefinition] = {
     case j: JObject =>
       CustomFieldDefinition(
@@ -72,12 +87,11 @@ object CustomFieldSerializers {
         (j \ "searchable").extractOpt[Boolean].getOrElse(false),
         (j \ "multiple").extractOpt[Boolean].getOrElse(false),
         (j \ "default_value").extractOpt[String],
-        (j \ "possible_values").toOption.map(j => (j \ "value").extract[Set[String]]),
+        (j \ "possible_values").toOption.map(_.extract[Set[CustomFieldPossibleValue]]),
         (j \ "trackers").toOption.map(_.extract[Set[TrackerLink]]),
         (j \ "roles").toOption.map(_.extract[Set[RoleLink]]))
   }
 
   object customFieldDefinitionSerializer extends CustomSerializer[CustomFieldDefinition](
     formats => deserializeCustomFieldDefinition(formats) -> PartialFunction.empty)
-
 }

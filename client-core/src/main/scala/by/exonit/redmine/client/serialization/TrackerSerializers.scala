@@ -25,16 +25,16 @@ object TrackerSerializers {
   lazy val all: Seq[Serializer[_]] = Seq(
     trackerIdSerializer, trackerLinkSerializer, trackerSerializer)
 
-  def deserializeTrackerId(implicit formats: Formats): PartialFunction[JValue, TrackerId] = {
+  def deserializeTrackerId: PartialFunction[JValue, TrackerId] = {
     case JInt(id) => TrackerId(id)
   }
 
-  def serializeTrackerId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeTrackerId: PartialFunction[Any, JValue] = {
     case TrackerId(id) => JInt(id)
   }
 
   object trackerIdSerializer extends CustomSerializer[TrackerId](
-    formats => deserializeTrackerId(formats) -> serializeTrackerId(formats))
+    _ => deserializeTrackerId -> serializeTrackerId)
 
   def deserializeTrackerLink(implicit formats: Formats): PartialFunction[JValue, TrackerLink] = {
     case j: JObject =>

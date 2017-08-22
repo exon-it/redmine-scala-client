@@ -27,21 +27,29 @@ trait MembershipLike extends MembershipIdLike {
   def roles: Set[RoleLink]
 }
 
-case class IdentityMembership(id: BigInt, project: ProjectLink, roles: Set[RoleLink]) extends MembershipLike
+case class IdentityMembership(
+  id: BigInt,
+  project: ProjectLink,
+  roles: Set[RoleLink]
+) extends MembershipLike
 
-
-case class Membership(id: BigInt,
-                      project: ProjectLink,
-                      user: Either[UserLink, GroupLink],
-                      roles: Set[RoleLink]) extends MembershipLike
+case class Membership(
+  id: BigInt,
+  project: ProjectLink,
+  user: Either[UserLink, GroupLink],
+  roles: Set[RoleLink]
+) extends MembershipLike
 
 object Membership {
 
-  case class New(user: Either[UserIdLike, GroupIdLike], roles: Seq[RoleIdLike])
+  case class New(
+    user: Either[UserIdLike, GroupIdLike],
+    roles: Seq[RoleIdLike]
+  )
 
-  class Update {
-    val roles: Seq[RoleIdLike] = Seq[RoleIdLike]()
-  }
+  case class Update(
+    roles: Seq[RoleIdLike]
+  )
 
 }
 

@@ -17,8 +17,6 @@
 package by.exonit.redmine.client.managers
 
 import by.exonit.redmine.client._
-
-import scala.collection.immutable.List
 import monix.eval.Task
 
 /**

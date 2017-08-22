@@ -49,10 +49,11 @@ object IssueRelation {
     def unapply(rt: RelationType): Option[String] = Some(rt.token)
   }
 
-  case class New(issueTo: IssueIdLike) {
-    val relationType = new FluentSettableField[RelationType, New](this)
-    val delayDays = new FluentSettableField[BigInt, New](this)
-  }
+  case class New(
+    issueTo: IssueIdLike,
+    relationType: Option[RelationType] = None,
+    delayDays: Option[BigInt] = None
+  )
 }
 
 case class IssueRelation(
@@ -60,4 +61,5 @@ case class IssueRelation(
   fromIssue: IssueId,
   toIssue: IssueId,
   relationType: RelationType,
-  delay: Option[Int]) extends IssueRelationIdLike
+  delay: Option[BigInt]
+) extends IssueRelationIdLike

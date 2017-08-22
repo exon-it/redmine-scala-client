@@ -29,7 +29,6 @@ object WebClient {
   object Constants {
     lazy val ApiKeyQueryParameterName = "key"
     lazy val ContentTypeHeader        = "Content-Type"
-    lazy val StatusOk                 = 200
   }
 
   object RequestDSL {
@@ -38,11 +37,11 @@ object WebClient {
 
     object AuthenticationMethod {
 
-      sealed case class Basic(user: String, password: IndexedSeq[Char]) extends AuthenticationMethod
+      final case class Basic(user: String, password: IndexedSeq[Char]) extends AuthenticationMethod
 
-      sealed case class Digest(user: String, password: IndexedSeq[Char]) extends AuthenticationMethod
+      final case class Digest(user: String, password: IndexedSeq[Char]) extends AuthenticationMethod
 
-      sealed case class Bearer(token: IndexedSeq[Char]) extends AuthenticationMethod
+      final case class Bearer(token: String) extends AuthenticationMethod
 
     }
 
@@ -50,13 +49,13 @@ object WebClient {
 
     object Body {
 
-      sealed case class EmptyBody() extends Body
+      final case class EmptyBody() extends Body
 
-      sealed case class FileBody(file: File) extends Body
+      final case class FileBody(file: File) extends Body
 
-      sealed case class InMemoryByteBody(body: Array[Byte]) extends Body
+      final case class InMemoryByteBody(body: Array[Byte]) extends Body
 
-      sealed case class StreamedBody(streamProvider: () => InputStream) extends Body
+      final case class StreamedBody(streamProvider: () => InputStream) extends Body
 
     }
 
@@ -64,21 +63,21 @@ object WebClient {
 
     sealed trait RequestOp[Req]
 
-    sealed case class SetUrl(url: String) extends RequestOp[Unit]
+    final case class SetUrl(url: String) extends RequestOp[Unit]
 
-    sealed case class AddSegments(segments: String*) extends RequestOp[Unit]
+    final case class AddSegments(segments: String*) extends RequestOp[Unit]
 
-    sealed case class AddQueries(queries: (String, String)*) extends RequestOp[Unit]
+    final case class AddQueries(queries: (String, String)*) extends RequestOp[Unit]
 
-    sealed case class SetHeaders(headers: (String, String)*) extends RequestOp[Unit]
+    final case class SetHeaders(headers: (String, String)*) extends RequestOp[Unit]
 
-    sealed case class SetMethod(method: String) extends RequestOp[Unit]
+    final case class SetMethod(method: String) extends RequestOp[Unit]
 
-    sealed case class SetAuth(auth: AuthenticationMethod) extends RequestOp[Unit]
+    final case class SetAuth(auth: AuthenticationMethod) extends RequestOp[Unit]
 
-    sealed case class SetBody(body: Body) extends RequestOp[Unit]
+    final case class SetBody(body: Body) extends RequestOp[Unit]
 
-    sealed case class NoOp() extends RequestOp[Unit]
+    final case class NoOp() extends RequestOp[Unit]
 
     def setUrl(url: String): Request[Unit] =
       liftF[RequestOp, Unit](SetUrl(url))
@@ -115,15 +114,15 @@ object WebClient {
 
     sealed trait ResponseOp[Res]
 
-    sealed case class GetBodyAsBytes() extends ResponseOp[Array[Byte]]
+    final case class GetBodyAsBytes() extends ResponseOp[Array[Byte]]
 
-    sealed case class GetBodyAsString() extends ResponseOp[String]
+    final case class GetBodyAsString() extends ResponseOp[String]
 
-    sealed case class GetStatusCode() extends ResponseOp[Int]
+    final case class GetStatusCode() extends ResponseOp[Int]
 
-    sealed case class GetStatusText() extends ResponseOp[String]
+    final case class GetStatusText() extends ResponseOp[String]
 
-    sealed case class GetHeaders() extends ResponseOp[Map[String, String]]
+    final case class GetHeaders() extends ResponseOp[Map[String, String]]
 
     type Response[Res] = Free[ResponseOp, Res]
 
@@ -147,11 +146,11 @@ object WebClient {
 
     sealed trait StreamingResponseOp[Res]
 
-    sealed case class GetStatusCode() extends StreamingResponseOp[Int]
+    final case class GetStatusCode() extends StreamingResponseOp[Int]
 
-    sealed case class GetHeaders() extends StreamingResponseOp[Map[String, String]]
+    final case class GetHeaders() extends StreamingResponseOp[Map[String, String]]
 
-    sealed case class GetBodyStream(outputStreamProvider: () => OutputStream) extends StreamingResponseOp[Task[Unit]]
+    final case class GetBodyStream(outputStreamProvider: () => OutputStream) extends StreamingResponseOp[Task[Unit]]
 
     type StreamingResponse[A] = Free[StreamingResponseOp, A]
 

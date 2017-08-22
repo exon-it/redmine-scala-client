@@ -17,8 +17,14 @@
 package by.exonit.redmine.client.serialization
 
 import org.joda.time.{ReadableInstant, ReadablePartial}
+import org.json4s.JValue
+import org.json4s.JsonAST.{JNothing, JNull}
 
 object Implicits {
+  implicit class ExtendedOption[+A](o: Option[A]) {
+    def orJNull(implicit ev: A => JValue): JValue = o.map(ev).getOrElse(JNull)
+    def orJNothing(implicit ev: A => JValue): JValue = o.map(ev).getOrElse(JNothing)
+  }
 
   implicit class RedmineInstantExtensions(instant: ReadableInstant) {
     def toRedmineFullDate: String =

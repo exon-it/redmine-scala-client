@@ -29,39 +29,39 @@ object VersionSerializers {
     versionIdSerializer, versionStatusSerializer, versionSharingSerializer, versionLinkSerializer, versionSerializer,
     newVersionSerializer, versionUpdateSerializer)
 
-  def deserializeVersionId(implicit formats: Formats): PartialFunction[JValue, VersionId] = {
+  def deserializeVersionId: PartialFunction[JValue, VersionId] = {
     case JInt(id) => VersionId(id)
   }
 
-  def serializeVersionId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeVersionId: PartialFunction[Any, JValue] = {
     case VersionId(id) => JInt(id)
   }
 
   object versionIdSerializer extends CustomSerializer[VersionId](
-    formats => deserializeVersionId(formats) -> serializeVersionId(formats))
+    _ => deserializeVersionId -> serializeVersionId)
 
 
-  def deserializeVersionStatus(implicit formats: Formats): PartialFunction[JValue, Version.Status] = {
+  def deserializeVersionStatus: PartialFunction[JValue, Version.Status] = {
     case JString(s) => Version.Status(s)
   }
 
-  def serializeVersionStatus(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeVersionStatus: PartialFunction[Any, JValue] = {
     case Version.Status(id) => JString(id)
   }
 
   object versionStatusSerializer extends CustomSerializer[Version.Status](
-    formats => deserializeVersionStatus(formats) -> serializeVersionStatus(formats))
+    _ => deserializeVersionStatus -> serializeVersionStatus)
 
-  def deserializeVersionSharing(implicit formats: Formats): PartialFunction[JValue, Version.Sharing] = {
+  def deserializeVersionSharing: PartialFunction[JValue, Version.Sharing] = {
     case JString(s) => Version.Sharing(s)
   }
 
-  def serializeVersionSharing(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeVersionSharing: PartialFunction[Any, JValue] = {
     case Version.Sharing(id) => JString(id)
   }
 
   object versionSharingSerializer extends CustomSerializer[Version.Sharing](
-    formats => deserializeVersionSharing(formats) -> serializeVersionSharing(formats))
+    _ => deserializeVersionSharing -> serializeVersionSharing)
 
   def deserializeVersionLink(implicit formats: Formats): PartialFunction[JValue, VersionLink] = {
     case j: JObject =>
@@ -92,13 +92,13 @@ object VersionSerializers {
     formats => deserializeVersion(formats) -> PartialFunction.empty)
 
   def serializeNewVersion(implicit formats: Formats): PartialFunction[Any, JValue] = {
-    case v@Version.New(name) =>
-      ("name" -> name) ~
-        ("status" -> v.status.toOpt.map(Extraction.decompose(_))) ~
-        ("sharing" -> v.sharing.toOpt.map(Extraction.decompose(_))) ~
-        ("due_date" -> v.dueDate.toOpt.map(_.toRedmine2ShortDate)) ~
-        ("description" -> v.description.toOpt) ~
-        ("custom_fields" -> v.customFields.toOpt.map(_.map(Extraction.decompose)))
+    case v : Version.New =>
+      ("name" -> v.name) ~
+        ("status" -> v.status.map(Extraction.decompose)) ~
+        ("sharing" -> v.sharing.map(Extraction.decompose)) ~
+        ("due_date" -> v.dueDate.map(_.toRedmine2ShortDate)) ~
+        ("description" -> v.description) ~
+        ("custom_fields" -> v.customFields.map(_.map(Extraction.decompose)))
   }
 
   object newVersionSerializer extends CustomSerializer[Version.New](
@@ -106,12 +106,12 @@ object VersionSerializers {
 
   def serializeVersionUpdate(implicit formats: Formats): PartialFunction[Any, JValue] = {
     case u: Version.Update =>
-      ("name" -> u.name.toOpt) ~
-        ("status" -> u.status.toOpt.map(Extraction.decompose(_))) ~
-        ("sharing" -> u.sharing.toOpt.map(Extraction.decompose(_))) ~
-        ("due_date" -> u.dueDate.toOpt.map(_.map(_.toRedmine2ShortDate).map(Extraction.decompose).getOrElse(JNull)).getOrElse(JNothing)) ~
-        ("description" -> u.description.toOpt.map(_.map(Extraction.decompose).getOrElse(JNull)).getOrElse(JNothing)) ~
-        ("custom_fields" -> u.customFields.toOpt.map(_.map(Extraction.decompose)))
+      ("name" -> u.name) ~
+        ("status" -> u.status.map(Extraction.decompose)) ~
+        ("sharing" -> u.sharing.map(Extraction.decompose)) ~
+        ("due_date" -> u.dueDate.map(_.map(_.toRedmine2ShortDate).map(Extraction.decompose).orJNull).orJNothing) ~
+        ("description" -> u.description.map(_.map(Extraction.decompose).orJNull).orJNothing) ~
+        ("custom_fields" -> u.customFields.map(_.map(Extraction.decompose)))
   }
 
   object versionUpdateSerializer extends CustomSerializer[Version.Update](

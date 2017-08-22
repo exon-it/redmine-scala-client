@@ -60,23 +60,23 @@ object Version {
     def unapply(sharing: Sharing): Option[String] = Option(sharing).map(_.token)
   }
 
-  case class New(name: String) extends CustomFieldUpdateSetFSF[New] {
-    val status = new FluentSettableField[Status, New](this)
-    val sharing = new FluentSettableField[Sharing, New](this)
-    val dueDate = new FluentSettableField[LocalDate, New](this)
-    val description = new FluentSettableField[String, New](this)
-  }
+  case class New(
+    name: String,
+    status: Option[Status] = None,
+    sharing: Option[Sharing] = None,
+    dueDate: Option[LocalDate] = None,
+    description: Option[String] = None,
+    customFields: Option[Set[CustomField.Update]] = None
+  )
 
-  object Update {
-    def apply() = new Update
-  }
-  class Update extends CustomFieldUpdateSetFSF[Update] {
-    val name = new FluentSettableField[String, Update](this)
-    val status = new FluentSettableField[Status, Update](this)
-    val sharing = new FluentSettableField[Sharing, Update](this)
-    val dueDate = new FluentSettableField[Option[LocalDate], Update](this)
-    val description = new FluentSettableField[Option[String], Update](this)
-  }
+  case class Update(
+    name: Option[String] = None,
+    status: Option[Status] = None,
+    sharing: Option[Sharing] = None,
+    dueDate: Option[Option[LocalDate]] = None,
+    description: Option[Option[String]] = None,
+    customFields: Option[Set[CustomField.Update]] = None
+  )
 }
 
 case class Version(
@@ -89,4 +89,5 @@ case class Version(
   dueDate: Option[LocalDate],
   createdOn: DateTime,
   updatedOn: DateTime,
-  customFields: Option[Set[CustomField]]) extends VersionIdLike with OptionalCustomFieldSet
+  customFields: Option[Set[CustomField]]
+) extends VersionIdLike with OptionalCustomFieldSet

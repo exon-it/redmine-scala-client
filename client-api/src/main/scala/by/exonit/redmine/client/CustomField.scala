@@ -44,6 +44,8 @@ object CustomField {
 
 }
 
+case class CustomFieldPossibleValue(value: String, label: Option[String])
+
 case class CustomFieldDefinition(
   id: BigInt,
   name: String,
@@ -58,7 +60,7 @@ case class CustomFieldDefinition(
   isSearchable: Boolean,
   isMultiple: Boolean,
   defaultValue: Option[String],
-  possibleValues: Option[Set[String]],
+  possibleValues: Option[Set[CustomFieldPossibleValue]],
   trackers: Option[Set[TrackerLink]],
   roles: Option[Set[RoleLink]]) extends CustomFieldIdLike
 
@@ -83,12 +85,5 @@ trait OptionalCustomFieldSet {
   def getCustomFieldByName(name: String): Option[CustomField] = {
     customFields.flatMap(_.find {cf => cf.name == name})
   }
-
-}
-
-trait CustomFieldUpdateSetFSF[T] {
-  this: T =>
-
-  val customFields = new FluentSettableField[Set[CustomField.Update], T](this)
 
 }

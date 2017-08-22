@@ -23,25 +23,30 @@ import org.json4s.JsonDSL._
 import scala.collection.immutable._
 
 object WikiSerializers {
+  import Implicits._
+
   lazy val all: Seq[Serializer[_]] = Seq(wikiPageIdSerializer, wikiPageSerializer, wikiPageDetailsSerializer,
     newWikiPageSerializer, wikiPageUpdateSerializer)
 
-  def deserializeWikiPageId(implicit formats: Formats): PartialFunction[JValue, WikiPageId] = {
+  def deserializeWikiPageId: PartialFunction[JValue, WikiPageId] = {
     case JString(id) => WikiPageId(id)
   }
 
-  def serializeWikiPageId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeWikiPageId: PartialFunction[Any, JValue] = {
     case WikiPageId(id) => JString(id)
   }
 
   object wikiPageIdSerializer extends CustomSerializer[WikiPageId](
-    formats => deserializeWikiPageId(formats) -> serializeWikiPageId(formats))
+    _ => deserializeWikiPageId -> serializeWikiPageId)
 
   def deserializeWikiPage(implicit formats: Formats): PartialFunction[JValue, WikiPage] = {
     case j: JObject =>
-      WikiPage((j \ "title").extract[String], (j \ "version").extract[BigInt],
+      WikiPage(
+        (j \ "title").extract[String], (j \ "version").extract[BigInt],
         RedmineDateParser.parse((j \ "created_on").extract[String]),
-        RedmineDateParser.parse((j \ "updated_on").extract[String]), (j \ "parent" \ "title").extractOpt[WikiPageId])
+        RedmineDateParser.parse((j \ "updated_on").extract[String]),
+        (j \ "parent" \ "title").extractOpt[WikiPageId]
+      )
   }
 
   object wikiPageSerializer extends CustomSerializer[WikiPage](
@@ -59,24 +64,24 @@ object WikiSerializers {
   object wikiPageDetailsSerializer extends CustomSerializer[WikiPageDetails](
     formats => deserializeWikiPageDetails(formats) -> PartialFunction.empty)
 
-  def serializeNewWikiPage(implicit formats: Formats): PartialFunction[Any, JValue] = {
-    case u@WikiPage.New(_, text) =>
-      ("text" -> text) ~
-        ("comments" -> u.comments.toOpt) ~
-        ("parent_title" -> u.parent.toOpt.map(_.map(_.id).orNull))
+  def serializeNewWikiPage: PartialFunction[Any, JValue] = {
+    case u: WikiPage.New =>
+      ("text" -> u.text) ~
+        ("comments" -> u.comments) ~
+        ("parent_title" -> u.parent.map(_.id))
   }
 
   object newWikiPageSerializer extends CustomSerializer[WikiPage.New](
-    formats => PartialFunction.empty -> serializeNewWikiPage(formats))
+    _ => PartialFunction.empty -> serializeNewWikiPage)
 
-  def serializeWikiPageUpdate(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeWikiPageUpdate: PartialFunction[Any, JValue] = {
     case u: WikiPage.Update =>
-      ("text" -> u.text.toOpt) ~
-        ("comments" -> u.comments.toOpt) ~
-        ("parent_title" -> u.parent.toOpt.map(_.map(_.id).map(Extraction.decompose).getOrElse(JNull)).getOrElse(JNothing))
+      ("text" -> u.text) ~
+        ("comments" -> u.comments) ~
+        ("parent_title" -> u.parent.map(_.map(_.id).orJNull).orJNothing)
   }
 
   object wikiPageUpdateSerializer extends CustomSerializer[WikiPage.Update](
-    formats => PartialFunction.empty -> serializeWikiPageUpdate(formats))
+    _ => PartialFunction.empty -> serializeWikiPageUpdate)
 
 }

@@ -26,16 +26,16 @@ object ModuleSerializers {
     moduleIdSerializer,
     moduleLinkSerializer)
 
-  def deserializeModuleId(implicit formats: Formats): PartialFunction[JValue, ModuleId] = {
+  def deserializeModuleId: PartialFunction[JValue, ModuleId] = {
     case JInt(id) => ModuleId(id)
   }
 
-  def serializeModuleId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeModuleId: PartialFunction[Any, JValue] = {
     case ModuleId(id) => JInt(id)
   }
 
   object moduleIdSerializer extends CustomSerializer[ModuleId](
-    formats => deserializeModuleId(formats) -> serializeModuleId(formats))
+    _ => deserializeModuleId -> serializeModuleId)
 
   def deserializeModuleLink(implicit formats: Formats): PartialFunction[JValue, ModuleLink] = {
     case j: JObject =>

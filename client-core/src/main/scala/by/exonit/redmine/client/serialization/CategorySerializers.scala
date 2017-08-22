@@ -23,6 +23,8 @@ import org.json4s.JsonDSL._
 import scala.collection.immutable._
 
 object CategorySerializers {
+  import Implicits._
+
   lazy val all: Seq[Serializer[_]] = Seq(
     categoryIdSerializer,
     categoryLinkSerializer,
@@ -30,11 +32,11 @@ object CategorySerializers {
     newCategorySerializer,
     categoryUpdateSerializer)
 
-  def serializeCategoryId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeCategoryId: PartialFunction[Any, JValue] = {
     case CategoryId(id) => JInt(id)
   }
 
-  def deserializeCategoryId(implicit formats: Formats): PartialFunction[JValue, CategoryId] = {
+  def deserializeCategoryId: PartialFunction[JValue, CategoryId] = {
     case JInt(id) => CategoryId(id)
   }
 
@@ -57,19 +59,19 @@ object CategorySerializers {
 
   def serializeNewCategory(implicit formats: Formats): PartialFunction[Any, JValue] = {
     case Category.New(name, assignee) =>
-      ("name" -> name) ~ ("assigned_to_id" -> assignee.map(Extraction.decompose))
+      ("name" -> name) ~
+        ("assigned_to_id" -> assignee.map(Extraction.decompose))
   }
 
   def serializeCategoryUpdate(implicit formats: Formats): PartialFunction[Any, JValue] = {
     case u: Category.Update =>
-      ("name" -> u.name.toOpt) ~
-        ("project_id" -> u.project.toOpt.map(_.map(Extraction.decompose).getOrElse(JNull)).getOrElse(JNothing)) ~
-        ("assigned_to_id" -> u.defaultAssignee.toOpt.map(_.map(Extraction.decompose).getOrElse(JNull)).getOrElse(JNothing))
+      ("name" -> u.name) ~
+        ("project_id" -> u.project.map(_.map(Extraction.decompose).orJNull).orJNothing) ~
+        ("assigned_to_id" -> u.defaultAssignee.map(_.map(Extraction.decompose).orJNull).orJNothing)
   }
 
-  object categoryIdSerializer extends CustomSerializer[CategoryId](formats => (
-    deserializeCategoryId(formats),
-    serializeCategoryId(formats)))
+  object categoryIdSerializer extends CustomSerializer[CategoryId](_ =>
+    deserializeCategoryId -> serializeCategoryId)
 
   object categoryLinkSerializer extends CustomSerializer[CategoryLink](formats => (
     deserializeCategoryLink(formats),

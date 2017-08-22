@@ -27,16 +27,16 @@ object TimeEntrySerializers {
   lazy val all: Seq[Serializer[_]] = Seq(
     timeEntryIdSerializer, timeEntrySerializer, newTimeEntrySerializer, timeEntryUpdateSerializer)
 
-  def deserializeTimeEntryId(implicit formats: Formats): PartialFunction[JValue, TimeEntryId] = {
+  def deserializeTimeEntryId: PartialFunction[JValue, TimeEntryId] = {
     case JInt(id) => TimeEntryId(id)
   }
 
-  def serializeTimeEntryId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeTimeEntryId: PartialFunction[Any, JValue] = {
     case TimeEntryId(id) => JInt(id)
   }
 
   object timeEntryIdSerializer extends CustomSerializer[TimeEntryId](
-    formats => deserializeTimeEntryId(formats) -> serializeTimeEntryId(formats))
+    _ => deserializeTimeEntryId -> serializeTimeEntryId)
 
   def deserializeTimeEntry(implicit formats: Formats): PartialFunction[JValue, TimeEntry] = {
     case j: JObject =>
@@ -46,7 +46,7 @@ object TimeEntrySerializers {
         (j \ "issue" \ "id").extractOpt[IssueId],
         (j \ "user").extractOpt[UserLink],
         (j \ "activity").extract[ActivityLink],
-        RedmineDateParser.parse((j \ "spent_on").extract[String]),
+        RedmineDateParser.parseLocalDate((j \ "spent_on").extract[String]),
         (j \ "hours").extract[BigDecimal],
         (j \ "comment").extractOpt[String],
         RedmineDateParser.parse((j \ "created_on").extract[String]),
@@ -58,14 +58,14 @@ object TimeEntrySerializers {
     formats => deserializeTimeEntry(formats) -> PartialFunction.empty)
 
   def serializeNewTimeEntry(implicit formats: Formats): PartialFunction[Any, JValue] = {
-    case te @ TimeEntry.New(issueOrProject, hours) =>
-      val iopJson = issueOrProject.fold("issue_id" -> Extraction.decompose(_), "project_id" -> Extraction.decompose(_))
-      iopJson ~
-        ("hours" -> hours) ~
-        ("spent_on" -> te.spentOn.toOpt.map(_.toRedmine2ShortDate)) ~
-        ("activity_id" -> te.activity.toOpt.map(Extraction.decompose(_))) ~
-        ("comments" -> te.comments.toOpt) ~
-        ("custom_fields" -> te.customFields.toOpt.map(_.map(Extraction.decompose)))
+    case te: TimeEntry.New =>
+      ("issue_id" -> te.issueOrProjectId.left.toOption.map(_.id)) ~
+        ("project_id" -> te.issueOrProjectId.right.toOption.map(_.id)) ~
+        ("hours" -> te.hours) ~
+        ("spent_on" -> te.spentOn.map(_.toRedmine2ShortDate)) ~
+        ("activity_id" -> te.activity.map(_.id)) ~
+        ("comments" -> te.comments) ~
+        ("custom_fields" -> te.customFields.map(_.map(Extraction.decompose)))
   }
 
   object newTimeEntrySerializer extends CustomSerializer[TimeEntry.New](
@@ -73,15 +73,13 @@ object TimeEntrySerializers {
 
   def serializeTimeEntryUpdate(implicit formats: Formats): PartialFunction[Any, JValue] = {
     case te: TimeEntry.Update =>
-      val iopJson = te.issueOrProjectId.toOpt.map {newIdentity =>
-        newIdentity.fold("issue_id" -> Extraction.decompose(_), "project_id" -> Extraction.decompose(_))
-      }.getOrElse("identityChange" -> JNothing)
-      iopJson ~
-        ("hours" -> te.hours.toOpt) ~
-        ("spent_on" -> te.spentOn.toOpt.map(_.toRedmine2ShortDate)) ~
-        ("activity_id" -> te.activity.toOpt.map(Extraction.decompose(_))) ~
-        ("comments" -> te.comments.toOpt.map(_.map(Extraction.decompose).getOrElse(JNull)).getOrElse(JNothing)) ~
-        ("custom_fields" -> te.customFields.toOpt.map(_.map(Extraction.decompose)))
+      ("issue_id" -> te.issueOrProjectId.flatMap(_.left.toOption.map(_.id))) ~
+        ("project_id" -> te.issueOrProjectId.flatMap(_.right.toOption.map(_.id))) ~
+        ("hours" -> te.hours) ~
+        ("spent_on" -> te.spentOn.map(_.toRedmine2ShortDate)) ~
+        ("activity_id" -> te.activity.map(_.id)) ~
+        ("comments" -> te.comments.map(_.orJNull).orJNothing) ~
+        ("custom_fields" -> te.customFields.map(_.map(Extraction.decompose)))
   }
 
   object timeEntryUpdateSerializer extends CustomSerializer[TimeEntry.Update](

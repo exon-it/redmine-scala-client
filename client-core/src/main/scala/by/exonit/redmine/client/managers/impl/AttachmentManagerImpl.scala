@@ -59,8 +59,7 @@ class AttachmentManagerImpl(requestManager: RequestManager) extends AttachmentMa
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("issues", s"${issue.id}.json")
     } yield ()
-    val issueUpdate = new Issue.Update()
-    issueUpdate.uploads.set(uploads.toSet)
+    val issueUpdate = new Issue.Update(uploads = Some(uploads.toSet))
     requestManager.putEntity(request, "issue", issueUpdate)
   }
 
@@ -81,6 +80,7 @@ class AttachmentManagerImpl(requestManager: RequestManager) extends AttachmentMa
   def downloadAttachment(attachment: Attachment): Task[Array[Byte]] = {
     val request = for {
       _ <- RequestDSL.setUrl(attachment.contentUrl)
+      _ <- requestManager.authenticateRequest()
     } yield ()
     requestManager.downloadToByteArray(request)
   }
@@ -88,6 +88,7 @@ class AttachmentManagerImpl(requestManager: RequestManager) extends AttachmentMa
   def downloadAttachmentStreaming(attachment: Attachment, outputStreamProvider: () => OutputStream): Task[Task[Unit]] = {
     val request = for {
       _ <- RequestDSL.setUrl(attachment.contentUrl)
+      _ <- requestManager.authenticateRequest()
     } yield ()
     requestManager.downloadToStream(request, outputStreamProvider)
   }

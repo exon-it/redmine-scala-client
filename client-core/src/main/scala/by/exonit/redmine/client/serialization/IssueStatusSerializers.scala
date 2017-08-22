@@ -27,11 +27,11 @@ object IssueStatusSerializers {
     issueStatusLinkSerializer,
     issueStatusSerializer)
 
-  def serializeIssueStatusId(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeIssueStatusId: PartialFunction[Any, JValue] = {
     case IssueStatusId(id) => JInt(id)
   }
 
-  def deserializeIssueStatusId(implicit formats: Formats): PartialFunction[JValue, IssueStatusId] = {
+  def deserializeIssueStatusId: PartialFunction[JValue, IssueStatusId] = {
     case JInt(id) => IssueStatusId(id)
   }
 
@@ -51,9 +51,8 @@ object IssueStatusSerializers {
         (j \ "is_closed").toOption.exists(_.extract[Boolean]))
   }
 
-  object issueStatusIdSerializer extends CustomSerializer[IssueStatusId](formats => (
-    deserializeIssueStatusId(formats),
-    serializeIssueStatusId(formats)))
+  object issueStatusIdSerializer extends CustomSerializer[IssueStatusId](_ =>
+    deserializeIssueStatusId -> serializeIssueStatusId)
 
   object issueStatusLinkSerializer extends CustomSerializer[IssueStatusLink](formats => (
     deserializeIssueStatusLink(formats),

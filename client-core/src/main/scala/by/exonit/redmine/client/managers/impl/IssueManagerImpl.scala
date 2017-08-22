@@ -138,9 +138,9 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
   }
 
   def deleteRelationsOfIssue(issue: IssueIdLike): Task[Unit] = {
-    getIssue(issue, Issue.Include.Relations).map {i =>
-      Task.sequence(i.relations.get.map(deleteRelation))
-    }
+    getIssue(issue, Issue.Include.Relations).flatMap {i =>
+      Task.gatherUnordered(i.relations.map(_.map(deleteRelation)).getOrElse(Set.empty))
+    } map (_ => ())
   }
 
   def getIssue(id: IssueIdLike, includes: Issue.Include*): Task[Issue] = {

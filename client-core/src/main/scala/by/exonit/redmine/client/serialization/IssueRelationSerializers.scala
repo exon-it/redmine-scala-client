@@ -39,29 +39,26 @@ object IssueRelationSerializers {
       val issueFrom = IssueId((j \ "issue_id").extract[BigInt])
       val issueTo = IssueId((j \ "issue_to_id").extract[BigInt])
       val relationType = (j \ "relation_type").extract[IssueRelation.RelationType]
-      val delay = (j \ "delay").extractOpt[Int]
+      val delay = (j \ "delay").extractOpt[BigInt]
       IssueRelation(id, issueFrom, issueTo, relationType, delay)
   }
 
-  def deserializeIssueRelationType(formats: => Formats): PartialFunction[JValue, IssueRelation.RelationType] = {
-    case j: JString =>
-      implicit val implicitFormats = formats
-      IssueRelation.RelationType.apply(j.extract[String])
+  def deserializeIssueRelationType: PartialFunction[JValue, IssueRelation.RelationType] = {
+    case JString(s) => IssueRelation.RelationType(s)
   }
 
-  def serializeIssueRelationType(formats: => Formats): PartialFunction[Any, JValue] = {
+  def serializeIssueRelationType: PartialFunction[Any, JValue] = {
     case rt: IssueRelation.RelationType => JString(rt.token)
   }
 
-  object issueRelationTypeSerializer extends CustomSerializer[IssueRelation.RelationType](formats => (
-    deserializeIssueRelationType(formats),
-    serializeIssueRelationType(formats)))
+  object issueRelationTypeSerializer extends CustomSerializer[IssueRelation.RelationType](
+    _ => deserializeIssueRelationType -> serializeIssueRelationType)
 
   def serializeNewIssueRelation(implicit formats: Formats): PartialFunction[Any, JValue] = {
-    case i@IssueRelation.New(issueTo) =>
-      ("issue_to_id" -> issueTo.id) ~
-        ("relation_type" -> i.relationType.toOpt.map(Extraction.decompose)) ~
-        ("delay" -> i.delayDays.toOpt)
+    case i: IssueRelation.New =>
+      ("issue_to_id" -> i.issueTo.id) ~
+        ("relation_type" -> i.relationType.map(Extraction.decompose)) ~
+        ("delay" -> i.delayDays)
   }
 
   object newIssueRelationSerializer extends CustomSerializer[IssueRelation.New](

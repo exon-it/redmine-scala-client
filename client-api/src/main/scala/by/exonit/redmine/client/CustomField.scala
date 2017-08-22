@@ -87,10 +87,3 @@ trait OptionalCustomFieldSet {
   }
 
 }
-
-trait CustomFieldUpdateSetFSF[T] {
-  this: T =>
-
-  val customFields = new FluentSettableField[Set[CustomField.Update], T](this)
-
-}

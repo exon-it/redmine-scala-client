@@ -10,7 +10,7 @@ lazy val commonSettings = Seq(
 
   startYear := Some(2015),
 
-  version := "5.0.0-rc4",
+  version := "5.0.0-SNAPSHOT",
 
   scalaVersion := "2.11.11",
   scalacOptions ++= Seq(

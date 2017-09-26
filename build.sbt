@@ -72,7 +72,6 @@ lazy val `client-api` = (project in file("client-api")).
       Dependencies.json4sCore,
       Dependencies.scalaLogging,
       Dependencies.slf4jJdk14 % Test,
-      Dependencies.junit % Test,
       Dependencies.scalatest % Test
     )
   )
@@ -94,7 +93,6 @@ lazy val `client-core` = (project in file("client-core")).
       Dependencies.slf4jApi,
       Dependencies.scalaLogging,
       Dependencies.slf4jJdk14 % Test,
-      Dependencies.junit % Test,
       Dependencies.scalatest % Test,
       Dependencies.restClientDriver % Test
     )
@@ -110,7 +108,6 @@ lazy val `client-play25-ws` = (project in file("client-play25-ws")).
     libraryDependencies ++= Seq(
       Dependencies.play25Ws,
       Dependencies.slf4jJdk14 % Test,
-      Dependencies.junit % Test,
       Dependencies.scalatest % Test,
       Dependencies.restClientDriver % Test,
       Dependencies.scalaArm % Test
@@ -127,7 +124,6 @@ lazy val `client-play26-ws` = (project in file("client-play26-ws")).
     libraryDependencies ++= Seq(
       Dependencies.play26Ws,
       Dependencies.slf4jJdk14 % Test,
-      Dependencies.junit % Test,
       Dependencies.scalatest % Test,
       Dependencies.restClientDriver % Test,
       Dependencies.scalaArm % Test
@@ -144,7 +140,6 @@ lazy val `client-play-ws-standalone` = (project in file("client-play-ws-standalo
     libraryDependencies ++= Seq(
       Dependencies.playWsStandalone,
       Dependencies.slf4jJdk14 % Test,
-      Dependencies.junit % Test,
       Dependencies.scalatest % Test,
       Dependencies.restClientDriver % Test,
       Dependencies.scalaArm % Test

@@ -1,7 +1,6 @@
 import sbt._
 
 object Dependencies {
-  val junit            : ModuleID = "junit" % "junit" % "4.12"
   val slf4jApi         : ModuleID = "org.slf4j" % "slf4j-api" % "1.7.25"
   val slf4jJdk14       : ModuleID = "org.slf4j" % "slf4j-jdk14" % "1.7.25"
   val jodaTime         : ModuleID = "joda-time" % "joda-time" % "2.9.9"

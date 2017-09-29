@@ -81,6 +81,7 @@ class Play26WSWebClient(val client: WSClient)
     })
     val finalUrl = url.getOrElse(throw new UnsupportedOperationException("Unable to compile request from provided AST: no base URL specified"))
     val baseRequest = client.url(finalUrl)
+      .withMethod(method)
       .addHttpHeaders(headers.toSeq: _*)
       .addQueryStringParameters(queryParams: _*)
     val requestWithAuth = auth match {

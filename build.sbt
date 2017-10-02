@@ -34,7 +34,7 @@ lazy val commonSettings = Seq(
     "-Xfuture",
     // Typelevel Scala 4
     "-Yinduction-heuristics",       // speeds up the compilation of inductive implicit resolution
-    "-Ykind-polymorphism",          // type and method definitions with type parameters of arbitrary kinds
+//    "-Ykind-polymorphism",          // type and method definitions with type parameters of arbitrary kinds
     "-Yliteral-types",              // literals can appear in type position
     "-Xstrict-patmat-analysis",     // more accurate reporting of failures of match exhaustivity
     "-Xlint:strict-unsealed-patmat" // warn on inexhaustive matches against unsealed traits
@@ -51,8 +51,6 @@ lazy val commonSettings = Seq(
     )
     case _ => Nil
   }),
-
-  addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.4" cross CrossVersion.binary),
 
   publishMavenStyle := true,
   bintrayOrganization := Some("exon-it"),

@@ -1,6 +1,4 @@
 
-import com.atlassian.labs.gitstamp.GitStampPlugin._
-
 lazy val repo: Option[String] = sys.props.get("publishTo")
 
 lazy val commonSettings = Seq(
@@ -77,7 +75,7 @@ lazy val commonSettings = Seq(
   credentials ++= sys.props.get("credentialPath").map {cp =>
     cp.split(',').map {path => Credentials(file(path))}.toSeq
   } getOrElse Seq.empty
-) ++ Seq(gitStampSettings: _*)
+)
 
 lazy val `client-api` = (project in file("client-api")).
   settings(commonSettings: _*).
@@ -176,6 +174,5 @@ lazy val `client-parent` = (project in file(".")).
     // Do not publish root project
     publishArtifact := false
   ).
-  aggregate(`client-api`, `client-core`, `client-play25-ws`, `client-play26-ws`, `client-play-ws-standalone`).
-  enablePlugins(CrossPerProjectPlugin)
+  aggregate(`client-api`, `client-core`, `client-play25-ws`, `client-play26-ws`, `client-play-ws-standalone`)
 

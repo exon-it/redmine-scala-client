@@ -81,8 +81,8 @@ lazy val `client-api` = (project in file("client-api")).
   settings(commonSettings: _*).
   settings(
     name := s"client-api",
-    description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Client API. " +
-      s"Contains domain classes and API manager traits.",
+    description := "Redmine REST API Client for Scala: Client API. " +
+      "Contains domain classes and API manager traits.",
     crossScalaVersions := Seq("2.11.11-bin-typelevel-4", "2.12.4-bin-typelevel-4"),
     libraryDependencies ++= Seq(
       Dependencies.monixEval,
@@ -100,9 +100,9 @@ lazy val `client-core` = (project in file("client-core")).
   dependsOn(`client-api`).
   settings(commonSettings: _*).
   settings(
-    name := s"client-core",
-    description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Client Core. " +
-      s"Contains API manager and JSON serialization implementation.",
+    name := "client-core",
+    description := "Redmine REST API Client for Scala: Client Core. " +
+      "Contains API manager and JSON serialization implementation.",
     crossScalaVersions := Seq("2.11.11-bin-typelevel-4", "2.12.4-bin-typelevel-4"),
     libraryDependencies ++= Seq(
       Dependencies.catsFree,
@@ -122,8 +122,8 @@ lazy val `client-play25-ws` = (project in file("client-play25-ws")).
   dependsOn(`client-core`).
   settings(commonSettings: _*).
   settings(
-    name := s"client-play25-ws",
-    description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Play-WS 2.5 Web Client",
+    name := "client-play25-ws",
+    description := "Redmine REST API Client for Scala: Play-WS 2.5 Web Client",
     crossScalaVersions := Seq("2.11.11-bin-typelevel-4"),
     libraryDependencies ++= Seq(
       Dependencies.play25Ws,
@@ -138,8 +138,8 @@ lazy val `client-play26-ws` = (project in file("client-play26-ws")).
   dependsOn(`client-core`).
   settings(commonSettings: _*).
   settings(
-    name := s"client-play26-ws",
-    description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Play-WS 2.6 Web Client",
+    name := "client-play26-ws",
+    description := "Redmine REST API Client for Scala: Play-WS 2.6 Web Client",
     crossScalaVersions := Seq("2.11.11-bin-typelevel-4","2.12.4-bin-typelevel-4"),
     libraryDependencies ++= Seq(
       Dependencies.play26Ws,
@@ -154,8 +154,8 @@ lazy val `client-play-ws-standalone` = (project in file("client-play-ws-standalo
   dependsOn(`client-core`).
   settings(commonSettings: _*).
   settings(
-    name := s"client-play-ws-standalone",
-    description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Play-WS Standalone Web Client",
+    name := "client-play-ws-standalone",
+    description := "Redmine REST API Client for Scala: Play-WS Standalone Web Client",
     crossScalaVersions := Seq("2.11.11-bin-typelevel-4", "2.12.4-bin-typelevel-4"),
     libraryDependencies ++= Seq(
       Dependencies.playWsStandalone,
@@ -169,8 +169,8 @@ lazy val `client-play-ws-standalone` = (project in file("client-play-ws-standalo
 lazy val `client-parent` = (project in file(".")).
   settings(commonSettings: _*).
   settings(
-    name := s"client-parent",
-    description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Parent POM. Used for grouping sub-projects.",
+    name := "client-parent",
+    description := "Redmine REST API Client for Scala: Parent POM. Used for grouping sub-projects.",
     // Do not publish root project
     publishArtifact := false
   ).

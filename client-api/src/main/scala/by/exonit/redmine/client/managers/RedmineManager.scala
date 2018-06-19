@@ -39,6 +39,8 @@ trait RedmineManager {
 
   def searchManager: SearchManager
 
+  def fileManager: FileManager
+
   /**
    * Creates a [[by.exonit.redmine.client.managers.RedmineManager RedmineManager]]
    * for performing operations as another Redmine user

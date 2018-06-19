@@ -20,4 +20,4 @@ trait UploadLike {
   def token: String
 }
 
-case class Upload(token: String) extends UploadLike
+case class Upload(token: String, id: Option[BigInt]) extends UploadLike

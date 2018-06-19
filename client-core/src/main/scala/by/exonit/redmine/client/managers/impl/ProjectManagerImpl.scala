@@ -127,5 +127,15 @@ class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager 
     } yield ()
     requestManager.getEntityPagedList[News](request, "news")
   }
+
+  /** Get news across all projects
+    */
+  override def getAllNews(): Task[PagedList[News]] = {
+    val request = for {
+      _ <- requestManager.baseRequest
+      _ <- RequestDSL.addSegments("news.json")
+    } yield ()
+    requestManager.getEntityPagedList[News](request, "news")
+  }
 }
 

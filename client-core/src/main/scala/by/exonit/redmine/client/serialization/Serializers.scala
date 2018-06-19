@@ -43,5 +43,6 @@ object Serializers {
       TrackerSerializers.all ++
       UserSerializers.all ++
       VersionSerializers.all ++
-      WikiSerializers.all
+      WikiSerializers.all ++
+      DocumentCategorySerializers.all
 }

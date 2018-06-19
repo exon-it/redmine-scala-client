@@ -35,6 +35,8 @@ trait RedmineManager {
 
   def timeEntryManager: TimeEntryManager
 
+  def documentsManager: DocumentsManager
+
   /**
    * Creates a [[by.exonit.redmine.client.managers.RedmineManager RedmineManager]]
    * for performing operations as another Redmine user

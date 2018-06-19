@@ -17,8 +17,8 @@
 package by.exonit.redmine.client.managers.impl
 
 import by.exonit.redmine.client._
-import by.exonit.redmine.client.managers.{RequestManager, WikiManager}
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
+import by.exonit.redmine.client.managers.{RequestManager, WikiManager}
 import monix.eval.Task
 
 class WikiManagerImpl(requestManager: RequestManager) extends WikiManager {
@@ -35,6 +35,46 @@ class WikiManagerImpl(requestManager: RequestManager) extends WikiManager {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", project.id.toString, "wiki", s"${page.id}.json")
+    } yield ()
+    requestManager.getEntity[WikiPageDetails](request, "wiki_page")
+  }
+
+  /** Returns details of a wiki page in specified project with optional includes
+    *
+    * @param project  Project ID
+    * @param page     Page identifier
+    * @param includes Included details
+    */
+  override def getPage(
+    project: ProjectIdLike,
+    page: WikiPageIdLike,
+    includes: WikiPage.Include*
+  ): Task[WikiPageDetails] = {
+    val request = for {
+      _ <- requestManager.baseRequest
+      _ <- RequestDSL.addSegments("projects", project.id.toString, "wiki", s"${page.id}.json")
+      _ <- RequestBlocks.includes(includes)
+    } yield ()
+    requestManager.getEntity[WikiPageDetails](request, "wiki_page")
+  }
+
+  /** Returns details of a wiki page version in specified project with optional includes
+    *
+    * @param project  Project ID
+    * @param page     Page identifier
+    * @param version  Page version number
+    * @param includes Included details
+    */
+  override def getPageVersion(
+    project: ProjectIdLike,
+    page: WikiPageIdLike,
+    version: Int,
+    includes: WikiPage.Include*
+  ): Task[WikiPageDetails] = {
+    val request = for {
+      _ <- requestManager.baseRequest
+      _ <- RequestDSL.addSegments("projects", project.id.toString, "wiki", s"${page.id}", s"$version.json")
+      _ <- RequestBlocks.includes(includes)
     } yield ()
     requestManager.getEntity[WikiPageDetails](request, "wiki_page")
   }

@@ -45,7 +45,8 @@ case class WikiPageDetails(
   parent: Option[WikiPageId],
   text: String,
   author: Option[UserLink],
-  comments: Option[String]
+  comments: Option[String],
+  attachments: Option[Set[Attachment]]
 ) extends WikiPageLike
 
 object WikiPage {
@@ -53,12 +54,22 @@ object WikiPage {
     title: String,
     text: String,
     parent: Option[WikiPageIdLike] = None,
-    comments: Option[String] = None
+    comments: Option[String] = None,
+    uploads: Option[Set[Upload]] = None
   )
 
   case class Update(
     text: Option[String] = None,
     parent: Option[Option[WikiPageIdLike]] = None,
-    comments: Option[String] = None
+    comments: Option[String] = None,
+    uploads: Option[Set[Upload]] = None
   )
+
+  case class Upload(token: String, fileName: String, contentType: String)
+
+  sealed abstract class Include(val token: String) extends Tokenized
+
+  object Include {
+    case object Attachments extends Include("attachments")
+  }
 }

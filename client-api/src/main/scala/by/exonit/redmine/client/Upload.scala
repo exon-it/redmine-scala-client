@@ -16,4 +16,8 @@
 
 package by.exonit.redmine.client
 
-case class Upload(token: String)
+trait UploadLike {
+  def token: String
+}
+
+case class Upload(token: String) extends UploadLike

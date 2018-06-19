@@ -50,7 +50,9 @@ object TrackerSerializers {
     case j: JObject =>
       Tracker(
         (j \ "id").extract[BigInt],
-        (j \ "name").extract[String])
+        (j \ "name").extract[String],
+        (j \ "default_status").extractOpt[IssueStatusLink]
+      )
   }
 
   object trackerSerializer extends CustomSerializer[Tracker](

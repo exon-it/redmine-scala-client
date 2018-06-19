@@ -17,16 +17,22 @@
 package by.exonit.redmine.client.serialization
 
 import by.exonit.redmine.client._
-import org.json4s._
 import org.json4s.JsonDSL._
+import org.json4s._
 
 import scala.collection.immutable._
 
 object WikiSerializers {
   import Implicits._
 
-  lazy val all: Seq[Serializer[_]] = Seq(wikiPageIdSerializer, wikiPageSerializer, wikiPageDetailsSerializer,
-    newWikiPageSerializer, wikiPageUpdateSerializer)
+  lazy val all: Seq[Serializer[_]] = Seq(
+    wikiPageIdSerializer,
+    wikiPageSerializer,
+    wikiPageDetailsSerializer,
+    newWikiPageSerializer,
+    wikiPageUpdateSerializer,
+    wikiUploadSerializer
+  )
 
   def deserializeWikiPageId: PartialFunction[JValue, WikiPageId] = {
     case JString(id) => WikiPageId(id)
@@ -58,30 +64,44 @@ object WikiSerializers {
         RedmineDateParser.parse((j \ "created_on").extract[String]),
         RedmineDateParser.parse((j \ "updated_on").extract[String]), (j \ "parent" \ "title").extractOpt[WikiPageId],
         (j \ "text").extractOpt[String].getOrElse(""), (j \ "author").extractOpt[UserLink],
-        (j \ "comments").extractOpt[String])
+        (j \ "comments").extractOpt[String],
+        (j \ "attachments").toOption.map(_.extract[Set[Attachment]])
+      )
   }
 
   object wikiPageDetailsSerializer extends CustomSerializer[WikiPageDetails](
     formats => deserializeWikiPageDetails(formats) -> PartialFunction.empty)
 
-  def serializeNewWikiPage: PartialFunction[Any, JValue] = {
+  def serializeNewWikiPage(implicit formats: Formats): PartialFunction[Any, JValue] = {
     case u: WikiPage.New =>
       ("text" -> u.text) ~
         ("comments" -> u.comments) ~
-        ("parent_title" -> u.parent.map(_.id))
+        ("parent_title" -> u.parent.map(_.id)) ~
+        ("uploads" -> u.uploads.map(_.map(Extraction.decompose)))
   }
 
   object newWikiPageSerializer extends CustomSerializer[WikiPage.New](
-    _ => PartialFunction.empty -> serializeNewWikiPage)
+    formats => PartialFunction.empty -> serializeNewWikiPage(formats))
 
-  def serializeWikiPageUpdate: PartialFunction[Any, JValue] = {
+  def serializeWikiPageUpdate(implicit formats: Formats): PartialFunction[Any, JValue] = {
     case u: WikiPage.Update =>
       ("text" -> u.text) ~
         ("comments" -> u.comments) ~
-        ("parent_title" -> u.parent.map(_.map(_.id).orJNull).orJNothing)
+        ("parent_title" -> u.parent.map(_.map(_.id).orJNull).orJNothing) ~
+        ("uploads" -> u.uploads.map(_.map(Extraction.decompose)))
   }
 
   object wikiPageUpdateSerializer extends CustomSerializer[WikiPage.Update](
-    _ => PartialFunction.empty -> serializeWikiPageUpdate)
+    formats => PartialFunction.empty -> serializeWikiPageUpdate(formats))
 
+  object wikiUploadSerializer extends CustomSerializer[WikiPage.Upload](
+    _ => PartialFunction.empty -> serializeWikiPageUpload
+  )
+
+  def serializeWikiPageUpload: PartialFunction[Any, JValue] = {
+    case u: WikiPage.Upload =>
+      ("token" -> u.token) ~
+        ("filename" -> u.fileName) ~
+        ("content-type" -> u.contentType)
+  }
 }

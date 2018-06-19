@@ -38,6 +38,21 @@ trait WikiManager {
    */
   def getPage(project: ProjectIdLike, page: WikiPageIdLike): Task[WikiPageDetails]
 
+  /** Returns details of a wiki page in specified project with optional includes
+    * @param project Project ID
+    * @param page Page identifier
+    * @param includes Included details
+    */
+  def getPage(project: ProjectIdLike, page: WikiPageIdLike, includes: WikiPage.Include*): Task[WikiPageDetails]
+
+  /** Returns details of a wiki page version in specified project with optional includes
+    * @param project Project ID
+    * @param page Page identifier
+    * @param version Page version number
+    * @param includes Included details
+    */
+  def getPageVersion(project: ProjectIdLike, page: WikiPageIdLike, version: Int, includes: WikiPage.Include*): Task[WikiPageDetails]
+
   /**
    * Creates a wiki page in specified project
    *

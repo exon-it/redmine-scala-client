@@ -109,6 +109,10 @@ trait ProjectManager {
    */
   def deleteVersion(id: VersionIdLike): Task[Unit]
 
+  /** Get news across all projects
+    */
+  def getAllNews(): Task[PagedList[News]]
+
   /**
    * Returns project news
    * @param project Project number

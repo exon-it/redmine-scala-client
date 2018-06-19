@@ -30,6 +30,7 @@ class RedmineManagerImpl(client: WebClient, baseRequest: Request[Unit], authenti
   lazy val customFieldManager: CustomFieldManager = new CustomFieldManagerImpl(requestManager)
   lazy val membershipManager : MembershipManager  = new MembershipManagerImpl(requestManager)
   lazy val timeEntryManager  : TimeEntryManager   = new TimeEntryManagerImpl(requestManager)
+  lazy val documentsManager  : DocumentsManager   = new DocumentsManagerImpl(requestManager)
 
   /**
    * Creates a [[by.exonit.redmine.client.managers.RedmineManager RedmineManager]]

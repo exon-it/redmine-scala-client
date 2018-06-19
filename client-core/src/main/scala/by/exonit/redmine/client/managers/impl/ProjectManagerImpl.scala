@@ -19,7 +19,6 @@ package by.exonit.redmine.client.managers.impl
 import by.exonit.redmine.client._
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
 import by.exonit.redmine.client.managers.{ProjectManager, RequestManager}
-import cats.data.NonEmptyList
 import monix.eval.Task
 
 class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager {
@@ -37,9 +36,7 @@ class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager 
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", s"${id.id}.json")
-      includeTokens = NonEmptyList.fromList(includes.map(_.token).toList)
-      includeQuery = includeTokens.toSeq.map(l => l.reduceLeft {_ + "," + _}).map("include" -> _)
-      _ <- RequestDSL.addQueries(includeQuery: _*)
+      _ <- RequestBlocks.include(includes)
     } yield ()
     requestManager.getEntity[Project](request, "project")
   }
@@ -48,9 +45,7 @@ class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager 
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", s"$key.json")
-      includeTokens = NonEmptyList.fromList(includes.map(_.token).toList)
-      includeQuery = includeTokens.toSeq.map(l => l.reduceLeft {_ + "," + _}).map("include" -> _)
-      _ <- RequestDSL.addQueries(includeQuery: _*)
+      _ <- RequestBlocks.include(includes)
     } yield ()
     requestManager.getEntity[Project](request, "project")
   }

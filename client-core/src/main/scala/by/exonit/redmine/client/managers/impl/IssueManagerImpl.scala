@@ -17,9 +17,8 @@
 package by.exonit.redmine.client.managers.impl
 
 import by.exonit.redmine.client._
-import by.exonit.redmine.client.managers.{IssueManager, RequestManager}
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
-import cats.data.NonEmptyList
+import by.exonit.redmine.client.managers.{IssueManager, RequestManager}
 import monix.eval.Task
 
 import scala.collection.immutable._
@@ -147,10 +146,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("issues", s"${id.id}.json")
-      includeTokensOpt = NonEmptyList.fromList(includes.map(_.token).toList)
-      includeValueOpt = includeTokensOpt.map(list => list.reduceLeft(_ + "," + _))
-      addQueries = includeValueOpt.map {v => Seq("include" -> v)}.getOrElse(Seq.empty)
-      _ <- RequestDSL.addQueries(addQueries: _*)
+      _ <- RequestBlocks.include(includes)
     } yield ()
     requestManager.getEntity[Issue](request, "issue")
   }

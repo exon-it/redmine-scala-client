@@ -30,9 +30,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("users", "current.json")
-      includesList = NonEmptyList.fromList(includes.map(_.token).toList)
-      includesQuery = includesList.toSeq.map(l => "include" -> l.reduceLeft {_ + "," + _})
-      _ <- RequestDSL.addQueries(includesQuery: _*)
+      _ <- RequestBlocks.include(includes)
     } yield ()
     requestManager.getEntity[User](request, "user")
   }
@@ -48,7 +46,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
 
   def getUsers(params: Seq[(String, String)], includes: User.Include*): Task[PagedList[User]] = {
     val allParams = if (includes.nonEmpty) {
-      params :+ "include" -> includes.map(_.token).mkString(",")
+      params :+ "include" -> includes.map(_.entryName).mkString(",")
     } else {
       params
     }
@@ -59,9 +57,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("users", s"${id.id}.json")
-      includesList = NonEmptyList.fromList(includes.map(_.token).toList)
-      includesQuery = includesList.toSeq.map(l => "include" -> l.reduceLeft {_ + "," + _})
-      _ <- RequestDSL.addQueries(includesQuery: _*)
+      _ <- RequestBlocks.include(includes)
     } yield ()
     requestManager.getEntity[User](request, "user")
   }
@@ -102,9 +98,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("groups", s"${id.id}.json")
-      includesList = NonEmptyList.fromList(includes.map(_.token).toList)
-      includesQuery = includesList.toSeq.map(l => "include" -> l.reduceLeft {_ + "," + _})
-      _ <- RequestDSL.addQueries(includesQuery: _*)
+      _ <- RequestBlocks.include(includes)
     } yield ()
     requestManager.getEntity[Group](request, "group")
   }

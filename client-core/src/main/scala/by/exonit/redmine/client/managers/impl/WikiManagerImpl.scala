@@ -53,7 +53,7 @@ class WikiManagerImpl(requestManager: RequestManager) extends WikiManager {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", project.id.toString, "wiki", s"${page.id}.json")
-      _ <- RequestBlocks.includes(includes)
+      _ <- RequestBlocks.include(includes)
     } yield ()
     requestManager.getEntity[WikiPageDetails](request, "wiki_page")
   }
@@ -74,7 +74,7 @@ class WikiManagerImpl(requestManager: RequestManager) extends WikiManager {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", project.id.toString, "wiki", s"${page.id}", s"$version.json")
-      _ <- RequestBlocks.includes(includes)
+      _ <- RequestBlocks.include(includes)
     } yield ()
     requestManager.getEntity[WikiPageDetails](request, "wiki_page")
   }

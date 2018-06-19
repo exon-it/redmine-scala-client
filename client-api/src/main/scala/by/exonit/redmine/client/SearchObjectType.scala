@@ -1,6 +1,6 @@
 package by.exonit.redmine.client
 
-sealed abstract class SearchObjectType(val token: String) extends Tokenized
+sealed abstract class SearchObjectType(val token: String)
 object SearchObjectType {
 
 

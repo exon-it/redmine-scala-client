@@ -16,7 +16,11 @@
 
 package by.exonit.redmine.client
 
+import enumeratum._
+import enumeratum.EnumEntry.Snakecase
 import org.joda.time.DateTime
+
+import scala.collection.immutable
 
 trait WikiPageIdLike extends Identifiable[String]
 
@@ -67,9 +71,10 @@ object WikiPage {
 
   case class Upload(token: String, fileName: String, contentType: String)
 
-  sealed abstract class Include(val token: String) extends Tokenized
+  sealed abstract class Include extends EnumEntry with Snakecase
 
-  object Include {
-    case object Attachments extends Include("attachments")
+  object Include extends Enum[Include] {
+    val values: immutable.IndexedSeq[Include] = findValues
+    case object Attachments extends Include
   }
 }

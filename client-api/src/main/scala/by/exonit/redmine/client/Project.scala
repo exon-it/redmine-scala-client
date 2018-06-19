@@ -16,6 +16,8 @@
 
 package by.exonit.redmine.client
 
+import enumeratum.EnumEntry.Snakecase
+import enumeratum._
 import org.joda.time.DateTime
 
 import scala.collection.immutable._
@@ -70,17 +72,19 @@ object Project {
     customFields: Option[Set[CustomField.Update]] = None
   )
 
-  sealed abstract class Include(val token: String) extends Tokenized
+  sealed abstract class Include extends EnumEntry with Snakecase
 
-  object Include {
+  object Include extends Enum[Include] {
 
-    case object Trackers extends Include("trackers")
+    val values: IndexedSeq[Include] = findValues
 
-    case object IssueCategories extends Include("issue_categories")
+    case object Trackers extends Include
 
-    case object EnabledModules extends Include("enabled_modules")
+    case object IssueCategories extends Include
 
-    case object TimeEntryActivities extends Include("time_entry_activities")
+    case object EnabledModules extends Include
+
+    case object TimeEntryActivities extends Include
   }
 
 }

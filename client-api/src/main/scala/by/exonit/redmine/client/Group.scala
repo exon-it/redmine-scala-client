@@ -16,6 +16,9 @@
 
 package by.exonit.redmine.client
 
+import enumeratum.EnumEntry.Snakecase
+import enumeratum._
+
 import scala.collection.immutable._
 
 /**
@@ -81,25 +84,25 @@ object Group {
 
   /**
    * Group read operation additional include code type
-   * @param token Redmine REST API include token
    */
-  sealed abstract class Include(val token: String)
+  sealed abstract class Include extends EnumEntry with Snakecase
 
   /**
    * Predefined group read include tokens
    */
-  object Include {
+  object Include extends Enum[Include] {
+
+    val values: IndexedSeq[Include] = findValues
 
     /**
      * Project memberships for group
      */
-    case object Memberships extends Include("memberships")
+    case object Memberships extends Include
 
     /**
      * Group users
      */
-    case object Users extends Include("users")
+    case object Users extends Include
 
   }
-
 }

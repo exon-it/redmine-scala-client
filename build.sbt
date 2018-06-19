@@ -1,6 +1,4 @@
 
-import com.atlassian.labs.gitstamp.GitStampPlugin._
-
 lazy val repo: Option[String] = sys.props.get("publishTo")
 
 lazy val commonSettings = Seq(
@@ -10,7 +8,7 @@ lazy val commonSettings = Seq(
 
   startYear := Some(2015),
 
-  version := "5.0.0-rc5",
+  version := "5.0.0",
 
   scalaOrganization := "org.typelevel",
   scalaVersion := "2.11.11-bin-typelevel-4",
@@ -77,7 +75,7 @@ lazy val commonSettings = Seq(
   credentials ++= sys.props.get("credentialPath").map {cp =>
     cp.split(',').map {path => Credentials(file(path))}.toSeq
   } getOrElse Seq.empty
-) ++ Seq(gitStampSettings: _*)
+)
 
 lazy val `client-api` = (project in file("client-api")).
   settings(commonSettings: _*).
@@ -85,7 +83,7 @@ lazy val `client-api` = (project in file("client-api")).
     name := s"client-api",
     description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Client API. " +
       s"Contains domain classes and API manager traits.",
-    crossScalaVersions := Seq("2.11.11-bin-typelevel-4", "2.12.3-bin-typelevel-4"),
+    crossScalaVersions := Seq("2.11.11-bin-typelevel-4", "2.12.4-bin-typelevel-4"),
     libraryDependencies ++= Seq(
       Dependencies.monixEval,
       Dependencies.catsFree,
@@ -105,7 +103,7 @@ lazy val `client-core` = (project in file("client-core")).
     name := s"client-core",
     description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Client Core. " +
       s"Contains API manager and JSON serialization implementation.",
-    crossScalaVersions := Seq("2.11.11-bin-typelevel-4", "2.12.3-bin-typelevel-4"),
+    crossScalaVersions := Seq("2.11.11-bin-typelevel-4", "2.12.4-bin-typelevel-4"),
     libraryDependencies ++= Seq(
       Dependencies.catsFree,
       Dependencies.jodaTime,
@@ -142,7 +140,7 @@ lazy val `client-play26-ws` = (project in file("client-play26-ws")).
   settings(
     name := s"client-play26-ws",
     description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Play-WS 2.6 Web Client",
-    crossScalaVersions := Seq("2.11.11-bin-typelevel-4","2.12.3-bin-typelevel-4"),
+    crossScalaVersions := Seq("2.11.11-bin-typelevel-4","2.12.4-bin-typelevel-4"),
     libraryDependencies ++= Seq(
       Dependencies.play26Ws,
       Dependencies.slf4jJdk14 % Test,
@@ -158,7 +156,7 @@ lazy val `client-play-ws-standalone` = (project in file("client-play-ws-standalo
   settings(
     name := s"client-play-ws-standalone",
     description := s"Redmine REST API Client for Scala ${scalaBinaryVersion.value}: Play-WS Standalone Web Client",
-    crossScalaVersions := Seq("2.11.11-bin-typelevel-4", "2.12.3-bin-typelevel-4"),
+    crossScalaVersions := Seq("2.11.11-bin-typelevel-4", "2.12.4-bin-typelevel-4"),
     libraryDependencies ++= Seq(
       Dependencies.playWsStandalone,
       Dependencies.slf4jJdk14 % Test,
@@ -176,6 +174,4 @@ lazy val `client-parent` = (project in file(".")).
     // Do not publish root project
     publishArtifact := false
   ).
-  aggregate(`client-api`, `client-core`, `client-play25-ws`, `client-play26-ws`, `client-play-ws-standalone`).
-  enablePlugins(CrossPerProjectPlugin)
-
+  aggregate(`client-api`, `client-core`, `client-play25-ws`, `client-play26-ws`, `client-play-ws-standalone`)

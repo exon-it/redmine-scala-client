@@ -71,9 +71,10 @@ object ProjectSerializers {
       val trackers = (j \ "trackers").toOption.map(_.extract[Set[TrackerLink]])
       val issueCategories = (j \ "issue_categories").toOption.map(_.extract[Set[CategoryLink]])
       val enabledModules = (j \ "enabled_module_names").toOption.map(_.extract[Set[ModuleLink]])
+      val timeEntryActivities = (j \ "time_entry_activities").toOption.map(_.extract[Set[ActivityLink]])
       new Project(
         id, identifier, parent, name, description, homepage, createdOn, updatedOn, isPublic, customFields, trackers,
-        issueCategories, enabledModules)
+        issueCategories, enabledModules, timeEntryActivities)
   }
 
   object projectSerializer

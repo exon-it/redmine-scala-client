@@ -39,7 +39,8 @@ case class Project(
   customFields: Option[Set[CustomField]],
   trackers: Option[Set[TrackerLink]],
   issueCategories: Option[Set[CategoryLink]],
-  enabledModules: Option[Set[ModuleLink]]
+  enabledModules: Option[Set[ModuleLink]],
+  timeEntryActivities: Option[Set[ActivityLink]]
 ) extends ProjectIdLike with OptionalCustomFieldSet
 
 object Project {
@@ -69,7 +70,7 @@ object Project {
     customFields: Option[Set[CustomField.Update]] = None
   )
 
-  sealed abstract class Include(val token: String)
+  sealed abstract class Include(val token: String) extends Tokenized
 
   object Include {
 
@@ -79,6 +80,7 @@ object Project {
 
     case object EnabledModules extends Include("enabled_modules")
 
+    case object TimeEntryActivities extends Include("time_entry_activities")
   }
 
 }

@@ -44,5 +44,6 @@ object Serializers {
       UserSerializers.all ++
       VersionSerializers.all ++
       WikiSerializers.all ++
-      DocumentCategorySerializers.all
+      DocumentCategorySerializers.all ++
+      SearchSerializers.all
 }

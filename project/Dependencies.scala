@@ -16,4 +16,5 @@ object Dependencies {
   val catsFree         : ModuleID = "org.typelevel" %% "cats-free" % "0.9.0"
   val scalaArm         : ModuleID = "com.jsuereth" %% "scala-arm" % "2.0"
   val monixEval        : ModuleID = "io.monix" %% "monix-eval" % "2.3.3"
+  val enumeratum       : ModuleID = "com.beachape" %% "enumeratum" % "1.5.13"
 }

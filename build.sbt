@@ -91,6 +91,7 @@ lazy val `client-api` = (project in file("client-api")).
       Dependencies.jodaConvert,
       Dependencies.json4sCore,
       Dependencies.scalaLogging,
+      Dependencies.enumeratum,
       Dependencies.slf4jJdk14 % Test,
       Dependencies.scalatest % Test
     )

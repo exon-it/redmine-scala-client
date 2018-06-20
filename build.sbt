@@ -151,15 +151,47 @@ lazy val `client-play26-ws` = (project in file("client-play26-ws")).
     )
   )
 
+lazy val `client-play27-ws` = (project in file("client-play27-ws")).
+  dependsOn(`client-core`).
+  settings(commonSettings: _*).
+  settings(
+    name := "client-play27-ws",
+    description := "Redmine REST API Client for Scala: Play-WS 2.7 Web Client",
+    crossScalaVersions := Seq("2.11.11-bin-typelevel-4","2.12.4-bin-typelevel-4"),
+    libraryDependencies ++= Seq(
+      Dependencies.play27Ws,
+      Dependencies.slf4jJdk14 % Test,
+      Dependencies.scalatest % Test,
+      Dependencies.restClientDriver % Test,
+      Dependencies.scalaArm % Test
+    )
+  )
+
 lazy val `client-play-ws-standalone` = (project in file("client-play-ws-standalone")).
   dependsOn(`client-core`).
   settings(commonSettings: _*).
   settings(
     name := "client-play-ws-standalone",
-    description := "Redmine REST API Client for Scala: Play-WS Standalone Web Client",
+    description := "Redmine REST API Client for Scala: Play-WS Standalone 1.x Web Client",
     crossScalaVersions := Seq("2.11.11-bin-typelevel-4", "2.12.4-bin-typelevel-4"),
     libraryDependencies ++= Seq(
       Dependencies.playWsStandalone,
+      Dependencies.slf4jJdk14 % Test,
+      Dependencies.scalatest % Test,
+      Dependencies.restClientDriver % Test,
+      Dependencies.scalaArm % Test
+    )
+  )
+
+lazy val `client-play-ws-standalone-2` = (project in file("client-play-ws-standalone-2")).
+  dependsOn(`client-core`).
+  settings(commonSettings: _*).
+  settings(
+    name := "client-play-ws-standalone-2",
+    description := "Redmine REST API Client for Scala: Play-WS Standalone 2.x Web Client",
+    crossScalaVersions := Seq("2.11.11-bin-typelevel-4", "2.12.4-bin-typelevel-4"),
+    libraryDependencies ++= Seq(
+      Dependencies.playWsStandalone2,
       Dependencies.slf4jJdk14 % Test,
       Dependencies.scalatest % Test,
       Dependencies.restClientDriver % Test,
@@ -175,4 +207,12 @@ lazy val `client-parent` = (project in file(".")).
     // Do not publish root project
     publishArtifact := false
   ).
-  aggregate(`client-api`, `client-core`, `client-play25-ws`, `client-play26-ws`, `client-play-ws-standalone`)
+  aggregate(
+    `client-api`,
+    `client-core`,
+    `client-play25-ws`,
+    `client-play26-ws`,
+    `client-play27-ws`,
+    `client-play-ws-standalone`,
+    `client-play-ws-standalone-2`
+  )

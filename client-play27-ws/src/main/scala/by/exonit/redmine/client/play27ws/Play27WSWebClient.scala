@@ -14,26 +14,25 @@
  * limitations under the License.
  */
 
-package by.exonit.redmine.client.play25ws
+package by.exonit.redmine.client.play27ws
 
 import java.net.{URL, URLEncoder}
 
-import akka.stream.scaladsl.StreamConverters
 import akka.stream.{IOResult, Materializer}
+import akka.stream.scaladsl.StreamConverters
 import by.exonit.redmine.client.managers.WebClient
 import by.exonit.redmine.client.managers.WebClient._
-import by.exonit.redmine.client.play25ws.Implicits._
-import by.exonit.redmine.client.play25ws.Play25WSWebClient.{RequestInterpreter, RequestState, ResponseInterpreter, StreamingResponseInterpreter}
 import cats.data.State
-import cats.effect.IO
 import cats.{Id, ~>}
-import play.api.libs.ws.{StreamedResponse, WSClient, WSRequest, WSResponse}
+import cats.effect.IO
+import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 
-import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
+import Implicits._
+import by.exonit.redmine.client.play27ws.Play27WSWebClient.{RequestInterpreter, RequestState, ResponseInterpreter, StreamingResponseInterpreter}
 
-class Play25WSWebClient(val client: WSClient)
-  (implicit mat: Materializer, ec: ExecutionContext = ExecutionContext.global)
+class Play27WSWebClient(val client: WSClient)
+  (implicit mat: Materializer)
   extends WebClient {
 
   def compileRequestCommand(requestCommand: RequestDSL.Request[Unit]): IO[WSRequest] = IO {
@@ -44,8 +43,8 @@ class Play25WSWebClient(val client: WSClient)
       throw new UnsupportedOperationException("Unable to compile request from provided AST: no base URL specified"))
     val baseRequest = client.url(finalUrl)
       .withMethod(requestState.method)
-      .withHeaders(requestState.headers.toSeq: _*)
-      .withQueryString(requestState.queryParams: _*)
+      .withHttpHeaders(requestState.headers.toSeq: _*)
+      .withQueryStringParameters(requestState.queryParams: _*)
     val requestWithAuth = requestState.auth match {
       case Some(x) => baseRequest.withDslAuth(x)
       case None => baseRequest
@@ -59,7 +58,7 @@ class Play25WSWebClient(val client: WSClient)
 
   def compileStreamingResponseCommand[T](
     responseCommand: StreamingResponseDSL.StreamingResponse[T]
-  ): StreamedResponse => IO[T] = response => IO {
+  ): WSResponse => IO[T] = response => IO {
     responseCommand.foldMap(new StreamingResponseInterpreter(response))
   }
 
@@ -88,8 +87,7 @@ class Play25WSWebClient(val client: WSClient)
     }
   }
 }
-
-object Play25WSWebClient {
+object Play27WSWebClient {
 
   type RequestStateT[A] = State[RequestState, A]
 
@@ -143,7 +141,7 @@ object Play25WSWebClient {
   }
 
   class ResponseInterpreter(response: WSResponse) extends (ResponseDSL.ResponseOp ~> Id) {
-    override def apply[A](fa: ResponseDSL.ResponseOp[A]): Id[A] = fa match {
+    override def apply[A](fa: ResponseDSL.ResponseOp[A]) = fa match {
       case ResponseDSL.GetBodyAsBytes() =>
         response.bodyAsBytes.toArray
       case ResponseDSL.GetBodyAsString() =>
@@ -153,26 +151,26 @@ object Play25WSWebClient {
       case ResponseDSL.GetStatusText() =>
         response.statusText
       case ResponseDSL.GetHeaders() =>
-        response.allHeaders.mapValues(_.mkString(","))
+        response.headers.mapValues(_.mkString(","))
     }
   }
 
-  class StreamingResponseInterpreter(response: StreamedResponse)(implicit mat: Materializer)
+  class StreamingResponseInterpreter(response: WSResponse)(implicit mat: Materializer)
     extends (StreamingResponseDSL.StreamingResponseOp ~> Id) {
     override def apply[A](fa: StreamingResponseDSL.StreamingResponseOp[A]) = fa match {
       case StreamingResponseDSL.GetBodyStream(osp) =>
         IO.fromFuture {
           IO {
-            response.body.runWith(StreamConverters.fromOutputStream(osp))
+            response.bodyAsSource.runWith(StreamConverters.fromOutputStream(osp))
           }
         } flatMap {
           case r: IOResult if r.wasSuccessful => IO.unit
           case r: IOResult => IO.raiseError(r.getError)
         }
       case StreamingResponseDSL.GetStatusCode() =>
-        response.headers.status
+        response.status
       case StreamingResponseDSL.GetHeaders() =>
-        response.headers.headers.mapValues(_.mkString(","))
+        response.headers.mapValues(_.mkString(","))
     }
   }
 }

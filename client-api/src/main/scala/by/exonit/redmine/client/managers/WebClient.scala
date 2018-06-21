@@ -48,9 +48,6 @@ object WebClient {
     sealed trait Body
 
     object Body {
-
-      final case class EmptyBody() extends Body
-
       final case class FileBody(file: File) extends Body
 
       final case class InMemoryByteBody(body: Array[Byte]) extends Body
@@ -73,9 +70,9 @@ object WebClient {
 
     final case class SetMethod(method: String) extends RequestOp[Unit]
 
-    final case class SetAuth(auth: AuthenticationMethod) extends RequestOp[Unit]
+    final case class SetAuth(auth: Option[AuthenticationMethod]) extends RequestOp[Unit]
 
-    final case class SetBody(body: Body) extends RequestOp[Unit]
+    final case class SetBody(body: Option[Body]) extends RequestOp[Unit]
 
     final case class NoOp() extends RequestOp[Unit]
 
@@ -94,7 +91,7 @@ object WebClient {
     def setMethod(method: String): Request[Unit] =
       liftF[RequestOp, Unit](SetMethod(method))
 
-    def setAuth(auth: AuthenticationMethod): Request[Unit] =
+    def setAuth(auth: Option[AuthenticationMethod]): Request[Unit] =
       liftF[RequestOp, Unit](SetAuth(auth))
 
     def setContentType(contentType: String, charset: String): Request[Unit] =
@@ -103,7 +100,7 @@ object WebClient {
     def setContentType(contentType: String): Request[Unit] =
       setHeaders(Constants.ContentTypeHeader -> s"${contentType.toLowerCase}")
 
-    def setBody(body: Body): Request[Unit] =
+    def setBody(body: Option[Body]): Request[Unit] =
       liftF[RequestOp, Unit](SetBody(body))
 
     def noOp(): Request[Unit] =

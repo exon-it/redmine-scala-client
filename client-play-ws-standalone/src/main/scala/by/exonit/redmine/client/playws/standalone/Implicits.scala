@@ -18,7 +18,7 @@ package by.exonit.redmine.client.playws.standalone
 
 import akka.stream.scaladsl.StreamConverters
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
-import by.exonit.redmine.client.managers.WebClient.RequestDSL.Body.{EmptyBody, FileBody, InMemoryByteBody, StreamedBody}
+import by.exonit.redmine.client.managers.WebClient.RequestDSL.Body.{FileBody, InMemoryByteBody, StreamedBody}
 import play.api.libs.ws
 import play.api.libs.ws.{StandaloneWSRequest, WSAuthScheme}
 
@@ -56,16 +56,16 @@ object Implicits {
       }
     }
 
-    def withDslBody(body: RequestDSL.Body): StandaloneWSRequest = {
+    def withDslBody(body: Option[RequestDSL.Body]): StandaloneWSRequest = {
       import play.api.libs.ws.DefaultBodyWritables._
       body match {
-        case EmptyBody() =>
+        case None =>
           r.withBody(ws.EmptyBody)
-        case FileBody(file) =>
+        case Some(FileBody(file)) =>
           r.withBody(file)
-        case InMemoryByteBody(b) =>
+        case Some(InMemoryByteBody(b)) =>
           r.withBody(b)
-        case StreamedBody(streamProvider) =>
+        case Some(StreamedBody(streamProvider)) =>
           r.withBody(ws.SourceBody(StreamConverters.fromInputStream(streamProvider)))
       }
     }

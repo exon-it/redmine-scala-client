@@ -74,7 +74,8 @@ lazy val commonSettings = Seq(
   </developers>,
   credentials ++= sys.props.get("credentialPath").map {cp =>
     cp.split(',').map {path => Credentials(file(path))}.toSeq
-  } getOrElse Seq.empty
+  } getOrElse Seq.empty,
+  addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.7" cross CrossVersion.binary)
 )
 
 lazy val `client-api` = (project in file("client-api")).

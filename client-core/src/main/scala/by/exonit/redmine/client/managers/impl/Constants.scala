@@ -23,5 +23,5 @@ object Constants {
   lazy val JsonContentType          = "application/json"
   lazy val UploadContentType        = "application/octet-stream"
   lazy val Charset                  = "UTF-8"
-  lazy val DefaultObjectsPerPage    = BigInt(25)
+  lazy val DefaultObjectsPerPage    = 25
 }

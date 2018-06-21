@@ -121,7 +121,7 @@ class RequestManagerImpl(
       _ <- RequestDSL.setContentType(Constants.JsonContentType, Constants.Charset)
       bodyString = extractJsonEntityToString(entityName, entity)
       bodyBytes = bodyString.getBytes(Constants.Charset)
-      _ <- RequestDSL.setBody(RequestDSL.Body.InMemoryByteBody(bodyBytes))
+      _ <- RequestDSL.setBody(Some(RequestDSL.Body.InMemoryByteBody(bodyBytes)))
       _ <- authenticateRequest()
     } yield ()
     clientRequest(subRequest)
@@ -140,7 +140,7 @@ class RequestManagerImpl(
       _ <- RequestDSL.setContentType(Constants.JsonContentType, Constants.Charset)
       bodyString = extractJsonEntityToString(entityName, entity)
       bodyBytes = bodyString.getBytes(Constants.Charset)
-      _ <- RequestDSL.setBody(RequestDSL.Body.InMemoryByteBody(bodyBytes))
+      _ <- RequestDSL.setBody(Some(RequestDSL.Body.InMemoryByteBody(bodyBytes)))
       _ <- authenticateRequest()
     } yield ()
     clientRequestAsJSON(subRequest) map {j => (j \ responseEntityName).extract[TResponse]}
@@ -153,7 +153,7 @@ class RequestManagerImpl(
       _ <- request
       _ <- RequestDSL.setMethod("POST")
       _ <- RequestDSL.setContentType(Constants.UploadContentType)
-      _ <- RequestDSL.setBody(RequestDSL.Body.FileBody(file))
+      _ <- RequestDSL.setBody(Some(RequestDSL.Body.FileBody(file)))
       _ <- authenticateRequest()
     } yield ()
     clientRequestAsJSON(subRequest) map {j => (j \ responseEntityName).extract[TResponse]}
@@ -166,7 +166,7 @@ class RequestManagerImpl(
       _ <- request
       _ <- RequestDSL.setMethod("POST")
       _ <- RequestDSL.setContentType(Constants.UploadContentType)
-      _ <- RequestDSL.setBody(RequestDSL.Body.StreamedBody(stream))
+      _ <- RequestDSL.setBody(Some(RequestDSL.Body.StreamedBody(stream)))
       _ <- authenticateRequest()
     } yield ()
     clientRequestAsJSON(subRequest) map {j => (j \ responseEntityName).extract[TResponse]}
@@ -179,7 +179,7 @@ class RequestManagerImpl(
       _ <- request
       _ <- RequestDSL.setMethod("POST")
       _ <- RequestDSL.setContentType(Constants.UploadContentType)
-      _ <- RequestDSL.setBody(RequestDSL.Body.InMemoryByteBody(bytes))
+      _ <- RequestDSL.setBody(Some(RequestDSL.Body.InMemoryByteBody(bytes)))
       _ <- authenticateRequest()
     } yield ()
     clientRequestAsJSON(subRequest) map {j => (j \ responseEntityName).extract[TResponse]}
@@ -193,7 +193,7 @@ class RequestManagerImpl(
       _ <- RequestDSL.setContentType(Constants.JsonContentType, Constants.Charset)
       bodyString = extractJsonEntityToString(entityName, entity)
       bodyBytes = bodyString.getBytes(Constants.Charset)
-      _ <- RequestDSL.setBody(RequestDSL.Body.InMemoryByteBody(bodyBytes))
+      _ <- RequestDSL.setBody(Some(RequestDSL.Body.InMemoryByteBody(bodyBytes)))
       _ <- authenticateRequest()
     } yield ()
     clientRequest(subRequest)
@@ -213,7 +213,7 @@ class RequestManagerImpl(
       _ <- RequestDSL.setContentType(Constants.JsonContentType, Constants.Charset)
       bodyString = extractJsonEntityToString(entityName, entity)
       bodyBytes = bodyString.getBytes(Constants.Charset)
-      _ <- RequestDSL.setBody(RequestDSL.Body.InMemoryByteBody(bodyBytes))
+      _ <- RequestDSL.setBody(Some(RequestDSL.Body.InMemoryByteBody(bodyBytes)))
       _ <- authenticateRequest()
     } yield ()
     clientRequestAsJSON(subRequest) map {j => (j \ responseEntityName).extract[TResponse]}

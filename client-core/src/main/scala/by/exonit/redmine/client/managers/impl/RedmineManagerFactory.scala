@@ -57,7 +57,7 @@ class RedmineManagerFactory(val client: WebClient) {
     val baseRequest = for {
       _ <- RequestDSL.setUrl(baseUrl)
     } yield ()
-    val authenticator = RequestDSL.setAuth(AuthenticationMethod.Basic(login, password))
+    val authenticator = RequestDSL.setAuth(Some(AuthenticationMethod.Basic(login, password)))
     new RedmineManagerImpl(client, baseRequest, authenticator)
   }
 

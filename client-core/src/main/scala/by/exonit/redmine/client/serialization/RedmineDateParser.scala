@@ -21,24 +21,29 @@ import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, ISODateTimeForma
 
 object RedmineDateParser {
 
-  val FULL_DATE_FORMAT: DateTimeFormatter = DateTimeFormat.forPattern("""yyyy/MM/dd HH:mm:ss Z""")
+  val FullDateFormatV1: DateTimeFormatter = DateTimeFormat.forPattern("""yyyy/MM/dd HH:mm:ss Z""")
 
-  val FULL_DATE_FORMAT_V2: DateTimeFormatter = ISODateTimeFormat.dateTimeNoMillis()
+  val FullDateFormatV2: DateTimeFormatter = ISODateTimeFormat.dateTimeNoMillis()
 
-  val FULL_DATE_FORMAT_V3: DateTimeFormatter = ISODateTimeFormat.dateTime()
+  val FullDateFormatV3: DateTimeFormatter = ISODateTimeFormat.dateTime()
 
-  private val SHORT_DATE_PATTERN_V1 = """yyyy/MM/dd"""
+  private val ShortDatePatternV1 = """yyyy/MM/dd"""
 
-  private val SHORT_DATE_PATTERN_V2 = """yyyy-MM-dd"""
+  private val ShortDatePatternV2 = """yyyy-MM-dd"""
 
-  val SHORT_DATE_FORMAT: DateTimeFormatter = DateTimeFormat.forPattern(SHORT_DATE_PATTERN_V1)
+  val ShortDateFormatV1: DateTimeFormatter = DateTimeFormat.forPattern(ShortDatePatternV1)
 
-  val SHORT_DATE_FORMAT_V2: DateTimeFormatter = DateTimeFormat.forPattern(SHORT_DATE_PATTERN_V2)
+  val ShortDateFormatV2: DateTimeFormatter = DateTimeFormat.forPattern(ShortDatePatternV2)
 
-  private val SHORT_DATE_FORMAT_MAX_LENGTH = Math.max(SHORT_DATE_PATTERN_V1.length, SHORT_DATE_PATTERN_V2.length)
+  private val ShortDateFormatMaxLength = Math.max(ShortDatePatternV1.length, ShortDatePatternV2.length)
+
+  private val SlashSeparator = '/'
+
+  private val V1DateMinStringLength = 5
+  private val V1DateSlashPositionIndex = 4
 
   def parse(dateStr: String): DateTime = {
-    if (dateStr.length > SHORT_DATE_FORMAT_MAX_LENGTH) {
+    if (dateStr.length > ShortDateFormatMaxLength) {
       parseLongFormat(dateStr)
     } else {
       parseShortFormat(dateStr).toDateTimeAtStartOfDay
@@ -47,23 +52,22 @@ object RedmineDateParser {
 
   def parseLocalDate(str: String): LocalDate = parseShortFormat(str)
 
-  private val SLASH_SEPARATOR = '/'
-
   private def parseShortFormat(dateStr: String): LocalDate = {
-    val format = if (dateStr.length >= 5 && dateStr.charAt(4) == SLASH_SEPARATOR) {
-      RedmineDateParser.SHORT_DATE_FORMAT
+
+    val format = if (dateStr.length >= V1DateMinStringLength && dateStr.charAt(V1DateSlashPositionIndex) == SlashSeparator) {
+      RedmineDateParser.ShortDateFormatV1
     } else {
-      RedmineDateParser.SHORT_DATE_FORMAT_V2
+      RedmineDateParser.ShortDateFormatV2
     }
     format.parseLocalDate(dateStr)
   }
 
   private def parseLongFormat(dateStr: String): DateTime = {
-    if (dateStr.length >= 5 && dateStr.charAt(4) == SLASH_SEPARATOR) {
-      RedmineDateParser.FULL_DATE_FORMAT.parseDateTime(dateStr)
+    if (dateStr.length >= V1DateMinStringLength && dateStr.charAt(V1DateSlashPositionIndex) == SlashSeparator) {
+      RedmineDateParser.FullDateFormatV1.parseDateTime(dateStr)
     } else {
       val s0 = normalizeTimeZoneInfo(dateStr)
-      val format = if (s0.indexOf('.') < 0) RedmineDateParser.FULL_DATE_FORMAT_V2 else RedmineDateParser.FULL_DATE_FORMAT_V3
+      val format = if (s0.indexOf('.') < 0) RedmineDateParser.FullDateFormatV2 else RedmineDateParser.FullDateFormatV3
       format.parseDateTime(s0)
     }
   }

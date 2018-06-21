@@ -19,12 +19,12 @@ package by.exonit.redmine.client.play25ws.fixtures
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import by.exonit.redmine.client.play25ws.Play25WSWebClient
-import monix.execution.misc.NonFatal
 import org.scalatest.{BeforeAndAfterAll, Suite}
 import play.api.libs.ws.ahc.{AhcWSClient, AhcWSClientConfig}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.util.control.NonFatal
 
 trait WebClientFixture extends BeforeAndAfterAll {
   this: Suite =>
@@ -39,12 +39,14 @@ trait WebClientFixture extends BeforeAndAfterAll {
       webClient.close()
     } catch {
       case NonFatal(_) =>
+      case ex: Throwable => throw ex
     }
     try {
       val terminationFuture = as.terminate()
       Await.ready(terminationFuture, 10.seconds)
     } catch {
       case NonFatal(_) =>
+      case ex: Throwable => throw ex
     }
     super.afterAll()
   }

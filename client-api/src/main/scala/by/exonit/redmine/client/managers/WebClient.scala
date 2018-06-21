@@ -20,7 +20,7 @@ import java.io.{File, InputStream, OutputStream}
 
 import cats.free.Free
 import cats.free.Free.liftF
-import monix.eval.Task
+import cats.effect.IO
 
 import scala.collection.immutable._
 
@@ -150,7 +150,7 @@ object WebClient {
 
     final case class GetHeaders() extends StreamingResponseOp[Map[String, String]]
 
-    final case class GetBodyStream(outputStreamProvider: () => OutputStream) extends StreamingResponseOp[Task[Unit]]
+    final case class GetBodyStream(outputStreamProvider: () => OutputStream) extends StreamingResponseOp[IO[Unit]]
 
     type StreamingResponse[A] = Free[StreamingResponseOp, A]
 
@@ -160,8 +160,8 @@ object WebClient {
     def getStatusCode: StreamingResponse[Int] =
       liftF[StreamingResponseOp, Int](GetStatusCode())
 
-    def getBodyStream(outputStreamProvider: () => OutputStream): StreamingResponse[Task[Unit]] =
-      liftF[StreamingResponseOp, Task[Unit]](GetBodyStream(outputStreamProvider))
+    def getBodyStream(outputStreamProvider: () => OutputStream): StreamingResponse[IO[Unit]] =
+      liftF[StreamingResponseOp, IO[Unit]](GetBodyStream(outputStreamProvider))
   }
 }
 
@@ -169,9 +169,9 @@ trait WebClient {
 
   import WebClient._
 
-  def execute[T](requestCommand: RequestDSL.Request[Unit], responseCommand: ResponseDSL.Response[T]): Task[T]
+  def execute[T](requestCommand: RequestDSL.Request[Unit], responseCommand: ResponseDSL.Response[T]): IO[T]
 
   def executeStreaming[T](
     requestCommand : RequestDSL.Request[Unit],
-    responseCommand: StreamingResponseDSL.StreamingResponse[T]): Task[T]
+    responseCommand: StreamingResponseDSL.StreamingResponse[T]): IO[T]
 }

@@ -23,7 +23,7 @@ import akka.stream.scaladsl.StreamConverters
 import by.exonit.redmine.client.managers.WebClient
 import by.exonit.redmine.client.managers.WebClient._
 import cats.{~>, Id}
-import monix.eval.Task
+import cats.effect.IO
 import play.api.libs.ws.{StandaloneWSClient, StandaloneWSRequest, StandaloneWSResponse}
 
 import scala.util.control.NonFatal
@@ -34,7 +34,7 @@ class PlayWSStandaloneWebClient(val client: StandaloneWSClient)
 
   import Implicits._
 
-  def compileRequestCommand(requestCommand: RequestDSL.Request[Unit]): StandaloneWSRequest = {
+  def compileRequestCommand(requestCommand: RequestDSL.Request[Unit]): IO[StandaloneWSRequest] = IO {
     var url: Option[String] = None
     var queryParams: Seq[(String, String)] = Seq.empty
     var headers: Map[String, String] = Map.empty
@@ -94,7 +94,8 @@ class PlayWSStandaloneWebClient(val client: StandaloneWSClient)
     }
   }
 
-  def compileResponseCommand[T](responseCommand: ResponseDSL.Response[T]): StandaloneWSResponse => T = response => {
+  def compileResponseCommand[T](responseCommand: ResponseDSL.Response[T]): StandaloneWSResponse => IO[T] =
+    response => IO {
     responseCommand.foldMap(new (ResponseDSL.ResponseOp ~> Id) {
       override def apply[A](fa: ResponseDSL.ResponseOp[A]) = fa match {
         case ResponseDSL.GetBodyAsBytes() =>
@@ -113,15 +114,17 @@ class PlayWSStandaloneWebClient(val client: StandaloneWSClient)
 
   def compileStreamingResponseCommand[T](
     responseCommand: StreamingResponseDSL.StreamingResponse[T]
-  ): StandaloneWSResponse => T = response => {
+  ): StandaloneWSResponse => IO[T] = response => IO {
     responseCommand.foldMap(new (StreamingResponseDSL.StreamingResponseOp ~> Id) {
       override def apply[A](fa: StreamingResponseDSL.StreamingResponseOp[A]) = fa match {
         case StreamingResponseDSL.GetBodyStream(osp) =>
-          Task.deferFuture {
-            response.bodyAsSource.runWith(StreamConverters.fromOutputStream(osp))
+          IO.fromFuture {
+            IO {
+              response.bodyAsSource.runWith(StreamConverters.fromOutputStream(osp))
+            }
           } flatMap {
-            case r: IOResult if r.wasSuccessful => Task.unit
-            case r: IOResult => Task.raiseError(r.getError)
+            case r: IOResult if r.wasSuccessful => IO.unit
+            case r: IOResult => IO.raiseError(r.getError)
           }
         case StreamingResponseDSL.GetStatusCode() =>
           response.status
@@ -131,29 +134,28 @@ class PlayWSStandaloneWebClient(val client: StandaloneWSClient)
     })
   }
 
-  override def execute[T](requestCommand: RequestDSL.Request[Unit], responseCommand: ResponseDSL.Response[T]):
-  Task[T] =
-    Task.evalOnce {
-      compileRequestCommand(requestCommand)
-    } flatMap {req => Task.fromFuture(req.execute())} map {
-      compileResponseCommand(responseCommand)
-    }
+  override def execute[T](
+    requestCommand: RequestDSL.Request[Unit],
+    responseCommand: ResponseDSL.Response[T]
+  ): IO[T] =
+      compileRequestCommand(requestCommand) flatMap {req =>
+        IO.fromFuture(IO {req.execute()})
+      } flatMap compileResponseCommand(responseCommand)
 
   override def executeStreaming[T](
     requestCommand: RequestDSL.Request[Unit],
     responseCommand: StreamingResponseDSL.StreamingResponse[T]
-  ): Task[T] =
-    Task.evalOnce {
-      compileRequestCommand(requestCommand)
-    } flatMap {req => Task.fromFuture(req.stream())} map {
-      compileStreamingResponseCommand(responseCommand)
-    }
+  ): IO[T] =
+    compileRequestCommand(requestCommand) flatMap {req =>
+      IO.fromFuture(IO {req.stream()})
+    } flatMap compileStreamingResponseCommand(responseCommand)
 
   def close(): Unit = {
     try {
       client.close()
     } catch {
       case NonFatal(_) =>
+      case ex: Throwable => throw ex
     }
   }
 }

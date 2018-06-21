@@ -31,8 +31,8 @@ object Dependencies {
   val scalaLogging     : ModuleID = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
   val scalatest        : ModuleID = "org.scalatest" %% "scalatest" % "3.0.5"
   val restClientDriver : ModuleID = "com.github.rest-driver" % "rest-client-driver" % "2.0.0"
-  val catsFree         : ModuleID = "org.typelevel" %% "cats-free" % "0.9.0"
+  val catsFree         : ModuleID = "org.typelevel" %% "cats-free" % "1.1.0"
+  val catsEffect       : ModuleID = "org.typelevel" %% "cats-effect" % "1.0.0-RC2"
   val scalaArm         : ModuleID = "com.jsuereth" %% "scala-arm" % "2.0"
-  val monixEval        : ModuleID = "io.monix" %% "monix-eval" % "2.3.3"
   val enumeratum       : ModuleID = "com.beachape" %% "enumeratum" % "1.5.13"
 }

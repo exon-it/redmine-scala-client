@@ -19,6 +19,7 @@ package by.exonit.redmine.client.managers.impl
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
 import by.exonit.redmine.client.managers.WebClient.RequestDSL.AuthenticationMethod
 import by.exonit.redmine.client.managers.{RedmineManager, WebClient}
+import cats.effect.{IO, Timer}
 
 import scala.collection.immutable._
 
@@ -37,7 +38,7 @@ class RedmineManagerFactory(val client: WebClient) {
     * @param baseUrl Redmine REST API base URL
     * @return [[by.exonit.redmine.client.managers.RedmineManager RedmineManager]] instance
     */
-  def createUnauthenticated(baseUrl: String): RedmineManager = {
+  def createUnauthenticated(baseUrl: String)(implicit timer: Timer[IO]): RedmineManager = {
     val baseRequest = RequestDSL.setUrl(baseUrl)
     new RedmineManagerImpl(client, baseRequest, RequestDSL.noOp())
   }
@@ -52,7 +53,7 @@ class RedmineManagerFactory(val client: WebClient) {
     * @return [[by.exonit.redmine.client.managers.RedmineManager RedmineManager]] instance
     */
   def createWithUserAuth(
-    baseUrl: String, login: String, password: IndexedSeq[Char]): RedmineManager = {
+    baseUrl: String, login: String, password: IndexedSeq[Char])(implicit timer: Timer[IO]): RedmineManager = {
     val baseRequest = for {
       _ <- RequestDSL.setUrl(baseUrl)
     } yield ()
@@ -69,7 +70,7 @@ class RedmineManagerFactory(val client: WebClient) {
     * @return [[by.exonit.redmine.client.managers.RedmineManager RedmineManager]] instance
     */
   def createWithApiKey(
-    baseUrl: String, apiKey: String): RedmineManager = {
+    baseUrl: String, apiKey: String)(implicit timer: Timer[IO]): RedmineManager = {
     val baseRequest = for {
       _ <- RequestDSL.setUrl(baseUrl)
     } yield ()

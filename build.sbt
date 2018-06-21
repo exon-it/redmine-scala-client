@@ -85,8 +85,8 @@ lazy val `client-api` = (project in file("client-api")).
       "Contains domain classes and API manager traits.",
     crossScalaVersions := Seq("2.11.11-bin-typelevel-4", "2.12.4-bin-typelevel-4"),
     libraryDependencies ++= Seq(
-      Dependencies.monixEval,
       Dependencies.catsFree,
+      Dependencies.catsEffect,
       Dependencies.jodaTime,
       Dependencies.jodaConvert,
       Dependencies.json4sCore,

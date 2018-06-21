@@ -41,7 +41,7 @@ class Play26WSClientSpec extends BasicSpec with ClientDriverFixture with WebClie
       } yield s -> b
 
       val requestFuture = webClient.execute(request, responseCommand)
-      whenReady(requestFuture.runAsync) {case (status, body) =>
+      whenReady(requestFuture.unsafeToFuture) {case (status, body) =>
         status shouldBe Status.OK
         body shouldBe "TEST"
         clientDriver.verify()
@@ -62,7 +62,7 @@ class Play26WSClientSpec extends BasicSpec with ClientDriverFixture with WebClie
       } yield s -> b
 
       val requestFuture = webClient.execute(request, responseCommand)
-      whenReady(requestFuture.runAsync) {case (status, body) =>
+      whenReady(requestFuture.unsafeToFuture) {case (status, body) =>
         status shouldBe Status.OK
         body shouldBe "TEST"
         clientDriver.verify()
@@ -83,7 +83,7 @@ class Play26WSClientSpec extends BasicSpec with ClientDriverFixture with WebClie
       } yield s -> b
 
       val requestFuture = webClient.execute(request, responseCommand)
-      whenReady(requestFuture.runAsync) {case (status, body) =>
+      whenReady(requestFuture.unsafeToFuture) {case (status, body) =>
         status shouldBe Status.OK
         body shouldBe "TEST"
         clientDriver.verify()
@@ -104,7 +104,7 @@ class Play26WSClientSpec extends BasicSpec with ClientDriverFixture with WebClie
       } yield s -> b
 
       val requestFuture = webClient.execute(request, responseCommand)
-      whenReady(requestFuture.runAsync) {case (status, body) =>
+      whenReady(requestFuture.unsafeToFuture) {case (status, body) =>
         status shouldBe Status.OK
         body shouldBe "TEST"
         clientDriver.verify()

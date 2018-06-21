@@ -20,13 +20,13 @@ import by.exonit.redmine.client._
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
 import by.exonit.redmine.client.managers.{RequestManager, UserManager}
 import cats.data.NonEmptyList
-import monix.eval.Task
+import cats.effect.IO
 
 import scala.collection.immutable._
 
 class UserManagerImpl(requestManager: RequestManager) extends UserManager {
 
-  def getCurrentUser(includes: User.Include*): Task[User] = {
+  def getCurrentUser(includes: User.Include*): IO[User] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("users", "current.json")
@@ -35,7 +35,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.getEntity[User](request, "user")
   }
 
-  def getUsers(params: (String, String)*): Task[PagedList[User]] = {
+  def getUsers(params: (String, String)*): IO[PagedList[User]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("users.json")
@@ -44,7 +44,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.getEntityPagedList[User](request, "users")
   }
 
-  def getUsers(params: Seq[(String, String)], includes: User.Include*): Task[PagedList[User]] = {
+  def getUsers(params: Seq[(String, String)], includes: User.Include*): IO[PagedList[User]] = IO.suspend {
     val allParams = if (includes.nonEmpty) {
       params :+ "include" -> includes.map(_.entryName).mkString(",")
     } else {
@@ -53,7 +53,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     getUsers(allParams: _*)
   }
 
-  def getUser(id: UserIdLike, includes: User.Include*): Task[User] = {
+  def getUser(id: UserIdLike, includes: User.Include*): IO[User] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("users", s"${id.id}.json")
@@ -62,7 +62,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.getEntity[User](request, "user")
   }
 
-  def createUser(user: User.New): Task[User] = {
+  def createUser(user: User.New): IO[User] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("users.json")
@@ -70,7 +70,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.postEntityWithResponse[User.New, User](request, "user", user, "user")
   }
 
-  def updateUser(id: UserIdLike, update: User.Update): Task[Unit] = {
+  def updateUser(id: UserIdLike, update: User.Update): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("users", s"${id.id}.json")
@@ -78,7 +78,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.putEntity(request, "user", update)
   }
 
-  def deleteUser(id: UserIdLike): Task[Unit] = {
+  def deleteUser(id: UserIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("users", s"${id.id}.json")
@@ -86,7 +86,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.deleteEntity(request)
   }
 
-  def getGroups(): Task[PagedList[Group]] = {
+  def getGroups(): IO[PagedList[Group]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("groups.json")
@@ -94,7 +94,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.getEntityPagedList[Group](request, "groups")
   }
 
-  def getGroup(id: GroupIdLike, includes: Group.Include*): Task[Group] = {
+  def getGroup(id: GroupIdLike, includes: Group.Include*): IO[Group] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("groups", s"${id.id}.json")
@@ -103,7 +103,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.getEntity[Group](request, "group")
   }
 
-  def createGroup(group: Group.New): Task[Group] = {
+  def createGroup(group: Group.New): IO[Group] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("groups.json")
@@ -111,7 +111,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.postEntityWithResponse[Group.New, Group](request, "group", group, "group")
   }
 
-  def updateGroup(id: GroupIdLike, update: Group.Update): Task[Unit] = {
+  def updateGroup(id: GroupIdLike, update: Group.Update): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("groups", s"${id.id}.json")
@@ -119,7 +119,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.putEntity(request, "group", update)
   }
 
-  def deleteGroup(id: GroupIdLike): Task[Unit] = {
+  def deleteGroup(id: GroupIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("groups", s"${id.id}.json")
@@ -127,7 +127,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.deleteEntity(request)
   }
 
-  def addUserToGroup(user: UserIdLike, group: GroupIdLike): Task[Unit] = {
+  def addUserToGroup(user: UserIdLike, group: GroupIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("groups", group.id.toString, "users.json")
@@ -135,7 +135,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.postEntity(request, "user_id", user.id)
   }
 
-  def removeUserFromGroup(user: UserIdLike, group: GroupIdLike): Task[Unit] = {
+  def removeUserFromGroup(user: UserIdLike, group: GroupIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("groups", group.id.toString, "users", s"${user.id}.json")

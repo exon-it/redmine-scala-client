@@ -19,10 +19,10 @@ package by.exonit.redmine.client.managers.impl
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
 import by.exonit.redmine.client.{PagedList, ProjectFile, ProjectIdLike}
 import by.exonit.redmine.client.managers.{FileManager, RequestManager}
-import monix.eval.Task
+import cats.effect.IO
 
 class FileManagerImpl(requestManager: RequestManager) extends FileManager {
-  override def getFiles(projectId: ProjectIdLike): Task[PagedList[ProjectFile]] = {
+  override def getFiles(projectId: ProjectIdLike): IO[PagedList[ProjectFile]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", projectId.id.toString, "files.json")
@@ -33,7 +33,7 @@ class FileManagerImpl(requestManager: RequestManager) extends FileManager {
   override def createFile(
     projectId: ProjectIdLike,
     file: ProjectFile.New
-  ): Task[Unit] = {
+  ): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", projectId.id.toString, "files.json")

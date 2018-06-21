@@ -17,26 +17,26 @@
 package by.exonit.redmine.client.managers
 
 import by.exonit.redmine.client._
-import monix.eval.Task
+import cats.effect.IO
 
 /**
   * Created by keritaf on 04.12.16.
   */
 //noinspection AccessorLikeMethodIsEmptyParen
 trait TimeEntryManager {
-  def getTimeEntries(params: (String, String)*): Task[PagedList[TimeEntry]]
+  def getTimeEntries(params: (String, String)*): IO[PagedList[TimeEntry]]
 
-  def getTimeEntriesForProject(project: ProjectIdLike, activity: Option[ActivityIdLike] = None): Task[PagedList[TimeEntry]]
+  def getTimeEntriesForProject(project: ProjectIdLike, activity: Option[ActivityIdLike] = None): IO[PagedList[TimeEntry]]
 
-  def getTimeEntriesForIssue(issue: IssueIdLike, activity: Option[ActivityIdLike] = None): Task[PagedList[TimeEntry]]
+  def getTimeEntriesForIssue(issue: IssueIdLike, activity: Option[ActivityIdLike] = None): IO[PagedList[TimeEntry]]
 
-  def getTimeEntry(id: TimeEntryIdLike): Task[TimeEntry]
+  def getTimeEntry(id: TimeEntryIdLike): IO[TimeEntry]
 
-  def createTimeEntry(newTimeEntry: TimeEntry.New): Task[TimeEntry]
+  def createTimeEntry(newTimeEntry: TimeEntry.New): IO[TimeEntry]
 
-  def updateTimeEntry(id: TimeEntryIdLike, update: TimeEntry.Update): Task[Unit]
+  def updateTimeEntry(id: TimeEntryIdLike, update: TimeEntry.Update): IO[Unit]
 
-  def deleteTimeEntry(id: TimeEntryIdLike): Task[Unit]
+  def deleteTimeEntry(id: TimeEntryIdLike): IO[Unit]
 
-  def getTimeEntryActivities(): Task[PagedList[Activity]]
+  def getTimeEntryActivities(): IO[PagedList[Activity]]
 }

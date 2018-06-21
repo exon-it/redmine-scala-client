@@ -19,35 +19,35 @@ package by.exonit.redmine.client.managers
 import by.exonit.redmine.client._
 
 import scala.collection.immutable._
-import monix.eval.Task
+import cats.effect.IO
 
 //noinspection AccessorLikeMethodIsEmptyParen
 trait UserManager {
-  def getCurrentUser(includes: User.Include*): Task[User]
+  def getCurrentUser(includes: User.Include*): IO[User]
 
-  def getUsers(params: (String, String)*): Task[PagedList[User]]
+  def getUsers(params: (String, String)*): IO[PagedList[User]]
 
-  def getUsers(params: Seq[(String, String)], includes: User.Include*): Task[PagedList[User]]
+  def getUsers(params: Seq[(String, String)], includes: User.Include*): IO[PagedList[User]]
 
-  def getUser(id: UserIdLike, includes: User.Include*): Task[User]
+  def getUser(id: UserIdLike, includes: User.Include*): IO[User]
 
-  def createUser(user: User.New): Task[User]
+  def createUser(user: User.New): IO[User]
 
-  def updateUser(id: UserIdLike, update: User.Update): Task[Unit]
+  def updateUser(id: UserIdLike, update: User.Update): IO[Unit]
 
-  def deleteUser(id: UserIdLike): Task[Unit]
+  def deleteUser(id: UserIdLike): IO[Unit]
 
-  def getGroups(): Task[PagedList[Group]]
+  def getGroups(): IO[PagedList[Group]]
 
-  def getGroup(id: GroupIdLike, includes: Group.Include*): Task[Group]
+  def getGroup(id: GroupIdLike, includes: Group.Include*): IO[Group]
 
-  def createGroup(group: Group.New): Task[Group]
+  def createGroup(group: Group.New): IO[Group]
 
-  def updateGroup(id: GroupIdLike, update: Group.Update): Task[Unit]
+  def updateGroup(id: GroupIdLike, update: Group.Update): IO[Unit]
 
-  def deleteGroup(id: GroupIdLike): Task[Unit]
+  def deleteGroup(id: GroupIdLike): IO[Unit]
 
-  def addUserToGroup(user: UserIdLike, group: GroupIdLike): Task[Unit]
+  def addUserToGroup(user: UserIdLike, group: GroupIdLike): IO[Unit]
 
-  def removeUserFromGroup(user: UserIdLike, group: GroupIdLike): Task[Unit]
+  def removeUserFromGroup(user: UserIdLike, group: GroupIdLike): IO[Unit]
 }

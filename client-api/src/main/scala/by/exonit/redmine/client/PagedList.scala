@@ -16,7 +16,7 @@
 
 package by.exonit.redmine.client
 
-import monix.eval.Task
+import cats.effect.IO
 
 import scala.collection.immutable._
 
@@ -24,7 +24,7 @@ case class PagedList[T](
   items: List[T],
   total: BigInt,
   offset: BigInt,
-  allItems: Task[List[T]],
-  next: Option[Task[PagedList[T]]] = None,
-  previous: Option[Task[PagedList[T]]] = None
+  allItems: IO[List[T]],
+  next: Option[IO[PagedList[T]]] = None,
+  previous: Option[IO[PagedList[T]]] = None
 )

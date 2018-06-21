@@ -19,8 +19,13 @@ package by.exonit.redmine.client.managers.impl
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
 import by.exonit.redmine.client.managers._
 import by.exonit.redmine.client.managers.WebClient.RequestDSL.Request
+import cats.effect.{IO, Timer}
 
-class RedmineManagerImpl(client: WebClient, baseRequest: Request[Unit], authenticator: Request[Unit]) extends RedmineManager {
+class RedmineManagerImpl(
+  client: WebClient,
+  baseRequest: Request[Unit],
+  authenticator: Request[Unit]
+)(implicit timer: Timer[IO]) extends RedmineManager {
   lazy val requestManager    : RequestManager     = new RequestManagerImpl(client, baseRequest, requestAuthenticator = authenticator)
   lazy val issueManager      : IssueManager       = new IssueManagerImpl(requestManager)
   lazy val projectManager    : ProjectManager     = new ProjectManagerImpl(requestManager)

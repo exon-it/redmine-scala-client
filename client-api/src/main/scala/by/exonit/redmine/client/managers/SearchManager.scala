@@ -17,7 +17,7 @@
 package by.exonit.redmine.client.managers
 
 import by.exonit.redmine.client._
-import monix.eval.Task
+import cats.effect.IO
 
 import scala.collection.immutable._
 
@@ -31,5 +31,5 @@ trait SearchManager {
     titlesOnly: Option[Boolean] = None,
     openIssuesOnly: Option[Boolean] = None,
     attachmentScope: Option[SearchAttachmentScope] = None
-  ): Task[PagedList[SearchResult]]
+  ): IO[PagedList[SearchResult]]
 }

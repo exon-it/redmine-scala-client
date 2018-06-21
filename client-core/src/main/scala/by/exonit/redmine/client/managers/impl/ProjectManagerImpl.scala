@@ -19,11 +19,11 @@ package by.exonit.redmine.client.managers.impl
 import by.exonit.redmine.client._
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
 import by.exonit.redmine.client.managers.{ProjectManager, RequestManager}
-import monix.eval.Task
+import cats.effect.IO
 
 class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager {
 
-  override def getProjects(params: (String, String)*): Task[PagedList[Project]] = {
+  override def getProjects(params: (String, String)*): IO[PagedList[Project]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects.json")
@@ -32,7 +32,7 @@ class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager 
     requestManager.getEntityPagedList[Project](request, "projects")
   }
 
-  override def getProject(id: ProjectIdLike, includes: Project.Include*): Task[Project] = {
+  override def getProject(id: ProjectIdLike, includes: Project.Include*): IO[Project] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", s"${id.id}.json")
@@ -41,7 +41,7 @@ class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager 
     requestManager.getEntity[Project](request, "project")
   }
 
-  override def getProjectByKey(key: String, includes: Project.Include*): Task[Project] = {
+  override def getProjectByKey(key: String, includes: Project.Include*): IO[Project] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", s"$key.json")
@@ -50,7 +50,7 @@ class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager 
     requestManager.getEntity[Project](request, "project")
   }
 
-  override def createProject(project: Project.New): Task[Project] = {
+  override def createProject(project: Project.New): IO[Project] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects")
@@ -58,7 +58,7 @@ class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager 
     requestManager.postEntityWithResponse[Project.New, Project](request, "project", project, "project")
   }
 
-  override def updateProject(id: ProjectIdLike, update: Project.Update): Task[Unit] = {
+  override def updateProject(id: ProjectIdLike, update: Project.Update): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", s"${id.id}.json")
@@ -66,7 +66,7 @@ class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager 
     requestManager.putEntity(request, "project", update)
   }
 
-  override def deleteProject(id: ProjectIdLike): Task[Unit] = {
+  override def deleteProject(id: ProjectIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", s"${id.id}.json")
@@ -74,7 +74,7 @@ class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager 
     requestManager.deleteEntity(request)
   }
 
-  override def getVersions(project: ProjectIdLike, params: (String, String)*): Task[PagedList[Version]] = {
+  override def getVersions(project: ProjectIdLike, params: (String, String)*): IO[PagedList[Version]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", project.id.toString, "versions.json")
@@ -83,7 +83,7 @@ class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager 
     requestManager.getEntityPagedList[Version](request, "versions")
   }
 
-  override def getVersion(id: VersionIdLike): Task[Version] = {
+  override def getVersion(id: VersionIdLike): IO[Version] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("versions", s"${id.id}.json")
@@ -91,7 +91,7 @@ class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager 
     requestManager.getEntity[Version](request, "version")
   }
 
-  override def createVersion(project: ProjectIdLike, version: Version.New): Task[Version] = {
+  override def createVersion(project: ProjectIdLike, version: Version.New): IO[Version] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", project.id.toString, "versions.json")
@@ -99,7 +99,7 @@ class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager 
     requestManager.postEntityWithResponse[Version.New, Version](request, "version", version, "version")
   }
 
-  override def updateVersion(id: VersionIdLike, update: Version.Update): Task[Unit] = {
+  override def updateVersion(id: VersionIdLike, update: Version.Update): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("versions", s"${id.id}.json")
@@ -107,7 +107,7 @@ class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager 
     requestManager.putEntity(request, "version", update)
   }
 
-  override def deleteVersion(id: VersionIdLike): Task[Unit] = {
+  override def deleteVersion(id: VersionIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("versions", s"${id.id}.json")
@@ -115,7 +115,7 @@ class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager 
     requestManager.deleteEntity(request)
   }
 
-  override def getNews(project: ProjectIdLike): Task[PagedList[News]] = {
+  override def getNews(project: ProjectIdLike): IO[PagedList[News]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", project.id.toString, "news.json")
@@ -125,7 +125,7 @@ class ProjectManagerImpl(requestManager: RequestManager) extends ProjectManager 
 
   /** Get news across all projects
     */
-  override def getAllNews(): Task[PagedList[News]] = {
+  override def getAllNews(): IO[PagedList[News]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("news.json")

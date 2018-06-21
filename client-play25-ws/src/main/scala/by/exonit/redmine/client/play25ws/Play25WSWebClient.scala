@@ -18,15 +18,15 @@ package by.exonit.redmine.client.play25ws
 
 import java.net.{URL, URLEncoder}
 
-import akka.stream.{IOResult, Materializer}
 import akka.stream.scaladsl.StreamConverters
+import akka.stream.{IOResult, Materializer}
 import by.exonit.redmine.client.managers.WebClient
 import by.exonit.redmine.client.managers.WebClient._
-import cats.{~>, Id}
-import monix.eval.Task
+import cats.effect.IO
+import cats.{Id, ~>}
 import play.api.libs.ws.{StreamedResponse, WSClient, WSRequest, WSResponse}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 
 class Play25WSWebClient(val client: WSClient)
@@ -35,7 +35,15 @@ class Play25WSWebClient(val client: WSClient)
 
   import Implicits._
 
-  def compileRequestCommand(requestCommand: RequestDSL.Request[Unit]): WSRequest = {
+  override def execute[T](
+    requestCommand: RequestDSL.Request[Unit],
+    responseCommand: ResponseDSL.Response[T]
+  ): IO[T] =
+    compileRequestCommand(requestCommand) flatMap { req =>
+      IO.fromFuture(IO { req.execute() })
+    } flatMap compileResponseCommand(responseCommand)
+
+  def compileRequestCommand(requestCommand: RequestDSL.Request[Unit]): IO[WSRequest] = IO {
     var url: Option[String] = None
     var queryParams: Seq[(String, String)] = Seq.empty
     var headers: Map[String, String] = Map.empty
@@ -48,18 +56,18 @@ class Play25WSWebClient(val client: WSClient)
         case RequestDSL.SetUrl(u) =>
           url = Some(u)
           ()
-        case RequestDSL.AddSegments(segments @ _*) =>
+        case RequestDSL.AddSegments(segments@_*) =>
           val encodedSegments = segments.map(URLEncoder.encode(_, "UTF-8"))
-          url = url.map {u =>
+          url = url.map { u =>
             val baseUrl = new URL(u)
             val newUrl = new URL(baseUrl, s"${baseUrl.getPath.trimRight('/')}/${encodedSegments.mkString("/")}")
             newUrl.toExternalForm
           }
           ()
-        case RequestDSL.AddQueries(queries @ _*) =>
+        case RequestDSL.AddQueries(queries@_*) =>
           queryParams ++= queries
           ()
-        case RequestDSL.SetHeaders(h @ _*) =>
+        case RequestDSL.SetHeaders(h@_*) =>
           headers ++= h
           ()
         case RequestDSL.SetMethod(m) =>
@@ -80,7 +88,8 @@ class Play25WSWebClient(val client: WSClient)
           ()
       }
     })
-    val finalUrl = url.getOrElse(throw new UnsupportedOperationException("Unable to compile request from provided AST: no base URL specified"))
+    val finalUrl = url.getOrElse(
+      throw new UnsupportedOperationException("Unable to compile request from provided AST: no base URL specified"))
     val baseRequest = client.url(finalUrl)
       .withMethod(method)
       .withHeaders(headers.toSeq: _*)
@@ -95,7 +104,7 @@ class Play25WSWebClient(val client: WSClient)
     }
   }
 
-  def compileResponseCommand[T](responseCommand: ResponseDSL.Response[T]): WSResponse => T = response => {
+  def compileResponseCommand[T](responseCommand: ResponseDSL.Response[T]): WSResponse => IO[T] = response => IO {
     responseCommand.foldMap(new (ResponseDSL.ResponseOp ~> Id) {
       override def apply[A](fa: ResponseDSL.ResponseOp[A]) = fa match {
         case ResponseDSL.GetBodyAsBytes() =>
@@ -112,17 +121,27 @@ class Play25WSWebClient(val client: WSClient)
     })
   }
 
+  override def executeStreaming[T](
+    requestCommand: RequestDSL.Request[Unit],
+    responseCommand: StreamingResponseDSL.StreamingResponse[T]
+  ): IO[T] =
+    compileRequestCommand(requestCommand) flatMap { req =>
+      IO.fromFuture(IO { req.stream() })
+    } flatMap compileStreamingResponseCommand(responseCommand)
+
   def compileStreamingResponseCommand[T](
     responseCommand: StreamingResponseDSL.StreamingResponse[T]
-  ): StreamedResponse => T = response => {
+  ): StreamedResponse => IO[T] = response => IO {
     responseCommand.foldMap(new (StreamingResponseDSL.StreamingResponseOp ~> Id) {
       override def apply[A](fa: StreamingResponseDSL.StreamingResponseOp[A]) = fa match {
         case StreamingResponseDSL.GetBodyStream(osp) =>
-          Task.deferFuture {
-            response.body.runWith(StreamConverters.fromOutputStream(osp))
+          IO.fromFuture {
+            IO {
+              response.body.runWith(StreamConverters.fromOutputStream(osp))
+            }
           } flatMap {
-            case r: IOResult if r.wasSuccessful => Task.unit
-            case r: IOResult => Task.raiseError(r.getError)
+            case r: IOResult if r.wasSuccessful => IO.unit
+            case r: IOResult => IO.raiseError(r.getError)
           }
         case StreamingResponseDSL.GetStatusCode() =>
           response.headers.status
@@ -132,29 +151,12 @@ class Play25WSWebClient(val client: WSClient)
     })
   }
 
-  override def execute[T](requestCommand: RequestDSL.Request[Unit], responseCommand: ResponseDSL.Response[T]):
-  Task[T] =
-    Task.evalOnce {
-      compileRequestCommand(requestCommand)
-    } flatMap {req => Task.fromFuture(req.execute())} map {
-      compileResponseCommand(responseCommand)
-    }
-
-  override def executeStreaming[T](
-    requestCommand: RequestDSL.Request[Unit],
-    responseCommand: StreamingResponseDSL.StreamingResponse[T]
-  ): Task[T] =
-    Task.evalOnce {
-      compileRequestCommand(requestCommand)
-    } flatMap {req => Task.fromFuture(req.stream())} map {
-      compileStreamingResponseCommand(responseCommand)
-    }
-
   def close(): Unit = {
     try {
       client.close()
     } catch {
       case NonFatal(_) =>
+      case ex: Throwable => throw ex
     }
   }
 }

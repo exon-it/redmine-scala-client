@@ -19,13 +19,13 @@ package by.exonit.redmine.client.managers.impl
 import by.exonit.redmine.client._
 import by.exonit.redmine.client.managers.{MembershipManager, RequestManager}
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
-import monix.eval.Task
+import cats.effect.IO
 
 import scala.collection.immutable._
 
 class MembershipManagerImpl(requestManager: RequestManager) extends MembershipManager {
 
-  def getMemberships(project: ProjectIdLike): Task[PagedList[Membership]] = {
+  def getMemberships(project: ProjectIdLike): IO[PagedList[Membership]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", project.id.toString, "memberships.json")
@@ -33,7 +33,7 @@ class MembershipManagerImpl(requestManager: RequestManager) extends MembershipMa
     requestManager.getEntityPagedList[Membership](request, "memberships")
   }
 
-  def getMemberships(projectKey: String): Task[PagedList[Membership]] = {
+  def getMemberships(projectKey: String): IO[PagedList[Membership]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", projectKey, "memberships.json")
@@ -41,7 +41,7 @@ class MembershipManagerImpl(requestManager: RequestManager) extends MembershipMa
     requestManager.getEntityPagedList[Membership](request, "memberships")
   }
 
-  def createMembership(project: ProjectIdLike, membership: Membership.New): Task[Membership] = {
+  def createMembership(project: ProjectIdLike, membership: Membership.New): IO[Membership] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", project.id.toString, "memberships.json")
@@ -49,7 +49,7 @@ class MembershipManagerImpl(requestManager: RequestManager) extends MembershipMa
     requestManager.postEntityWithResponse[Membership.New, Membership](request, "membership", membership, "membership")
   }
 
-  def updateMembership(id: MembershipIdLike, update: Membership.Update): Task[Unit] = {
+  def updateMembership(id: MembershipIdLike, update: Membership.Update): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("memberships", s"${id.id}.json")
@@ -57,7 +57,7 @@ class MembershipManagerImpl(requestManager: RequestManager) extends MembershipMa
     requestManager.putEntity(request, "membership", update)
   }
 
-  def deleteMembership(id: MembershipIdLike): Task[Unit] = {
+  def deleteMembership(id: MembershipIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("memberships", s"${id.id}.json")
@@ -65,11 +65,19 @@ class MembershipManagerImpl(requestManager: RequestManager) extends MembershipMa
     requestManager.deleteEntity(request)
   }
 
-  def createMembershipForUser(project: ProjectIdLike, user: UserIdLike, roles: RoleIdLike*): Task[Membership] = {
+  def createMembershipForUser(
+    project: ProjectIdLike,
+    user: UserIdLike,
+    roles: RoleIdLike*
+  ): IO[Membership] = IO.suspend {
     createMembership(project, Membership.New(Left(user), Seq(roles: _*)))
   }
 
-  def createMembershipForGroup(project: ProjectIdLike, group: GroupIdLike, roles: RoleIdLike*): Task[Membership] = {
+  def createMembershipForGroup(
+    project: ProjectIdLike,
+    group: GroupIdLike,
+    roles: RoleIdLike*
+  ): IO[Membership] = IO.suspend {
     createMembership(project, Membership.New(Right(group), Seq(roles: _*)))
   }
 }

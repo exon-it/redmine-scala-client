@@ -19,7 +19,7 @@ package by.exonit.redmine.client.managers.impl
 import by.exonit.redmine.client._
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
 import by.exonit.redmine.client.managers.{RequestManager, SearchManager}
-import monix.eval.Task
+import cats.effect.IO
 import scala.collection.immutable._
 
 class SearchManagerImpl(requestManager: RequestManager) extends SearchManager {
@@ -32,7 +32,7 @@ class SearchManagerImpl(requestManager: RequestManager) extends SearchManager {
     titlesOnly: Option[Boolean],
     openIssuesOnly: Option[Boolean],
     attachmentScope: Option[SearchAttachmentScope]
-  ): Task[PagedList[SearchResult]] = {
+  ): IO[PagedList[SearchResult]] = IO.suspend {
     def boolToFlag(bool: Boolean): String = if (bool) "1" else "0"
 
     val baseRequest = projectId match {

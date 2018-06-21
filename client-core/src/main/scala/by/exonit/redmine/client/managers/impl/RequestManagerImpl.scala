@@ -25,7 +25,7 @@ import by.exonit.redmine.client.managers.WebClient.RequestDSL.Request
 import by.exonit.redmine.client.managers.WebClient.ResponseDSL.Response
 import by.exonit.redmine.client.managers.WebClient.StreamingResponseDSL.StreamingResponse
 import by.exonit.redmine.client.serialization.Serializers
-import monix.eval.Task
+import cats.effect.IO
 import org.json4s.{Extraction, Formats, JValue, NoTypeHints, _}
 import org.json4s.jackson.Serialization
 import org.json4s.jackson.JsonMethods._
@@ -54,14 +54,14 @@ class RequestManagerImpl(
   }
 
   def getEntityPagedList[T](request: Request[Unit], listName: String)
-    (implicit mf: Manifest[T]): Task[PagedList[T]] =
+    (implicit mf: Manifest[T]): IO[PagedList[T]] =
     getEntityPagedList(request, listName, BigInt(0), Constants.DefaultObjectsPerPage)
 
   def getEntityPagedList[T](request: Request[Unit], listName: String, offset: BigInt, limit: BigInt)
-    (implicit mf: Manifest[T]): Task[PagedList[T]] = Task.defer {
-    implicit val implicitFormats = formats
+    (implicit mf: Manifest[T]): IO[PagedList[T]] = IO.suspend {
+    implicit val implicitFormats: Formats = formats
 
-    def getPartialResult(offset: BigInt, limit: BigInt): Task[PagedList[T]] = Task.defer {
+    def getPartialResult(offset: BigInt, limit: BigInt): IO[PagedList[T]] = IO.suspend {
       val subRequest = for {
         _ <- request
         _ <- RequestDSL.setMethod("GET")
@@ -85,13 +85,13 @@ class RequestManagerImpl(
         }
         val allItemsTask = if (offset == 0 && items.size >= total) {
           // Short-circuit if all items are already loaded
-          Task.now(items)
+          IO.pure(items)
         } else {
           // If not short-circuited - have to build item list from the first page
           getPartialResult(0, limit) flatMap {pr =>
             pr.next match {
               case Some(task) => task map {pr2 => pr.items ::: pr2.items}
-              case None => Task.now(pr.items)
+              case None => IO.pure(pr.items)
             }
           }
         }
@@ -102,8 +102,8 @@ class RequestManagerImpl(
     getPartialResult(offset, limit)
   }
 
-  def getEntity[T](request: Request[Unit], entityName: String)(implicit mf: Manifest[T]): Task[T] = {
-    implicit val implicitFormats = formats
+  def getEntity[T](request: Request[Unit], entityName: String)(implicit mf: Manifest[T]): IO[T] = IO.suspend {
+    implicit val implicitFormats: Formats = formats
     val subRequest = for {
       _ <- request
       _ <- RequestDSL.setMethod("GET")
@@ -114,7 +114,7 @@ class RequestManagerImpl(
   }
 
   def postEntity[T](request: Request[Unit], entityName: String, entity: T)
-    (implicit mf: Manifest[T]): Task[Unit] = {
+    (implicit mf: Manifest[T]): IO[Unit] = IO.suspend {
     val subRequest = for {
       _ <- request
       _ <- RequestDSL.setMethod("POST")
@@ -132,9 +132,8 @@ class RequestManagerImpl(
     entityName: String,
     entity: T,
     responseEntityName: String
-  )
-    (implicit mf1: Manifest[T], mf2: Manifest[TResponse]): Task[TResponse] = {
-    implicit val implicitFormats = formats
+  )(implicit mf1: Manifest[T], mf2: Manifest[TResponse]): IO[TResponse] = IO.suspend {
+    implicit val implicitFormats: Formats = formats
     val subRequest = for {
       _ <- request
       _ <- RequestDSL.setMethod("POST")
@@ -148,8 +147,8 @@ class RequestManagerImpl(
   }
 
   def postFileWithResponse[TResponse](request: Request[Unit], file: File, responseEntityName: String)
-    (implicit mf: Manifest[TResponse]): Task[TResponse] = {
-    implicit val implicitFormats = formats
+    (implicit mf: Manifest[TResponse]): IO[TResponse] = IO.suspend {
+    implicit val implicitFormats: Formats = formats
     val subRequest = for {
       _ <- request
       _ <- RequestDSL.setMethod("POST")
@@ -161,8 +160,8 @@ class RequestManagerImpl(
   }
 
   def postStreamWithResponse[TResponse](request: Request[Unit], stream: () => InputStream, responseEntityName: String)
-    (implicit mf: Manifest[TResponse]): Task[TResponse] = {
-    implicit val implicitFormats = formats
+    (implicit mf: Manifest[TResponse]): IO[TResponse] = IO.suspend {
+    implicit val implicitFormats: Formats = formats
     val subRequest = for {
       _ <- request
       _ <- RequestDSL.setMethod("POST")
@@ -174,8 +173,8 @@ class RequestManagerImpl(
   }
 
   def postBytesWithResponse[TResponse](request: Request[Unit], bytes: Array[Byte], responseEntityName: String)
-    (implicit mf: Manifest[TResponse]): Task[TResponse] = {
-    implicit val implicitFormats = formats
+    (implicit mf: Manifest[TResponse]): IO[TResponse] = IO.suspend {
+    implicit val implicitFormats: Formats = formats
     val subRequest = for {
       _ <- request
       _ <- RequestDSL.setMethod("POST")
@@ -187,7 +186,7 @@ class RequestManagerImpl(
   }
 
   def putEntity[T](request: Request[Unit], entityName: String, entity: T)
-    (implicit mf: Manifest[T]): Task[Unit] = {
+    (implicit mf: Manifest[T]): IO[Unit] = IO.suspend {
     val subRequest = for {
       _ <- request
       _ <- RequestDSL.setMethod("PUT")
@@ -206,8 +205,8 @@ class RequestManagerImpl(
     entity: T,
     responseEntityName: String
   )
-    (implicit mf1: Manifest[T], mf2: Manifest[TResponse]): Task[TResponse] = {
-    implicit val implicitFormats = formats
+    (implicit mf1: Manifest[T], mf2: Manifest[TResponse]): IO[TResponse] = IO.suspend {
+    implicit val implicitFormats: Formats = formats
     val subRequest = for {
       _ <- request
       _ <- RequestDSL.setMethod("PUT")
@@ -220,7 +219,7 @@ class RequestManagerImpl(
     clientRequestAsJSON(subRequest) map {j => (j \ responseEntityName).extract[TResponse]}
   }
 
-  def deleteEntity(request: Request[Unit]): Task[Unit] = {
+  def deleteEntity(request: Request[Unit]): IO[Unit] = IO.suspend {
     val subRequest = for {
       _ <- request
       _ <- RequestDSL.setMethod("DELETE")
@@ -229,7 +228,7 @@ class RequestManagerImpl(
     clientRequest(subRequest)
   }
 
-  def downloadToByteArray(request: Request[Unit]): Task[Array[Byte]] = {
+  def downloadToByteArray(request: Request[Unit]): IO[Array[Byte]] = IO.suspend {
     val responseHandler = for {
       _ <- checkResponseOk()
       body <- ResponseDSL.getBodyAsBytes
@@ -237,7 +236,10 @@ class RequestManagerImpl(
     client.execute(request, responseHandler)
   }
 
-  def downloadToStream(request: Request[Unit], outputStreamProvider: () => OutputStream): Task[Task[Unit]] = {
+  def downloadToStream(
+    request: Request[Unit],
+    outputStreamProvider: () => OutputStream
+  ): IO[IO[Unit]] = IO.suspend {
     val responseHandler = for {
       _ <- checkStreamingResponseOk()
       body <- StreamingResponseDSL.getBodyStream(outputStreamProvider)
@@ -253,11 +255,11 @@ class RequestManagerImpl(
   override def authenticateRequest(): Request[Unit] = requestAuthenticator
 
   protected def extractJsonEntityToString[T](entityName: String, entity: T): String = {
-    implicit val implicitFormats = formats
+    implicit val implicitFormats: Formats = formats
     compact(JObject(entityName -> Extraction.decompose(entity)))
   }
 
-  protected def clientRequestAsJSON(req: Request[Unit]): Task[JValue] = {
+  protected def clientRequestAsJSON(req: Request[Unit]): IO[JValue] = IO.suspend {
     val responseHandler = for {
       _ <- checkResponseOk()
       body <- ResponseDSL.getBodyAsBytes
@@ -267,14 +269,14 @@ class RequestManagerImpl(
     client.execute(req, responseHandler)
   }
 
-  protected def clientRequest(req: Request[Unit]): Task[Unit] = {
+  protected def clientRequest(req: Request[Unit]): IO[Unit] = IO.suspend {
     val responseHandler = for {
       _ <- checkResponseOk()
     } yield ()
     client.execute(req, responseHandler)
   }
 
-  protected def clientRequestAsString(req: Request[Unit]): Task[String] = {
+  protected def clientRequestAsString(req: Request[Unit]): IO[String] = IO.suspend {
     val responseHandler = for {
       _ <- checkResponseOk()
       body <- ResponseDSL.getBodyAsString

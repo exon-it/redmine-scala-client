@@ -55,7 +55,7 @@ object FileSerializers {
   object fileSerializer extends CustomSerializer[ProjectFile](
     formats => deserializeFile(formats) -> PartialFunction.empty)
 
-  def serializeNewFile(implicit formats: Formats): PartialFunction[Any, JValue] = {
+  def serializeNewFile: PartialFunction[Any, JValue] = {
     case u: ProjectFile.New =>
       ("token" -> u.token) ~
         ("version_id" -> u.version.map(_.id)) ~
@@ -64,5 +64,5 @@ object FileSerializers {
   }
 
   object newFileSerializer extends CustomSerializer[ProjectFile.New](
-    formats => PartialFunction.empty -> serializeNewFile(formats))
+    _ => PartialFunction.empty -> serializeNewFile)
 }

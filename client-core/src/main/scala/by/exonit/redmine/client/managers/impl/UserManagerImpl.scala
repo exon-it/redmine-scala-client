@@ -19,7 +19,6 @@ package by.exonit.redmine.client.managers.impl
 import by.exonit.redmine.client._
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
 import by.exonit.redmine.client.managers.{RequestManager, UserManager}
-import cats.data.NonEmptyList
 import cats.effect.IO
 
 import scala.collection.immutable._

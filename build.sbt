@@ -8,7 +8,7 @@ lazy val commonSettings = Seq(
 
   startYear := Some(2015),
 
-  version := "6.0.0-M3",
+  version := "6.0.0-SNAPSHOT",
 
   scalaOrganization := "org.typelevel",
   scalaVersion := "2.11.11-bin-typelevel-4",

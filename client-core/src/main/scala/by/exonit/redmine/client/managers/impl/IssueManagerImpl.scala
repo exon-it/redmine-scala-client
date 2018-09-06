@@ -20,12 +20,11 @@ import by.exonit.redmine.client._
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
 import by.exonit.redmine.client.managers.{IssueManager, RequestManager}
 import cats.data.NonEmptyList
-import cats.effect.{IO, Timer}
-import cats.syntax.all._
+import cats.effect.IO
 
 import scala.collection.immutable._
 
-class IssueManagerImpl(requestManager: RequestManager)(implicit timer: Timer[IO]) extends IssueManager {
+class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
 
   def getIssuesByProjectKey(projectKey: String): IO[PagedList[Issue]] = IO.suspend {
     getIssues("project_id" -> projectKey)
@@ -143,7 +142,7 @@ class IssueManagerImpl(requestManager: RequestManager)(implicit timer: Timer[IO]
       val relationsList = i.relations.map(_.to[List])
       relationsList.flatMap(NonEmptyList.fromList) match {
         case Some(l) =>
-          l.parTraverse(deleteRelation(_)).map(_ => ())
+          l.traverse(deleteRelation(_)).map(_ => ())
         case None => IO.unit
       }
     }

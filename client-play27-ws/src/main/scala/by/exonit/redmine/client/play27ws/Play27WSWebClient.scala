@@ -97,7 +97,7 @@ object Play27WSWebClient {
     headers: Map[String, String] = Map.empty,
     method: String = "GET",
     auth: Option[RequestDSL.AuthenticationMethod] = None,
-    body: Option[RequestDSL.Body] = None,
+    body: Option[RequestDSL.Body] = None
   )
 
   class RequestInterpreter extends (RequestDSL.RequestOp ~> State[RequestState, ?]) {

@@ -3,8 +3,17 @@ sudo: false
 jdk:
 - oraclejdk8
 
-script:
-- sbt ";+ test"
+jobs:
+  include:
+    - stage: test
+      script: sbt ";+ test"
+    - stage: deploy
+      name: Deploy to Bintray
+      script: skip
+      if: (tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+(\-.*)?) AND env(TRAVIS_PULL_REQUEST) = 'false'
+      deploy:
+        provider: script
+        script: sbt ';+publish'
 
 addons:
   apt:
@@ -15,12 +24,6 @@ env:
   global:
     - secure: "anUc1dx1EKy254aSmJn+53LBqIWrZQrSkbOBG4YpMjqh+337d/cSO472R7eLaLlqAfMRsi5lxPZS+50JHVOd0h/vpNyBAog+2Zh+FyCiaJAyR1ERK9P4q9uK9sXIvcsTOXectXv76S0iHnmjyIIp8LqrA9rJcxX3v9AVIW5Syk12xQRMFtpG18Opb8iVxencvnntdEY++S54LluYquhnYsFCf9LbRyHBma7mGW821VvO0S+ln5lHT6zJb4GH2pAzLSuUXp+LrPHfUikPT7OoJlJlDUKyyqRhZRfGc21NB0zst+cJ38fLNXgG7dx9K261Sxzdc4iU4bUEwmCde8lS0SEtA/odEZbjqG/GvC902j7otdHRXdw2CZ11S9ttVYd3B5i1ujftq1cbkespstH4pvBI3jwb5j2m3V+0XvzNM/lPiAKbkPQ6UNL15Zie0XmH994Qoi7qSvSU6UX/1cZjJ3Kbnyp0HaVO6wC2LIx1/vNgaE0IkPIpdMyOJ3BfZG/qPeWbFYDLvRotOpkTWCQUYFsw8OIMd3lTLq/4b48oTrZNquOEy1UYhE4E78PTtnw9h1LugWwMJzYH081pIlaUNTC7S7rTHWzlIo5hloZauVraDq4lW3GRYMoY7P8Vu00UAbF0XjlZwj9GvM/ZxELHRVSjmqIRqfpbFke2MJK5XXs="
     - secure: "gGf7cLmA7egM5Tx02AQXXwga39tePRxVLOHCecfQHMxmGVWoyp/g17f7HhkoAyo+hh9DbyeD032dixA7bc0P+JVfApkvHcV6blEwNoo99VaUU9425qwZ12GA+XVYBc/Hz5Utaf3xFr7my39qsDIeKSyL2Vu8NJtCPcSfwmTzQp3qgTmcSXH3eAT7ooGTDbRmm42+6tyr3A+X+raq3xm52iXQP9bEuBzcBklcEfCm8o9Vx88+BwE+CTOHFV9AmHhULfmbSvCna/JUFwpV226zo5t940IOs/YgM0GSEVuFIGjAPP2T345Tbhkbr0yCAsUucKAu5ktv49sJeGAkl1A3FmKRKibEkym1v1+vCWr4weA59NiTD1yzVD67z37ra0UQOuULv1h+cExCflLhwnIypkjSbYqo3lCrZQ00mNgVCQx7eTdeiLPb5tD6cD+uTizfPvMCN8+fEhg1C6eSc3zzMHW1D3TFv+F8T4vuDhRDpWDQpTCzORsblrXGh9OMEpwhtvhNEKlMl5BU0q0RKfsBvSFueBwDZVPexidxHMMCnIDMDZAbIe/UIVIr8ns1lUlN44nHboU+fVvOwvLd6X2P6p6t4NUM9v9Elrw8VM2L5cYnBQOenzBHKdK32P3GiYkG01Uoc6pQCyKtEJOefU4MpgFvTbPtjtlHa8emaDYYEcE="
-
-after_success:
-  - >
-    test "${TRAVIS_PULL_REQUEST}" = 'false' &&
-    test "${TRAVIS_BRANCH}" = 'release' &&
-    sbt ';+publish'
 
 cache:
   directories:

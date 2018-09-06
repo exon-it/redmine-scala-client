@@ -16,6 +16,7 @@
 
 package by.exonit.redmine.client.play26ws
 
+import cats.effect._
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -28,4 +29,6 @@ with OptionValues {
   val jsonContentType = "application/json"
 
   implicit val scheduler: ExecutionContext = ExecutionContext.global
+
+  implicit val ioTimer: Timer[IO] = IO.timer(scheduler)
 }

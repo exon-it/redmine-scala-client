@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,4 +16,8 @@
 
 package by.exonit.redmine.client
 
-case class Upload(token: String)
+trait UploadLike {
+  def token: String
+}
+
+case class Upload(token: String, id: Option[BigInt]) extends UploadLike

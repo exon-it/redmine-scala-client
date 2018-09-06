@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ class Play26WSClientSpec extends BasicSpec with ClientDriverFixture with WebClie
       } yield s -> b
 
       val requestFuture = webClient.execute(request, responseCommand)
-      whenReady(requestFuture.runAsync) {case (status, body) =>
+      whenReady(requestFuture.unsafeToFuture) {case (status, body) =>
         status shouldBe Status.OK
         body shouldBe "TEST"
         clientDriver.verify()
@@ -62,7 +62,7 @@ class Play26WSClientSpec extends BasicSpec with ClientDriverFixture with WebClie
       } yield s -> b
 
       val requestFuture = webClient.execute(request, responseCommand)
-      whenReady(requestFuture.runAsync) {case (status, body) =>
+      whenReady(requestFuture.unsafeToFuture) {case (status, body) =>
         status shouldBe Status.OK
         body shouldBe "TEST"
         clientDriver.verify()
@@ -83,7 +83,7 @@ class Play26WSClientSpec extends BasicSpec with ClientDriverFixture with WebClie
       } yield s -> b
 
       val requestFuture = webClient.execute(request, responseCommand)
-      whenReady(requestFuture.runAsync) {case (status, body) =>
+      whenReady(requestFuture.unsafeToFuture) {case (status, body) =>
         status shouldBe Status.OK
         body shouldBe "TEST"
         clientDriver.verify()
@@ -104,7 +104,7 @@ class Play26WSClientSpec extends BasicSpec with ClientDriverFixture with WebClie
       } yield s -> b
 
       val requestFuture = webClient.execute(request, responseCommand)
-      whenReady(requestFuture.runAsync) {case (status, body) =>
+      whenReady(requestFuture.unsafeToFuture) {case (status, body) =>
         status shouldBe Status.OK
         body shouldBe "TEST"
         clientDriver.verify()

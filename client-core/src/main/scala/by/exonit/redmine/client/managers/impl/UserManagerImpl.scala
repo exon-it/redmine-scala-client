@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,22 @@ package by.exonit.redmine.client.managers.impl
 import by.exonit.redmine.client._
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
 import by.exonit.redmine.client.managers.{RequestManager, UserManager}
-import cats.data.NonEmptyList
-import monix.eval.Task
+import cats.effect.IO
 
 import scala.collection.immutable._
 
 class UserManagerImpl(requestManager: RequestManager) extends UserManager {
 
-  def getCurrentUser(includes: User.Include*): Task[User] = {
+  def getCurrentUser(includes: User.Include*): IO[User] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("users", "current.json")
-      includesList = NonEmptyList.fromList(includes.map(_.token).toList)
-      includesQuery = includesList.toSeq.map(l => "include" -> l.reduceLeft {_ + "," + _})
-      _ <- RequestDSL.addQueries(includesQuery: _*)
+      _ <- RequestBlocks.include(includes)
     } yield ()
     requestManager.getEntity[User](request, "user")
   }
 
-  def getUsers(params: (String, String)*): Task[PagedList[User]] = {
+  def getUsers(params: (String, String)*): IO[PagedList[User]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("users.json")
@@ -46,27 +43,25 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.getEntityPagedList[User](request, "users")
   }
 
-  def getUsers(params: Seq[(String, String)], includes: User.Include*): Task[PagedList[User]] = {
+  def getUsers(params: Seq[(String, String)], includes: User.Include*): IO[PagedList[User]] = IO.suspend {
     val allParams = if (includes.nonEmpty) {
-      params :+ "include" -> includes.map(_.token).mkString(",")
+      params :+ "include" -> includes.map(_.entryName).mkString(",")
     } else {
       params
     }
     getUsers(allParams: _*)
   }
 
-  def getUser(id: UserIdLike, includes: User.Include*): Task[User] = {
+  def getUser(id: UserIdLike, includes: User.Include*): IO[User] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("users", s"${id.id}.json")
-      includesList = NonEmptyList.fromList(includes.map(_.token).toList)
-      includesQuery = includesList.toSeq.map(l => "include" -> l.reduceLeft {_ + "," + _})
-      _ <- RequestDSL.addQueries(includesQuery: _*)
+      _ <- RequestBlocks.include(includes)
     } yield ()
     requestManager.getEntity[User](request, "user")
   }
 
-  def createUser(user: User.New): Task[User] = {
+  def createUser(user: User.New): IO[User] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("users.json")
@@ -74,7 +69,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.postEntityWithResponse[User.New, User](request, "user", user, "user")
   }
 
-  def updateUser(id: UserIdLike, update: User.Update): Task[Unit] = {
+  def updateUser(id: UserIdLike, update: User.Update): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("users", s"${id.id}.json")
@@ -82,7 +77,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.putEntity(request, "user", update)
   }
 
-  def deleteUser(id: UserIdLike): Task[Unit] = {
+  def deleteUser(id: UserIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("users", s"${id.id}.json")
@@ -90,7 +85,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.deleteEntity(request)
   }
 
-  def getGroups(): Task[PagedList[Group]] = {
+  def getGroups(): IO[PagedList[Group]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("groups.json")
@@ -98,18 +93,16 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.getEntityPagedList[Group](request, "groups")
   }
 
-  def getGroup(id: GroupIdLike, includes: Group.Include*): Task[Group] = {
+  def getGroup(id: GroupIdLike, includes: Group.Include*): IO[Group] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("groups", s"${id.id}.json")
-      includesList = NonEmptyList.fromList(includes.map(_.token).toList)
-      includesQuery = includesList.toSeq.map(l => "include" -> l.reduceLeft {_ + "," + _})
-      _ <- RequestDSL.addQueries(includesQuery: _*)
+      _ <- RequestBlocks.include(includes)
     } yield ()
     requestManager.getEntity[Group](request, "group")
   }
 
-  def createGroup(group: Group.New): Task[Group] = {
+  def createGroup(group: Group.New): IO[Group] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("groups.json")
@@ -117,7 +110,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.postEntityWithResponse[Group.New, Group](request, "group", group, "group")
   }
 
-  def updateGroup(id: GroupIdLike, update: Group.Update): Task[Unit] = {
+  def updateGroup(id: GroupIdLike, update: Group.Update): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("groups", s"${id.id}.json")
@@ -125,7 +118,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.putEntity(request, "group", update)
   }
 
-  def deleteGroup(id: GroupIdLike): Task[Unit] = {
+  def deleteGroup(id: GroupIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("groups", s"${id.id}.json")
@@ -133,7 +126,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.deleteEntity(request)
   }
 
-  def addUserToGroup(user: UserIdLike, group: GroupIdLike): Task[Unit] = {
+  def addUserToGroup(user: UserIdLike, group: GroupIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("groups", group.id.toString, "users.json")
@@ -141,7 +134,7 @@ class UserManagerImpl(requestManager: RequestManager) extends UserManager {
     requestManager.postEntity(request, "user_id", user.id)
   }
 
-  def removeUserFromGroup(user: UserIdLike, group: GroupIdLike): Task[Unit] = {
+  def removeUserFromGroup(user: UserIdLike, group: GroupIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("groups", group.id.toString, "users", s"${user.id}.json")

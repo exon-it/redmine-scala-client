@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import java.io.{File, InputStream, OutputStream}
 
 import cats.free.Free
 import cats.free.Free.liftF
-import monix.eval.Task
+import cats.effect.IO
 
 import scala.collection.immutable._
 
@@ -48,9 +48,6 @@ object WebClient {
     sealed trait Body
 
     object Body {
-
-      final case class EmptyBody() extends Body
-
       final case class FileBody(file: File) extends Body
 
       final case class InMemoryByteBody(body: Array[Byte]) extends Body
@@ -73,9 +70,9 @@ object WebClient {
 
     final case class SetMethod(method: String) extends RequestOp[Unit]
 
-    final case class SetAuth(auth: AuthenticationMethod) extends RequestOp[Unit]
+    final case class SetAuth(auth: Option[AuthenticationMethod]) extends RequestOp[Unit]
 
-    final case class SetBody(body: Body) extends RequestOp[Unit]
+    final case class SetBody(body: Option[Body]) extends RequestOp[Unit]
 
     final case class NoOp() extends RequestOp[Unit]
 
@@ -94,7 +91,7 @@ object WebClient {
     def setMethod(method: String): Request[Unit] =
       liftF[RequestOp, Unit](SetMethod(method))
 
-    def setAuth(auth: AuthenticationMethod): Request[Unit] =
+    def setAuth(auth: Option[AuthenticationMethod]): Request[Unit] =
       liftF[RequestOp, Unit](SetAuth(auth))
 
     def setContentType(contentType: String, charset: String): Request[Unit] =
@@ -103,7 +100,7 @@ object WebClient {
     def setContentType(contentType: String): Request[Unit] =
       setHeaders(Constants.ContentTypeHeader -> s"${contentType.toLowerCase}")
 
-    def setBody(body: Body): Request[Unit] =
+    def setBody(body: Option[Body]): Request[Unit] =
       liftF[RequestOp, Unit](SetBody(body))
 
     def noOp(): Request[Unit] =
@@ -150,7 +147,7 @@ object WebClient {
 
     final case class GetHeaders() extends StreamingResponseOp[Map[String, String]]
 
-    final case class GetBodyStream(outputStreamProvider: () => OutputStream) extends StreamingResponseOp[Task[Unit]]
+    final case class GetBodyStream(outputStreamProvider: () => OutputStream) extends StreamingResponseOp[IO[Unit]]
 
     type StreamingResponse[A] = Free[StreamingResponseOp, A]
 
@@ -160,8 +157,8 @@ object WebClient {
     def getStatusCode: StreamingResponse[Int] =
       liftF[StreamingResponseOp, Int](GetStatusCode())
 
-    def getBodyStream(outputStreamProvider: () => OutputStream): StreamingResponse[Task[Unit]] =
-      liftF[StreamingResponseOp, Task[Unit]](GetBodyStream(outputStreamProvider))
+    def getBodyStream(outputStreamProvider: () => OutputStream): StreamingResponse[IO[Unit]] =
+      liftF[StreamingResponseOp, IO[Unit]](GetBodyStream(outputStreamProvider))
   }
 }
 
@@ -169,9 +166,9 @@ trait WebClient {
 
   import WebClient._
 
-  def execute[T](requestCommand: RequestDSL.Request[Unit], responseCommand: ResponseDSL.Response[T]): Task[T]
+  def execute[T](requestCommand: RequestDSL.Request[Unit], responseCommand: ResponseDSL.Response[T]): IO[T]
 
   def executeStreaming[T](
     requestCommand : RequestDSL.Request[Unit],
-    responseCommand: StreamingResponseDSL.StreamingResponse[T]): Task[T]
+    responseCommand: StreamingResponseDSL.StreamingResponse[T]): IO[T]
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package by.exonit.redmine.client.managers
 
 import by.exonit.redmine.client._
-import monix.eval.Task
+import cats.effect.IO
 
 /**
  * Redmine project wiki module manager
@@ -28,7 +28,7 @@ trait WikiManager {
    * @param project Project
    * @return Wiki page list
    */
-  def getPages(project: ProjectIdLike): Task[PagedList[WikiPage]]
+  def getPages(project: ProjectIdLike): IO[PagedList[WikiPage]]
 
   /**
    * Returns detail of a wiki page in specified project
@@ -36,7 +36,22 @@ trait WikiManager {
    * @param page Wiki page identifier
    * @return Wiki page details
    */
-  def getPage(project: ProjectIdLike, page: WikiPageIdLike): Task[WikiPageDetails]
+  def getPage(project: ProjectIdLike, page: WikiPageIdLike): IO[WikiPageDetails]
+
+  /** Returns details of a wiki page in specified project with optional includes
+    * @param project Project ID
+    * @param page Page identifier
+    * @param includes Included details
+    */
+  def getPage(project: ProjectIdLike, page: WikiPageIdLike, includes: WikiPage.Include*): IO[WikiPageDetails]
+
+  /** Returns details of a wiki page version in specified project with optional includes
+    * @param project Project ID
+    * @param page Page identifier
+    * @param version Page version number
+    * @param includes Included details
+    */
+  def getPageVersion(project: ProjectIdLike, page: WikiPageIdLike, version: Int, includes: WikiPage.Include*): IO[WikiPageDetails]
 
   /**
    * Creates a wiki page in specified project
@@ -46,22 +61,22 @@ trait WikiManager {
    * @param page Page to create
    * @return Created wiki page details
    */
-  def createPage(project: ProjectIdLike, page: WikiPage.New): Task[WikiPageDetails]
+  def createPage(project: ProjectIdLike, page: WikiPage.New): IO[WikiPageDetails]
 
   /**
    * Updates wiki page in specified project
    * @param project Project
    * @param id Wiki page identifier
    * @param page Page update
-   * @return Operation result Task
+   * @return Operation result IO
    */
-  def updatePage(project: ProjectIdLike, id: WikiPageIdLike, page: WikiPage.Update): Task[Unit]
+  def updatePage(project: ProjectIdLike, id: WikiPageIdLike, page: WikiPage.Update): IO[Unit]
 
   /**
    * Deletes wiki page from specified project
    * @param project Project
    * @param id Wiki page identifier
-   * @return Operation result Task
+   * @return Operation result IO
    */
-  def deletePage(project: ProjectIdLike, id: WikiPageIdLike): Task[Unit]
+  def deletePage(project: ProjectIdLike, id: WikiPageIdLike): IO[Unit]
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 
 package by.exonit.redmine.client
 
+import enumeratum.EnumEntry.Snakecase
+import enumeratum._
+
 import scala.collection.immutable._
 import org.joda.time.DateTime
 
@@ -26,10 +29,11 @@ case class UserId(id: BigInt) extends UserIdLike
 case class UserLink(id: BigInt, name: String) extends UserIdLike
 
 object User {
-  sealed abstract class Include(val token: String)
-  object Include {
-    case object Memberships extends Include("memberships")
-    case object Groups extends Include("groups")
+  sealed abstract class Include extends EnumEntry with Snakecase
+  object Include extends Enum[Include] {
+    val values: IndexedSeq[Include] = findValues
+    case object Memberships extends Include
+    case object Groups extends Include
   }
 
   sealed abstract class Status(val number: Int)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@
 package by.exonit.redmine.client.managers.impl
 
 import by.exonit.redmine.client._
-import by.exonit.redmine.client.managers.{RequestManager, WikiManager}
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
-import monix.eval.Task
+import by.exonit.redmine.client.managers.{RequestManager, WikiManager}
+import cats.effect.IO
 
 class WikiManagerImpl(requestManager: RequestManager) extends WikiManager {
 
-  def getPages(project: ProjectIdLike): Task[PagedList[WikiPage]] = {
+  def getPages(project: ProjectIdLike): IO[PagedList[WikiPage]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", project.id.toString, "wiki", "index.json")
@@ -31,7 +31,7 @@ class WikiManagerImpl(requestManager: RequestManager) extends WikiManager {
     requestManager.getEntityPagedList[WikiPage](request, "wiki_pages")
   }
 
-  def getPage(project: ProjectIdLike, page: WikiPageIdLike): Task[WikiPageDetails] = {
+  def getPage(project: ProjectIdLike, page: WikiPageIdLike): IO[WikiPageDetails] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", project.id.toString, "wiki", s"${page.id}.json")
@@ -39,7 +39,47 @@ class WikiManagerImpl(requestManager: RequestManager) extends WikiManager {
     requestManager.getEntity[WikiPageDetails](request, "wiki_page")
   }
 
-  def createPage(project: ProjectIdLike, page: WikiPage.New): Task[WikiPageDetails] = {
+  /** Returns details of a wiki page in specified project with optional includes
+    *
+    * @param project  Project ID
+    * @param page     Page identifier
+    * @param includes Included details
+    */
+  override def getPage(
+    project: ProjectIdLike,
+    page: WikiPageIdLike,
+    includes: WikiPage.Include*
+  ): IO[WikiPageDetails] = IO.suspend {
+    val request = for {
+      _ <- requestManager.baseRequest
+      _ <- RequestDSL.addSegments("projects", project.id.toString, "wiki", s"${page.id}.json")
+      _ <- RequestBlocks.include(includes)
+    } yield ()
+    requestManager.getEntity[WikiPageDetails](request, "wiki_page")
+  }
+
+  /** Returns details of a wiki page version in specified project with optional includes
+    *
+    * @param project  Project ID
+    * @param page     Page identifier
+    * @param version  Page version number
+    * @param includes Included details
+    */
+  override def getPageVersion(
+    project: ProjectIdLike,
+    page: WikiPageIdLike,
+    version: Int,
+    includes: WikiPage.Include*
+  ): IO[WikiPageDetails] = IO.suspend {
+    val request = for {
+      _ <- requestManager.baseRequest
+      _ <- RequestDSL.addSegments("projects", project.id.toString, "wiki", s"${page.id}", s"$version.json")
+      _ <- RequestBlocks.include(includes)
+    } yield ()
+    requestManager.getEntity[WikiPageDetails](request, "wiki_page")
+  }
+
+  def createPage(project: ProjectIdLike, page: WikiPage.New): IO[WikiPageDetails] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", project.id.toString, "wiki", s"${page.title}.json")
@@ -47,7 +87,7 @@ class WikiManagerImpl(requestManager: RequestManager) extends WikiManager {
     requestManager.putEntityWithResponse[WikiPage.New, WikiPageDetails](request, "wiki_page", page, "wiki_page")
   }
 
-  def updatePage(project: ProjectIdLike, id: WikiPageIdLike, update: WikiPage.Update): Task[Unit] = {
+  def updatePage(project: ProjectIdLike, id: WikiPageIdLike, update: WikiPage.Update): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", project.id.toString, "wiki", s"${id.id}.json")
@@ -55,7 +95,7 @@ class WikiManagerImpl(requestManager: RequestManager) extends WikiManager {
     requestManager.putEntity(request, "wiki_page", update)
   }
 
-  def deletePage(project: ProjectIdLike, id: WikiPageIdLike): Task[Unit] = {
+  def deletePage(project: ProjectIdLike, id: WikiPageIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", project.id.toString, "wiki", s"${id.id}.json")

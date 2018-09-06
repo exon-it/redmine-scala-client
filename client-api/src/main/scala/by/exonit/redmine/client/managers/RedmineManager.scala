@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,12 @@ trait RedmineManager {
   def membershipManager: MembershipManager
 
   def timeEntryManager: TimeEntryManager
+
+  def documentsManager: DocumentsManager
+
+  def searchManager: SearchManager
+
+  def fileManager: FileManager
 
   /**
    * Creates a [[by.exonit.redmine.client.managers.RedmineManager RedmineManager]]

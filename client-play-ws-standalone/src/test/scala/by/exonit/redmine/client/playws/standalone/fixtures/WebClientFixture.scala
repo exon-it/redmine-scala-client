@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@ package by.exonit.redmine.client.playws.standalone.fixtures
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import by.exonit.redmine.client.playws.standalone.PlayWSStandaloneWebClient
-import monix.execution.misc.NonFatal
 import org.scalatest.{BeforeAndAfterAll, Suite}
 import play.api.libs.ws.ahc.StandaloneAhcWSClient
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.util.control.NonFatal
 
 trait WebClientFixture extends BeforeAndAfterAll {
   this: Suite =>
@@ -39,12 +39,14 @@ trait WebClientFixture extends BeforeAndAfterAll {
       webClient.close()
     } catch {
       case NonFatal(_) =>
+      case ex: Throwable => throw ex
     }
     try {
       val terminationFuture = as.terminate()
       Await.ready(terminationFuture, 10.seconds)
     } catch {
       case NonFatal(_) =>
+      case ex: Throwable => throw ex
     }
     super.afterAll()
   }

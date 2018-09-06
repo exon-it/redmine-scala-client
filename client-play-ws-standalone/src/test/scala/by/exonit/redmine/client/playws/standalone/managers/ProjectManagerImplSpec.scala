@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ class ProjectManagerImplSpec extends BasicSpec with ClientDriverFixture with Web
           .createUnauthenticated(clientDriver.getBaseUrl)
         val im = manager.issueManager
         val request = im.getIssues()
-        whenReady(request.runAsync) {_ =>
+        whenReady(request.unsafeToFuture) {_ =>
           clientDriver.verify()
         }
       }
@@ -56,7 +56,7 @@ class ProjectManagerImplSpec extends BasicSpec with ClientDriverFixture with Web
         val manager = RedmineManagerFactory(webClient).createUnauthenticated(clientDriver.getBaseUrl)
         val pm = manager.projectManager
         val request = pm.getProjects()
-        whenReady(request.runAsync, Timeout(Span(4, Seconds))) {projects =>
+        whenReady(request.unsafeToFuture, Timeout(Span(4, Seconds))) {projects =>
           clientDriver.verify()
           projects should not be null
           projects.total shouldBe 3
@@ -83,7 +83,7 @@ class ProjectManagerImplSpec extends BasicSpec with ClientDriverFixture with Web
           .createUnauthenticated(clientDriver.getBaseUrl)
         val im = manager.projectManager
         val request = im.getProjects()
-        whenReady(request.runAsync) {projects1 =>
+        whenReady(request.unsafeToFuture) {projects1 =>
           clientDriver.verify()
           projects1 should not be null
           projects1.total shouldBe 50
@@ -92,7 +92,7 @@ class ProjectManagerImplSpec extends BasicSpec with ClientDriverFixture with Web
             p.name shouldBe "1"
           }
 
-          whenReady(projects1.next.value.runAsync) { projects2 =>
+          whenReady(projects1.next.value.unsafeToFuture) { projects2 =>
             projects2.items.size shouldBe 6
             inside(projects2.items.find(_.id == 49).value) {case p: Project =>
               p.name shouldBe "30"

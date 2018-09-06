@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package by.exonit.redmine.client
 
+import enumeratum.EnumEntry.Snakecase
+import enumeratum._
 import org.joda.time.DateTime
 
 import scala.collection.immutable._
@@ -39,7 +41,8 @@ case class Project(
   customFields: Option[Set[CustomField]],
   trackers: Option[Set[TrackerLink]],
   issueCategories: Option[Set[CategoryLink]],
-  enabledModules: Option[Set[ModuleLink]]
+  enabledModules: Option[Set[ModuleLink]],
+  timeEntryActivities: Option[Set[ActivityLink]]
 ) extends ProjectIdLike with OptionalCustomFieldSet
 
 object Project {
@@ -69,16 +72,19 @@ object Project {
     customFields: Option[Set[CustomField.Update]] = None
   )
 
-  sealed abstract class Include(val token: String)
+  sealed abstract class Include extends EnumEntry with Snakecase
 
-  object Include {
+  object Include extends Enum[Include] {
 
-    case object Trackers extends Include("trackers")
+    val values: IndexedSeq[Include] = findValues
 
-    case object IssueCategories extends Include("issue_categories")
+    case object Trackers extends Include
 
-    case object EnabledModules extends Include("enabled_modules")
+    case object IssueCategories extends Include
 
+    case object EnabledModules extends Include
+
+    case object TimeEntryActivities extends Include
   }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,20 @@
 package by.exonit.redmine.client.managers.impl
 
 import by.exonit.redmine.client._
-import by.exonit.redmine.client.managers.{IssueManager, RequestManager}
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
+import by.exonit.redmine.client.managers.{IssueManager, RequestManager}
 import cats.data.NonEmptyList
-import monix.eval.Task
+import cats.effect.IO
 
 import scala.collection.immutable._
 
 class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
 
-  def getIssuesByProjectKey(projectKey: String): Task[PagedList[Issue]] = {
+  def getIssuesByProjectKey(projectKey: String): IO[PagedList[Issue]] = IO.suspend {
     getIssues("project_id" -> projectKey)
   }
 
-  def getIssues(params: (String, String)*): Task[PagedList[Issue]] = {
+  def getIssues(params: (String, String)*): IO[PagedList[Issue]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("issues.json")
@@ -39,19 +39,19 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.getEntityPagedList[Issue](request, "issues")
   }
 
-  def getIssuesByQuery(queryId: SavedQueryIdLike, projectKey: Option[String]): Task[PagedList[Issue]] = {
+  def getIssuesByQuery(queryId: SavedQueryIdLike, projectKey: Option[String]): IO[PagedList[Issue]] = IO.suspend {
     val params = Seq(Some("query_id" -> queryId.id.toString), projectKey.map {key => "project_id" -> key}).flatten
     getIssues(params: _*)
   }
 
-  def getIssuesBySummary(summaryField: String, projectKey: Option[String]): Task[PagedList[Issue]] = {
+  def getIssuesBySummary(summaryField: String, projectKey: Option[String]): IO[PagedList[Issue]] = IO.suspend {
     val params = Seq(Some("subject" -> summaryField), projectKey.map {key => "project_id" -> key}).flatten
     getIssues(params: _*)
   }
 
-  def getIssues(params: Seq[(String, String)]): Task[PagedList[Issue]] = getIssues(params: _*)
+  def getIssues(params: Seq[(String, String)]): IO[PagedList[Issue]] = getIssues(params: _*)
 
-  def createIssue(issue: Issue.New): Task[Issue] = {
+  def createIssue(issue: Issue.New): IO[Issue] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("issues.json")
@@ -59,7 +59,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.postEntityWithResponse[Issue.New, Issue](request, "issue", issue, "issue")
   }
 
-  def updateIssue(id: IssueIdLike, update: Issue.Update): Task[Unit] = {
+  def updateIssue(id: IssueIdLike, update: Issue.Update): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("issues", s"${id.id}.json")
@@ -67,7 +67,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.putEntity(request, "issue", update)
   }
 
-  def deleteIssue(id: IssueIdLike): Task[Unit] = {
+  def deleteIssue(id: IssueIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("issues", s"${id.id}.json")
@@ -75,7 +75,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.deleteEntity(request)
   }
 
-  def getCategories(project: ProjectIdLike): Task[PagedList[Category]] = {
+  def getCategories(project: ProjectIdLike): IO[PagedList[Category]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", project.id.toString, "issue_categories.json")
@@ -83,7 +83,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.getEntityPagedList[Category](request, "issue_categories")
   }
 
-  def createCategory(project: ProjectIdLike, category: Category.New): Task[Category] = {
+  def createCategory(project: ProjectIdLike, category: Category.New): IO[Category] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("projects", project.id.toString, "issue_categories.json")
@@ -91,7 +91,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.postEntityWithResponse[Category.New, Category](request, "issue_category", category, "issue_category")
   }
 
-  def updateCategory(id: CategoryIdLike, update: Category.Update): Task[Unit] = {
+  def updateCategory(id: CategoryIdLike, update: Category.Update): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("issue_categories", s"${id.id}.json")
@@ -99,7 +99,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.putEntity(request, "issue_category", update)
   }
 
-  def deleteCategory(id: CategoryIdLike, reassignTo: Option[CategoryIdLike] = None): Task[Unit] = {
+  def deleteCategory(id: CategoryIdLike, reassignTo: Option[CategoryIdLike] = None): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("issue_categories",s"${id.id}.json")
@@ -113,7 +113,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.deleteEntity(reassignRequest)
   }
 
-  override def getRelation(id: IssueRelationIdLike): Task[IssueRelation] = {
+  override def getRelation(id: IssueRelationIdLike): IO[IssueRelation] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("relations", s"${id.id}.json")
@@ -121,7 +121,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.getEntity[IssueRelation](request, "relation")
   }
 
-  override def getRelationsByIssue(issue: IssueIdLike): Task[PagedList[IssueRelation]] = {
+  override def getRelationsByIssue(issue: IssueIdLike): IO[PagedList[IssueRelation]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("issues", issue.id.toString, "relations.json")
@@ -129,7 +129,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.getEntityPagedList[IssueRelation](request, "relations")
   }
 
-  def createRelation(issueFrom: IssueIdLike, relation: IssueRelation.New): Task[IssueRelation] = {
+  def createRelation(issueFrom: IssueIdLike, relation: IssueRelation.New): IO[IssueRelation] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("issues", issueFrom.id.toString, "relations.json")
@@ -137,25 +137,27 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.postEntityWithResponse[IssueRelation.New, IssueRelation](request, "relation", relation, "relation")
   }
 
-  def deleteRelationsOfIssue(issue: IssueIdLike): Task[Unit] = {
-    getIssue(issue, Issue.Include.Relations).flatMap {i =>
-      Task.gatherUnordered(i.relations.map(_.map(deleteRelation)).getOrElse(Set.empty))
-    } map (_ => ())
+  def deleteRelationsOfIssue(issue: IssueIdLike): IO[Unit] = IO.suspend {
+    getIssue(issue, Issue.Include.Relations).flatMap { i =>
+      val relationsList = i.relations.map(_.to[List])
+      relationsList.flatMap(NonEmptyList.fromList) match {
+        case Some(l) =>
+          l.traverse(deleteRelation(_)).map(_ => ())
+        case None => IO.unit
+      }
+    }
   }
 
-  def getIssue(id: IssueIdLike, includes: Issue.Include*): Task[Issue] = {
+  def getIssue(id: IssueIdLike, includes: Issue.Include*): IO[Issue] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("issues", s"${id.id}.json")
-      includeTokensOpt = NonEmptyList.fromList(includes.map(_.token).toList)
-      includeValueOpt = includeTokensOpt.map(list => list.reduceLeft(_ + "," + _))
-      addQueries = includeValueOpt.map {v => Seq("include" -> v)}.getOrElse(Seq.empty)
-      _ <- RequestDSL.addQueries(addQueries: _*)
+      _ <- RequestBlocks.include(includes)
     } yield ()
     requestManager.getEntity[Issue](request, "issue")
   }
 
-  def deleteRelation(id: IssueRelationIdLike): Task[Unit] = {
+  def deleteRelation(id: IssueRelationIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("relations", s"${id.id}.json")
@@ -164,7 +166,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
   }
 
 
-  def addWatcherToIssue(watcher: UserIdLike, issue: IssueIdLike): Task[Unit] = {
+  def addWatcherToIssue(watcher: UserIdLike, issue: IssueIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("issues", issue.id.toString, "watchers.json")
@@ -172,7 +174,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.postEntity(request, "user_id", watcher.id)
   }
 
-  def deleteWatcherFromIssue(watcher: UserIdLike, issue: IssueIdLike): Task[Unit] = {
+  def deleteWatcherFromIssue(watcher: UserIdLike, issue: IssueIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("issues", issue.id.toString, "watchers", s"${watcher.id}.json")
@@ -180,7 +182,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.deleteEntity(request)
   }
 
-  def getPriorities(): Task[PagedList[Priority]] = {
+  def getPriorities(): IO[PagedList[Priority]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("enumerations", "issue_priorities.json")
@@ -188,7 +190,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.getEntityPagedList[Priority](request, "issue_priorities")
   }
 
-  def getSavedQueries(): Task[PagedList[SavedQuery]] = {
+  def getSavedQueries(): IO[PagedList[SavedQuery]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("queries.json")
@@ -196,7 +198,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.getEntityPagedList[SavedQuery](request, "queries")
   }
 
-  def getStatuses(): Task[PagedList[IssueStatus]] = {
+  def getStatuses(): IO[PagedList[IssueStatus]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("issue_statuses.json")
@@ -204,7 +206,7 @@ class IssueManagerImpl(requestManager: RequestManager) extends IssueManager {
     requestManager.getEntityPagedList[IssueStatus](request, "issue_statuses")
   }
 
-  def getTrackers(): Task[PagedList[Tracker]] = {
+  def getTrackers(): IO[PagedList[Tracker]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("trackers.json")

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,41 +17,41 @@
 package by.exonit.redmine.client.managers
 
 import by.exonit.redmine.client._
-import monix.eval.Task
+import cats.effect.IO
 
 import scala.collection.immutable._
 
 //noinspection AccessorLikeMethodIsEmptyParen
 trait IssueManager {
-  def getIssues(parameters: (String, String)*): Task[PagedList[Issue]]
-  def getIssues(parameters: Seq[(String, String)]): Task[PagedList[Issue]]
-  def getIssuesByProjectKey(key: String): Task[PagedList[Issue]]
-  def getIssuesByQuery(queryId: SavedQueryIdLike, projectKey: Option[String] = None): Task[PagedList[Issue]]
-  def getIssuesBySummary(summaryField: String, projectKey: Option[String] = None): Task[PagedList[Issue]]
-  def getIssue(id: IssueIdLike, includes: Issue.Include*): Task[Issue]
-  def createIssue(issue: Issue.New): Task[Issue]
-  def updateIssue(id: IssueIdLike, update: Issue.Update): Task[Unit]
-  def deleteIssue(id: IssueIdLike): Task[Unit]
+  def getIssues(parameters: (String, String)*): IO[PagedList[Issue]]
+  def getIssues(parameters: Seq[(String, String)]): IO[PagedList[Issue]]
+  def getIssuesByProjectKey(key: String): IO[PagedList[Issue]]
+  def getIssuesByQuery(queryId: SavedQueryIdLike, projectKey: Option[String] = None): IO[PagedList[Issue]]
+  def getIssuesBySummary(summaryField: String, projectKey: Option[String] = None): IO[PagedList[Issue]]
+  def getIssue(id: IssueIdLike, includes: Issue.Include*): IO[Issue]
+  def createIssue(issue: Issue.New): IO[Issue]
+  def updateIssue(id: IssueIdLike, update: Issue.Update): IO[Unit]
+  def deleteIssue(id: IssueIdLike): IO[Unit]
 
-  def addWatcherToIssue(watcher: UserIdLike, issue: IssueIdLike): Task[Unit]
-  def deleteWatcherFromIssue(watcher: UserIdLike, issue: IssueIdLike): Task[Unit]
+  def addWatcherToIssue(watcher: UserIdLike, issue: IssueIdLike): IO[Unit]
+  def deleteWatcherFromIssue(watcher: UserIdLike, issue: IssueIdLike): IO[Unit]
 
-  def getRelation(id: IssueRelationIdLike): Task[IssueRelation]
-  def getRelationsByIssue(issue: IssueIdLike): Task[PagedList[IssueRelation]]
-  def createRelation(issueFrom: IssueIdLike, relation: IssueRelation.New): Task[IssueRelation]
-  def deleteRelation(id: IssueRelationIdLike): Task[Unit]
-  def deleteRelationsOfIssue(issue: IssueIdLike): Task[Unit]
+  def getRelation(id: IssueRelationIdLike): IO[IssueRelation]
+  def getRelationsByIssue(issue: IssueIdLike): IO[PagedList[IssueRelation]]
+  def createRelation(issueFrom: IssueIdLike, relation: IssueRelation.New): IO[IssueRelation]
+  def deleteRelation(id: IssueRelationIdLike): IO[Unit]
+  def deleteRelationsOfIssue(issue: IssueIdLike): IO[Unit]
 
-  def getPriorities(): Task[PagedList[Priority]]
+  def getPriorities(): IO[PagedList[Priority]]
 
-  def getCategories(project: ProjectIdLike): Task[PagedList[Category]]
-  def createCategory(project: ProjectIdLike, category: Category.New): Task[Category]
-  def updateCategory(id: CategoryIdLike, update: Category.Update): Task[Unit]
-  def deleteCategory(id: CategoryIdLike, reassignTo: Option[CategoryIdLike] = None): Task[Unit]
+  def getCategories(project: ProjectIdLike): IO[PagedList[Category]]
+  def createCategory(project: ProjectIdLike, category: Category.New): IO[Category]
+  def updateCategory(id: CategoryIdLike, update: Category.Update): IO[Unit]
+  def deleteCategory(id: CategoryIdLike, reassignTo: Option[CategoryIdLike] = None): IO[Unit]
 
-  def getStatuses(): Task[PagedList[IssueStatus]]
+  def getStatuses(): IO[PagedList[IssueStatus]]
 
-  def getTrackers(): Task[PagedList[Tracker]]
+  def getTrackers(): IO[PagedList[Tracker]]
 
-  def getSavedQueries(): Task[PagedList[SavedQuery]]
+  def getSavedQueries(): IO[PagedList[SavedQuery]]
 }

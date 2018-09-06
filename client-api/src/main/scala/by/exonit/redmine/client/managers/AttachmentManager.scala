@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package by.exonit.redmine.client.managers
 import java.io.{File, InputStream, OutputStream}
 
 import by.exonit.redmine.client.{Attachment, AttachmentIdLike, IssueIdLike, Upload}
-import monix.eval.Task
+import cats.effect.IO
 
 trait AttachmentManager {
   /**
@@ -27,21 +27,21 @@ trait AttachmentManager {
    * @param file File to upload
    * @return Upload data, containing attachment token
    */
-  def upload(file: File): Task[Upload]
+  def upload(file: File): IO[Upload]
 
   /**
    * Upload data from a stream to Redmine
    * @param stream Stream to read data from
    * @return Upload data, containing attachment token
    */
-  def upload(stream: InputStream): Task[Upload]
+  def upload(stream: InputStream): IO[Upload]
 
   /**
    * Uploads byte array to Redmine
    * @param bytes Data array
    * @return Upload data, containing attachment token
    */
-  def upload(bytes: Array[Byte]): Task[Upload]
+  def upload(bytes: Array[Byte]): IO[Upload]
 
   /**
    * Attaches an upload to issue
@@ -50,41 +50,41 @@ trait AttachmentManager {
    * @param filename Attachment file name
    * @param contentType Attachment content type
    * @param description Optional attachment description
-   * @return Task for completed operation
+   * @return IO for completed operation
    */
   def attachToIssue(issue: IssueIdLike,
                     upload: Upload,
                     filename: String,
                     contentType: String,
-                    description: Option[String] = None): Task[Unit]
+                    description: Option[String] = None): IO[Unit]
 
   /**
    * Returns attachment data by its ID
    * @param id Attachment ID
    * @return Attachment data
    */
-  def getAttachment(id: AttachmentIdLike): Task[Attachment]
+  def getAttachment(id: AttachmentIdLike): IO[Attachment]
 
   /**
    * Downloads attachment to byte array
    * @param attachment Attachment to download
-   * @return [[monix.eval.Task Task]] with downloaded attachment data in a byte array
+   * @return [[cats.effect.IO IO]] with downloaded attachment data in a byte array
    */
-  def downloadAttachment(attachment: Attachment): Task[Array[Byte]]
+  def downloadAttachment(attachment: Attachment): IO[Array[Byte]]
 
   /**
    * Downloads attachment and writes it to provided [[java.io.OutputStream output stream]]
    * @param attachment Attachment to download
     *
-    * Returned [[monix.eval.Task Task]] completes on data start, inner one completes on data end
-   * @return Completion [[monix.eval.Task Task]]
+    * Returned [[cats.effect.IO IO]] completes on data start, inner one completes on data end
+   * @return Completion [[cats.effect.IO IO]]
    */
-  def downloadAttachmentStreaming(attachment: Attachment, outputStreamProvider: () => OutputStream): Task[Task[Unit]]
+  def downloadAttachmentStreaming(attachment: Attachment, outputStreamProvider: () => OutputStream): IO[IO[Unit]]
 
   /**
     * Deletes existing attachment
     * @param id Attachment to delete
-    * @return Completion [[monix.eval.Task Task]]
+    * @return Completion [[cats.effect.IO IO]]
     */
-  def deleteAttachment(id: AttachmentIdLike): Task[Unit]
+  def deleteAttachment(id: AttachmentIdLike): IO[Unit]
 }

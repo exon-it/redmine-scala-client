@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,13 @@ package by.exonit.redmine.client.managers.impl
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
 import by.exonit.redmine.client.managers._
 import by.exonit.redmine.client.managers.WebClient.RequestDSL.Request
+import cats.effect.{IO, Timer}
 
-class RedmineManagerImpl(client: WebClient, baseRequest: Request[Unit], authenticator: Request[Unit]) extends RedmineManager {
+class RedmineManagerImpl(
+  client: WebClient,
+  baseRequest: Request[Unit],
+  authenticator: Request[Unit]
+)(implicit timer: Timer[IO]) extends RedmineManager {
   lazy val requestManager    : RequestManager     = new RequestManagerImpl(client, baseRequest, requestAuthenticator = authenticator)
   lazy val issueManager      : IssueManager       = new IssueManagerImpl(requestManager)
   lazy val projectManager    : ProjectManager     = new ProjectManagerImpl(requestManager)
@@ -30,6 +35,9 @@ class RedmineManagerImpl(client: WebClient, baseRequest: Request[Unit], authenti
   lazy val customFieldManager: CustomFieldManager = new CustomFieldManagerImpl(requestManager)
   lazy val membershipManager : MembershipManager  = new MembershipManagerImpl(requestManager)
   lazy val timeEntryManager  : TimeEntryManager   = new TimeEntryManagerImpl(requestManager)
+  lazy val documentsManager  : DocumentsManager   = new DocumentsManagerImpl(requestManager)
+  lazy val searchManager     : SearchManager      = new SearchManagerImpl(requestManager)
+  lazy val fileManager       : FileManager        = new FileManagerImpl(requestManager)
 
   /**
    * Creates a [[by.exonit.redmine.client.managers.RedmineManager RedmineManager]]

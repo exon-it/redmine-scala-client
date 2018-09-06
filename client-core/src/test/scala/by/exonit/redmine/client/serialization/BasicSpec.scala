@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,16 @@
 
 package by.exonit.redmine.client.serialization
 
-import monix.execution.Scheduler
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 
+import scala.concurrent.ExecutionContext
+
 trait BasicSpec extends WordSpec with Assertions with Matchers with ScalaFutures with Inside
 with OptionValues {
-  override implicit def patienceConfig = PatienceConfig(timeout = Span(2, Seconds), interval = Span(15, Millis))
+  override implicit val patienceConfig: PatienceConfig = PatienceConfig(timeout = Span(2, Seconds), interval = Span(15, Millis))
   val jsonContentType = "application/json"
 
-  implicit val scheduler: Scheduler = Scheduler.global
+  implicit val ec: ExecutionContext = ExecutionContext.global
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,5 +43,8 @@ object Serializers {
       TrackerSerializers.all ++
       UserSerializers.all ++
       VersionSerializers.all ++
-      WikiSerializers.all
+      WikiSerializers.all ++
+      DocumentCategorySerializers.all ++
+      SearchSerializers.all ++
+      FileSerializers.all
 }

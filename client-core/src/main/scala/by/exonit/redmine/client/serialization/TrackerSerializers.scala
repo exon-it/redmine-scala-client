@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,9 @@ object TrackerSerializers {
     case j: JObject =>
       Tracker(
         (j \ "id").extract[BigInt],
-        (j \ "name").extract[String])
+        (j \ "name").extract[String],
+        (j \ "default_status").extractOpt[IssueStatusLink]
+      )
   }
 
   object trackerSerializer extends CustomSerializer[Tracker](

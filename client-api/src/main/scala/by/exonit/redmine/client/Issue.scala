@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package by.exonit.redmine.client
 
+import enumeratum.EnumEntry.Snakecase
+import enumeratum._
 import org.joda.time.{DateTime, LocalDate}
 
 import scala.collection.immutable._
@@ -137,45 +139,45 @@ object Issue {
 
   /**
     * Issue read operation additional include type
-    *
-    * @param token Include token
     */
-  sealed abstract class Include(val token: String)
+  sealed abstract class Include extends EnumEntry with Snakecase
 
   /**
     * Predefined additional includes for issue read operation
     */
-  object Include {
+  object Include extends Enum[Include] {
+
+    val values: IndexedSeq[Include] = findValues
 
     /**
       * Issue journals
       */
-    case object Journals extends Include("journals")
+    case object Journals extends Include
 
     /**
       * Issue relations
       */
-    case object Relations extends Include("relations")
+    case object Relations extends Include
 
     /**
       * Issue attachments
       */
-    case object Attachments extends Include("attachments")
+    case object Attachments extends Include
 
     /**
       * Issue changesets
       */
-    case object Changesets extends Include("changesets")
+    case object Changesets extends Include
 
     /**
       * Issue watchers
       */
-    case object Watchers extends Include("watchers")
+    case object Watchers extends Include
 
     /**
       * Child issues
       */
-    case object Children extends Include("children")
+    case object Children extends Include
 
   }
 

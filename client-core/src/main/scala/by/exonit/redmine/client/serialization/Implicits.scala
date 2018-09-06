@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,36 +28,36 @@ object Implicits {
 
   implicit class RedmineInstantExtensions(instant: ReadableInstant) {
     def toRedmineFullDate: String =
-      RedmineDateParser.FULL_DATE_FORMAT.print(instant)
+      RedmineDateParser.FullDateFormatV1.print(instant)
 
     def toRedmineShortDate: String =
-      RedmineDateParser.SHORT_DATE_FORMAT.print(instant)
+      RedmineDateParser.ShortDateFormatV1.print(instant)
 
     def toRedmine2ShortDate: String =
-      RedmineDateParser.SHORT_DATE_FORMAT_V2.print(instant)
+      RedmineDateParser.ShortDateFormatV2.print(instant)
 
     def toRedmine2FullDate: String =
-      RedmineDateParser.FULL_DATE_FORMAT_V2.print(instant)
+      RedmineDateParser.FullDateFormatV2.print(instant)
 
     def toRedmine3FullDate: String =
-      RedmineDateParser.FULL_DATE_FORMAT_V3.print(instant)
+      RedmineDateParser.FullDateFormatV3.print(instant)
   }
 
   implicit class RedminePartialExtensions(partial: ReadablePartial) {
     def toRedmineFullDate: String =
-      RedmineDateParser.FULL_DATE_FORMAT.print(partial)
+      RedmineDateParser.FullDateFormatV1.print(partial)
 
     def toRedmineShortDate: String =
-      RedmineDateParser.SHORT_DATE_FORMAT.print(partial)
+      RedmineDateParser.ShortDateFormatV1.print(partial)
 
     def toRedmine2ShortDate: String =
-      RedmineDateParser.SHORT_DATE_FORMAT_V2.print(partial)
+      RedmineDateParser.ShortDateFormatV2.print(partial)
 
     def toRedmine2FullDate: String =
-      RedmineDateParser.FULL_DATE_FORMAT_V2.print(partial)
+      RedmineDateParser.FullDateFormatV2.print(partial)
 
     def toRedmine3FullDate: String =
-      RedmineDateParser.FULL_DATE_FORMAT_V3.print(partial)
+      RedmineDateParser.FullDateFormatV3.print(partial)
   }
 
 }

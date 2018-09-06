@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package by.exonit.redmine.client.managers
 
 import by.exonit.redmine.client.{CustomFieldDefinition, PagedList}
-import monix.eval.Task
+import cats.effect.IO
 
 /**
  * Redmine custom field manager
@@ -28,5 +28,5 @@ trait CustomFieldManager {
    * Returns Redmine custom field definitions
    * @return Custom field definition list
    */
-  def getCustomFieldDefinitions(): Task[PagedList[CustomFieldDefinition]]
+  def getCustomFieldDefinitions(): IO[PagedList[CustomFieldDefinition]]
 }

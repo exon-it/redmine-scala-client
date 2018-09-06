@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package by.exonit.redmine.client.managers
 
 import by.exonit.redmine.client._
-import monix.eval.Task
+import cats.effect.IO
 
 /**
  * Redmine project manager
@@ -28,7 +28,7 @@ trait ProjectManager {
    * @param project Project to create
    * @return Created project
    */
-  def createProject(project: Project.New): Task[Project]
+  def createProject(project: Project.New): IO[Project]
 
   /**
    * Returns project list
@@ -36,7 +36,7 @@ trait ProjectManager {
    * @param params Custom request parameters (filtering, etc.)
    * @return Project list
    */
-  def getProjects(params: (String, String)*): Task[PagedList[Project]]
+  def getProjects(params: (String, String)*): IO[PagedList[Project]]
 
   /**
    * Returns project details by its number
@@ -44,7 +44,7 @@ trait ProjectManager {
    * @param includes Project additional data includes
    * @return Project
    */
-  def getProject(id: ProjectIdLike, includes: Project.Include*): Task[Project]
+  def getProject(id: ProjectIdLike, includes: Project.Include*): IO[Project]
 
   /**
    * Returns project details by its identifier
@@ -52,22 +52,22 @@ trait ProjectManager {
    * @param includes Project additional data includes
    * @return Project
    */
-  def getProjectByKey(key: String, includes: Project.Include*): Task[Project]
+  def getProjectByKey(key: String, includes: Project.Include*): IO[Project]
 
   /**
    * Updates a project
    * @param id Project number
    * @param update Update data
-   * @return Operation Task
+   * @return Operation IO
    */
-  def updateProject(id: ProjectIdLike, update: Project.Update): Task[Unit]
+  def updateProject(id: ProjectIdLike, update: Project.Update): IO[Unit]
 
   /**
    * Removes a project
    * @param id Project number
-   * @return Operation Task
+   * @return Operation IO
    */
-  def deleteProject(id: ProjectIdLike): Task[Unit]
+  def deleteProject(id: ProjectIdLike): IO[Unit]
 
   /**
    * Returns versions, available in a project
@@ -77,14 +77,14 @@ trait ProjectManager {
    * @param params Custom request parameters (filtering, etc.)
    * @return Version list
    */
-  def getVersions(project: ProjectIdLike, params: (String, String)*): Task[PagedList[Version]]
+  def getVersions(project: ProjectIdLike, params: (String, String)*): IO[PagedList[Version]]
 
   /**
    * Returns version details by version ID
    * @param id Version ID
    * @return Version details
    */
-  def getVersion(id: VersionIdLike): Task[Version]
+  def getVersion(id: VersionIdLike): IO[Version]
 
   /**
    * Creates version in a project
@@ -92,27 +92,31 @@ trait ProjectManager {
    * @param version New version
    * @return Created version
    */
-  def createVersion(project: ProjectIdLike, version: Version.New): Task[Version]
+  def createVersion(project: ProjectIdLike, version: Version.New): IO[Version]
 
   /**
    * Updates version
    * @param id Version ID
    * @param update Update date
-   * @return Operation Task
+   * @return Operation IO
    */
-  def updateVersion(id: VersionIdLike, update: Version.Update): Task[Unit]
+  def updateVersion(id: VersionIdLike, update: Version.Update): IO[Unit]
 
   /**
    * Removes version
    * @param id Version ID
-   * @return Operation Task
+   * @return Operation IO
    */
-  def deleteVersion(id: VersionIdLike): Task[Unit]
+  def deleteVersion(id: VersionIdLike): IO[Unit]
+
+  /** Get news across all projects
+    */
+  def getAllNews(): IO[PagedList[News]]
 
   /**
    * Returns project news
    * @param project Project number
    * @return News list
    */
-  def getNews(project: ProjectIdLike): Task[PagedList[News]]
+  def getNews(project: ProjectIdLike): IO[PagedList[News]]
 }

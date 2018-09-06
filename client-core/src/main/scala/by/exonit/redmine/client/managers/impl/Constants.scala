@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,5 +23,5 @@ object Constants {
   lazy val JsonContentType          = "application/json"
   lazy val UploadContentType        = "application/octet-stream"
   lazy val Charset                  = "UTF-8"
-  lazy val DefaultObjectsPerPage    = BigInt(25)
+  lazy val DefaultObjectsPerPage    = 25
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,11 @@
 
 package by.exonit.redmine.client
 
+import enumeratum._
+import enumeratum.EnumEntry.Snakecase
 import org.joda.time.DateTime
+
+import scala.collection.immutable
 
 trait WikiPageIdLike extends Identifiable[String]
 
@@ -45,7 +49,8 @@ case class WikiPageDetails(
   parent: Option[WikiPageId],
   text: String,
   author: Option[UserLink],
-  comments: Option[String]
+  comments: Option[String],
+  attachments: Option[Set[Attachment]]
 ) extends WikiPageLike
 
 object WikiPage {
@@ -53,12 +58,23 @@ object WikiPage {
     title: String,
     text: String,
     parent: Option[WikiPageIdLike] = None,
-    comments: Option[String] = None
+    comments: Option[String] = None,
+    uploads: Option[Set[Upload]] = None
   )
 
   case class Update(
     text: Option[String] = None,
     parent: Option[Option[WikiPageIdLike]] = None,
-    comments: Option[String] = None
+    comments: Option[String] = None,
+    uploads: Option[Set[Upload]] = None
   )
+
+  case class Upload(token: String, fileName: String, contentType: String)
+
+  sealed abstract class Include extends EnumEntry with Snakecase
+
+  object Include extends Enum[Include] {
+    val values: immutable.IndexedSeq[Include] = findValues
+    case object Attachments extends Include
+  }
 }

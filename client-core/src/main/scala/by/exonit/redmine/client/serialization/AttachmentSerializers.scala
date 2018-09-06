@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package by.exonit.redmine.client.serialization
 
-import by.exonit.redmine.client.{Attachment, AttachmentId, UserLink}
+import by.exonit.redmine.client.{Attachment, AttachmentId, Upload, UserLink}
 import org.json4s._
 
 import scala.collection.immutable
@@ -41,10 +41,8 @@ object AttachmentSerializers {
     deserializeAttachment(formats),
     PartialFunction.empty))
 
-  def deserializeAttachment(formats: => Formats): PartialFunction[JValue, Attachment] =
-    {
+  def deserializeAttachment(implicit formats: Formats): PartialFunction[JValue, Attachment] = {
       case j: JObject =>
-        implicit val implicitFormats = formats
         Attachment(
           (j \ "id").extract[BigInt],
           RedmineDateParser.parse((j \ "created_on").extract[String]),
@@ -55,4 +53,16 @@ object AttachmentSerializers {
           (j \ "description").extractOpt[String],
           (j \ "author").extractOpt[UserLink])
     }
+
+  def deserializeUpload(implicit formats: Formats): PartialFunction[JValue, Upload] = {
+    case j: JObject =>
+      Upload(
+        (j \ "token").extract[String],
+        (j \ "id").extractOpt[BigInt]
+      )
+  }
+
+  object uploadDeserializer extends CustomSerializer[Upload](
+    formats => deserializeUpload(formats) -> PartialFunction.empty
+  )
 }

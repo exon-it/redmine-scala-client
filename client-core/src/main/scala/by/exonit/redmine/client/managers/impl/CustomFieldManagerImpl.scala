@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ package by.exonit.redmine.client.managers.impl
 import by.exonit.redmine.client.{CustomFieldDefinition, PagedList}
 import by.exonit.redmine.client.managers.{CustomFieldManager, RequestManager}
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
-import monix.eval.Task
+import cats.effect.IO
 
 class CustomFieldManagerImpl(requestManager: RequestManager) extends CustomFieldManager {
 
-  def getCustomFieldDefinitions(): Task[PagedList[CustomFieldDefinition]] = {
+  def getCustomFieldDefinitions(): IO[PagedList[CustomFieldDefinition]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("custom_fields.json")

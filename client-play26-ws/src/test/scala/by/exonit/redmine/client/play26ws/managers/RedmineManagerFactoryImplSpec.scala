@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ class RedmineManagerFactoryImplSpec extends BasicSpec with ClientDriverFixture w
         } yield RequestResult(s,b)
         
         val requestFuture = manager.client.execute(request, responseCommand)
-        whenReady(requestFuture.runAsync) {res =>
+        whenReady(requestFuture.unsafeToFuture) {res =>
           res.status shouldBe Status.OK
           res.body shouldBe "TEST"
           clientDriver.verify()
@@ -76,7 +76,7 @@ class RedmineManagerFactoryImplSpec extends BasicSpec with ClientDriverFixture w
         } yield RequestResult(s,b)
 
         val requestFuture = manager.client.execute(request, responseCommand)
-        whenReady(requestFuture.runAsync) {res =>
+        whenReady(requestFuture.unsafeToFuture) {res =>
           res.status shouldBe Status.OK
           res.body shouldBe "TEST"
           clientDriver.verify()
@@ -106,7 +106,7 @@ class RedmineManagerFactoryImplSpec extends BasicSpec with ClientDriverFixture w
         } yield RequestResult(s,b)
 
         val requestFuture = manager.client.execute(request, responseCommand)
-        whenReady(requestFuture.runAsync) {res =>
+        whenReady(requestFuture.unsafeToFuture) {res =>
           res.status shouldBe Status.OK
           res.body shouldBe "TEST"
           clientDriver.verify()

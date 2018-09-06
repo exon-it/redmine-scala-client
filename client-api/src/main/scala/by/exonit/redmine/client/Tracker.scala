@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,4 +22,8 @@ case class TrackerId(id: BigInt) extends Identifiable[BigInt]
 
 case class TrackerLink(id: BigInt, name: String) extends TrackerIdLike
 
-case class Tracker(id: BigInt, name: String) extends TrackerIdLike
+case class Tracker(
+  id: BigInt,
+  name: String,
+  defaultStatus: Option[IssueStatusLink]
+) extends TrackerIdLike

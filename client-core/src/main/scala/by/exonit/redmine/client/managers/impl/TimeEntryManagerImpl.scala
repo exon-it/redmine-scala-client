@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,25 @@ package by.exonit.redmine.client.managers.impl
 import by.exonit.redmine.client._
 import by.exonit.redmine.client.managers.{RequestManager, TimeEntryManager}
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
-import monix.eval.Task
+import cats.effect.IO
 
 class TimeEntryManagerImpl(requestManager: RequestManager) extends TimeEntryManager {
 
-  def getTimeEntriesForIssue(issue: IssueIdLike, activity: Option[ActivityIdLike]): Task[PagedList[TimeEntry]] = {
+  def getTimeEntriesForIssue(
+    issue: IssueIdLike,
+    activity: Option[ActivityIdLike]
+  ): IO[PagedList[TimeEntry]] = IO.suspend {
     getTimeEntries(("issue_id" -> issue.id.toString) +: activity.map(a => "activity_id" -> a.id.toString).toSeq: _*)
   }
 
-  def getTimeEntriesForProject(project: ProjectIdLike, activity: Option[ActivityIdLike]): Task[PagedList[TimeEntry]] = {
+  def getTimeEntriesForProject(
+    project: ProjectIdLike,
+    activity: Option[ActivityIdLike]
+  ): IO[PagedList[TimeEntry]] = IO.suspend {
     getTimeEntries(("project_id" -> project.id.toString) +: activity.map(a => "activity_id" -> a.id.toString).toSeq: _*)
   }
 
-  def getTimeEntries(params: (String, String)*): Task[PagedList[TimeEntry]] = {
+  def getTimeEntries(params: (String, String)*): IO[PagedList[TimeEntry]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("time_entries.json")
@@ -40,7 +46,7 @@ class TimeEntryManagerImpl(requestManager: RequestManager) extends TimeEntryMana
     requestManager.getEntityPagedList[TimeEntry](request, "time_entries")
   }
 
-  def getTimeEntry(id: TimeEntryIdLike): Task[TimeEntry] = {
+  def getTimeEntry(id: TimeEntryIdLike): IO[TimeEntry] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("time_entries", s"${id.id}.json")
@@ -48,7 +54,7 @@ class TimeEntryManagerImpl(requestManager: RequestManager) extends TimeEntryMana
     requestManager.getEntity[TimeEntry](request, "time_entry")
   }
 
-  def createTimeEntry(timeEntry: TimeEntry.New): Task[TimeEntry] = {
+  def createTimeEntry(timeEntry: TimeEntry.New): IO[TimeEntry] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("time_entries.json")
@@ -56,7 +62,7 @@ class TimeEntryManagerImpl(requestManager: RequestManager) extends TimeEntryMana
     requestManager.postEntityWithResponse[TimeEntry.New, TimeEntry](request, "time_entry", timeEntry, "time_entry")
   }
 
-  def updateTimeEntry(id: TimeEntryIdLike, update: TimeEntry.Update): Task[Unit] = {
+  def updateTimeEntry(id: TimeEntryIdLike, update: TimeEntry.Update): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("time_entries", s"${id.id}.json")
@@ -65,7 +71,7 @@ class TimeEntryManagerImpl(requestManager: RequestManager) extends TimeEntryMana
   }
 
 
-  def deleteTimeEntry(id: TimeEntryIdLike): Task[Unit] = {
+  def deleteTimeEntry(id: TimeEntryIdLike): IO[Unit] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("time_entries", s"${id.id}.json")
@@ -73,7 +79,7 @@ class TimeEntryManagerImpl(requestManager: RequestManager) extends TimeEntryMana
     requestManager.deleteEntity(request)
   }
 
-  def getTimeEntryActivities(): Task[PagedList[Activity]] = {
+  def getTimeEntryActivities(): IO[PagedList[Activity]] = IO.suspend {
     val request = for {
       _ <- requestManager.baseRequest
       _ <- RequestDSL.addSegments("enumerations", "time_entry_activities.json")

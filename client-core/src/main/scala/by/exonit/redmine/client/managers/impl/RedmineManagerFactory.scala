@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package by.exonit.redmine.client.managers.impl
 import by.exonit.redmine.client.managers.WebClient.RequestDSL
 import by.exonit.redmine.client.managers.WebClient.RequestDSL.AuthenticationMethod
 import by.exonit.redmine.client.managers.{RedmineManager, WebClient}
+import cats.effect.{IO, Timer}
 
 import scala.collection.immutable._
 
@@ -37,7 +38,7 @@ class RedmineManagerFactory(val client: WebClient) {
     * @param baseUrl Redmine REST API base URL
     * @return [[by.exonit.redmine.client.managers.RedmineManager RedmineManager]] instance
     */
-  def createUnauthenticated(baseUrl: String): RedmineManager = {
+  def createUnauthenticated(baseUrl: String)(implicit timer: Timer[IO]): RedmineManager = {
     val baseRequest = RequestDSL.setUrl(baseUrl)
     new RedmineManagerImpl(client, baseRequest, RequestDSL.noOp())
   }
@@ -52,11 +53,11 @@ class RedmineManagerFactory(val client: WebClient) {
     * @return [[by.exonit.redmine.client.managers.RedmineManager RedmineManager]] instance
     */
   def createWithUserAuth(
-    baseUrl: String, login: String, password: IndexedSeq[Char]): RedmineManager = {
+    baseUrl: String, login: String, password: IndexedSeq[Char])(implicit timer: Timer[IO]): RedmineManager = {
     val baseRequest = for {
       _ <- RequestDSL.setUrl(baseUrl)
     } yield ()
-    val authenticator = RequestDSL.setAuth(AuthenticationMethod.Basic(login, password))
+    val authenticator = RequestDSL.setAuth(Some(AuthenticationMethod.Basic(login, password)))
     new RedmineManagerImpl(client, baseRequest, authenticator)
   }
 
@@ -69,7 +70,7 @@ class RedmineManagerFactory(val client: WebClient) {
     * @return [[by.exonit.redmine.client.managers.RedmineManager RedmineManager]] instance
     */
   def createWithApiKey(
-    baseUrl: String, apiKey: String): RedmineManager = {
+    baseUrl: String, apiKey: String)(implicit timer: Timer[IO]): RedmineManager = {
     val baseRequest = for {
       _ <- RequestDSL.setUrl(baseUrl)
     } yield ()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ class IssueManagerImplSpec extends BasicSpec with ClientDriverFixture with WebCl
         val manager = RedmineManagerFactory(webClient).createUnauthenticated(clientDriver.getBaseUrl)
         val im = manager.issueManager
         val request = im.getIssue(IssueId(issueId))
-        whenReady(request.runAsync) {_ =>
+        whenReady(request.unsafeToFuture) {_ =>
           clientDriver.verify()
         }
       }
@@ -49,7 +49,7 @@ class IssueManagerImplSpec extends BasicSpec with ClientDriverFixture with WebCl
         val manager = RedmineManagerFactory(webClient).createWithApiKey(clientDriver.getBaseUrl, key)
         val im = manager.issueManager
         val request = im.getIssue(IssueId(issueId))
-        whenReady(request.runAsync) {_ =>
+        whenReady(request.unsafeToFuture) {_ =>
           clientDriver.verify()
         }
       }
@@ -69,7 +69,7 @@ class IssueManagerImplSpec extends BasicSpec with ClientDriverFixture with WebCl
           .createUnauthenticated(clientDriver.getBaseUrl)
         val im = manager.issueManager
         val request = im.getIssues()
-        whenReady(request.flatMap(_.next.value).runAsync) {_ =>
+        whenReady(request.flatMap(_.next.value).unsafeToFuture) {_ =>
           clientDriver.verify()
         }
       }
@@ -83,7 +83,7 @@ class IssueManagerImplSpec extends BasicSpec with ClientDriverFixture with WebCl
           .createUnauthenticated(clientDriver.getBaseUrl)
         val im = manager.issueManager
         val request = im.getIssues()
-        whenReady(request.runAsync) {issues =>
+        whenReady(request.unsafeToFuture) {issues =>
           clientDriver.verify()
           issues should not be null
           issues.total shouldBe 2
@@ -108,7 +108,7 @@ class IssueManagerImplSpec extends BasicSpec with ClientDriverFixture with WebCl
         val manager = RedmineManagerFactory(webClient).createUnauthenticated(clientDriver.getBaseUrl)
         val im = manager.issueManager
         val request = im.getIssues()
-        whenReady(request.runAsync) {issues =>
+        whenReady(request.unsafeToFuture) {issues =>
           issues should not be null
           issues.total shouldBe 30
           issues.items.size shouldBe 25
@@ -116,7 +116,7 @@ class IssueManagerImplSpec extends BasicSpec with ClientDriverFixture with WebCl
             i.subject shouldBe "30"
           }
 
-          whenReady(issues.next.value.runAsync) { issues2 =>
+          whenReady(issues.next.value.unsafeToFuture) { issues2 =>
             clientDriver.verify()
             issues2.items.size shouldBe 5
             inside(issues2.items.find(_.id == 20).value) {case i: Issue =>

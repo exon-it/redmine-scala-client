@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Exon IT
+ * Copyright 2018 Exon IT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,20 @@
 package by.exonit.redmine.client.managers
 
 import by.exonit.redmine.client._
-import monix.eval.Task
+import cats.effect.IO
 
 trait MembershipManager {
-  def getMemberships(project: ProjectIdLike): Task[PagedList[Membership]]
+  def getMemberships(project: ProjectIdLike): IO[PagedList[Membership]]
 
-  def getMemberships(projectKey: String): Task[PagedList[Membership]]
+  def getMemberships(projectKey: String): IO[PagedList[Membership]]
 
-  def createMembership(project: ProjectIdLike, membership: Membership.New): Task[Membership]
+  def createMembership(project: ProjectIdLike, membership: Membership.New): IO[Membership]
 
-  def updateMembership(id: MembershipIdLike, update: Membership.Update): Task[Unit]
+  def updateMembership(id: MembershipIdLike, update: Membership.Update): IO[Unit]
 
-  def deleteMembership(id: MembershipIdLike): Task[Unit]
+  def deleteMembership(id: MembershipIdLike): IO[Unit]
 
-  def createMembershipForUser(project: ProjectIdLike, user: UserIdLike, roles: RoleIdLike*): Task[Membership]
+  def createMembershipForUser(project: ProjectIdLike, user: UserIdLike, roles: RoleIdLike*): IO[Membership]
 
-  def createMembershipForGroup(project: ProjectIdLike, group: GroupIdLike, roles: RoleIdLike*): Task[Membership]
+  def createMembershipForGroup(project: ProjectIdLike, group: GroupIdLike, roles: RoleIdLike*): IO[Membership]
 }

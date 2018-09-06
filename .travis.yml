@@ -1,7 +1,6 @@
 language: scala
 sudo: false
-jdk:
-- oraclejdk8
+jdk: oraclejdk8
 
 jobs:
   include:
@@ -10,7 +9,7 @@ jobs:
     - stage: deploy
       name: Deploy to Bintray
       script: skip
-      if: (tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+(\-.*)?) AND env(TRAVIS_PULL_REQUEST) = 'false'
+      if: tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+(\-.*)?
       deploy:
         provider: script
         script: sbt ';+publish'

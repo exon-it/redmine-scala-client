@@ -13,6 +13,8 @@ jobs:
       deploy:
         provider: script
         script: sbt ';+publish'
+        on:
+          all_branches: true
 
 addons:
   apt:
